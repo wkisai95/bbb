@@ -105,18 +105,21 @@
       return res.json();
     });
   }
+  function usable(m) { return !!(m && m.idx && m.pace && m.theta && m.coef && m.market && m.reliability && m.zones); }
   function loadData(force) {
     if (data.loading) return Promise.resolve();
     data.loading = true; data.error = "";
     if (!data.model) {
-      try { var c = JSON.parse(localStorage.getItem(KEY + ".model") || "null"); if (c && c.idx) { data.model = c; data.cached = true; } } catch (e) { /* niente copia locale */ }
+      try { var c = JSON.parse(localStorage.getItem(KEY + ".model") || "null"); if (usable(c)) { data.model = c; data.cached = true; } } catch (e) { /* niente copia locale */ }
     }
     render();
     return Promise.all([getPublic("status.json").catch(function (e) { return { _err: e.message }; }),
       getPublic("model.json").catch(function (e) { return { _err: e.message }; })]).then(function (res) {
       var st = res[0], m = res[1];
       if (st && !st._err) data.status = st;
-      if (m && !m._err && m.idx) {
+      if (m && !m._err && !usable(m)) {
+        if (!data.model) data.error = "nodata";      // file di una versione precedente: arriva con la prossima scansione
+      } else if (m && !m._err) {
         data.model = m; data.cached = false; data.fetched = Date.now(); eff = null;
         try { localStorage.setItem(KEY + ".model", JSON.stringify(m)); } catch (e) { /* troppo grande: si fa senza copia locale */ }
       } else if (m && m._err === "not-found" && !data.model) {
