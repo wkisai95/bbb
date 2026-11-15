@@ -1,0 +1,29 @@
+{
+ "date": "2026-11-15",
+ "started": "2026-11-15T15:45:19Z",
+ "stopped": "tetto di richieste o di tempo raggiunto",
+ "windows": 13,
+ "census": 0,
+ "prices": 7534,
+ "details": 0,
+ "phases": [
+  {
+   "name": "offerta",
+   "requests": 20,
+   "secs": 35.4
+  },
+  {
+   "name": "date vicine",
+   "requests": 238,
+   "secs": 407.6
+  }
+ ],
+ "requests": 260,
+ "errors": 0,
+ "error_samples": [],
+ "listings": 4170,
+ "secs": 446.0,
+ "finished": "2026-11-15T15:52:45Z",
+ "windows_planned": 59,
+ "source": "AirbnbClient"
+}
