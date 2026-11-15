@@ -3,14 +3,21 @@ run-name: Prova di raggiungibilità degli altri portali
 
 on:
   workflow_dispatch:
+    inputs:
+      sample:
+        description: "Salva una pagina di esempio sul ramo debug (solo per sviluppo)"
+        type: boolean
+        default: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -18,4 +25,14 @@ jobs:
           python-version: "3.12"
       - run: pip install -q requests
       - name: Una richiesta per sito, solo dove robots.txt lo consente
+        if: ${{ !inputs.sample }}
         run: python tools/probe_sites.py "$GITHUB_STEP_SUMMARY"
+      - name: Pagina di esempio
+        if: ${{ inputs.sample }}
+        run: |
+          mkdir -p dbg && python tools/sample_page.py dbg/sample.html
+          cd dbg && git init -q -b debug
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "pagina di esempio"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" debug
