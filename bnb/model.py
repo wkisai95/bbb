@@ -254,18 +254,43 @@ def curve_at(curve: dict, lead) -> np.ndarray:
     return np.interp(np.asarray(lead, dtype=float), curve["lead"], curve["logit"])
 
 
-def pace_curve(curve: dict, horizon: int) -> np.ndarray:
-    """C[L] = quanto si è già "consumata" la disponibilità tipica quando mancano L giorni.
+def prior_pace(calib: dict, horizon: int) -> np.ndarray:
+    """Ritmo di prenotazione di partenza, per anticipo (0 = tutto ancora libero).
 
-    C[L] = ln(disponibilità massima / disponibilità tipica a L giorni): 0 quando è ancora tutto libero,
-    cresce avvicinandosi alla data. La differenza C[L-1] - C[L] è il ritmo di prenotazione di quel giorno.
+    Se ci sono, vale quello misurato sui calendari di Inside Airbnb; altrimenti una forma tipica:
+    tre quarti delle prenotazioni nell'ultimo mese, il resto distribuito sui mesi precedenti.
     """
     L = np.arange(horizon + 1, dtype=float)
-    avail = 1 - expit(curve_at(curve, L))
-    a0 = float(avail[: min(len(avail), 241)].max())
-    raw = np.maximum(np.log(a0 / np.maximum(avail, 1e-4)), 0.0)
-    C = np.maximum.accumulate(raw[::-1])[::-1]        # non decrescente avvicinandosi alla data
-    return C
+    pts = calib.get("pace")
+    if pts and len(pts) >= 4:
+        x, y = [float(p[0]) for p in pts], [float(p[1]) for p in pts]
+        C = np.interp(L, x, y)
+    else:
+        share = 0.75 * np.exp(-L / 21.0) + 0.25 * np.exp(-L / 100.0)
+        C = -np.log(1 - 0.65 * share)
+    return np.maximum.accumulate(C[::-1])[::-1]
+
+
+def reference_curve(city: pd.DataFrame, curve: dict, calib: dict, horizon: int, days_n: int):
+    """Disponibilità tipica (in log) per anticipo e ritmo cumulato C.
+
+    Il primo giorno una sola lettura non basta a distinguere l'effetto dell'anticipo da quello delle
+    singole date: si parte quindi dalla forma di riferimento, portata al livello di oggi, e ci si sposta
+    verso la curva osservata man mano che i giorni di scansione si accumulano (pieno peso a 21 giorni).
+    """
+    L = np.arange(horizon + 1, dtype=float)
+    Cp = prior_pace(calib, horizon)
+    ln_obs = np.log(np.clip(1 - city["U"].to_numpy(), 1e-4, 1.0))
+    lead = np.clip(city["lead"].to_numpy(), 0, horizon).astype(int)
+    level = float(np.median(ln_obs + Cp[lead]))
+    ln_prior = level - Cp
+    ln_live = np.log(np.clip(1 - expit(curve_at(curve, L)), 1e-4, 1.0))
+    w = min(1.0, days_n / 21.0) * min(1.0, curve.get("n", 0) / 400.0)
+    ln_ref = (1 - w) * ln_prior + w * ln_live
+    a0 = float(ln_ref[: min(len(ln_ref), 241)].max())
+    raw = np.maximum(a0 - ln_ref, 0.0)
+    C = np.maximum.accumulate(raw[::-1])[::-1]
+    return ln_ref, C, w
 
 
 THETA_PRIOR = {0: 1.0, 1: 1.0, 2: 1.1, 3: 1.3, 4: 1.6, 5: 2.0}
@@ -490,6 +515,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
             "beta": beta,
             "curve_n": demand["curve"]["n"],
             "demand_days": demand["days"],
+            "curve_live_weight": demand.get("live_weight", 0.0),
             "event_n": {str(k): v for k, v in learned_n.items()},
             "nights_covered_60": int(sum(1 for x in cov[:61] if x >= 6)),
         },
@@ -516,8 +542,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     empty_curve = {"lead": [0.0, 30.0, 120.0, 365.0], "logit": [float(logit(0.72)), float(logit(0.55)), float(logit(0.35)), float(logit(0.3))], "n": 0}
     w_arr = np.array([min(5, weights.get(d, 0)) for d in days])
 
-    def finish(curve, extra, measured, theta_adj, days_n):
-        C = pace_curve(curve, n - 1)
+    def finish(curve, C, extra, measured, theta_adj, days_n, weight_live=0.0):
         typ = dict(THETA_PRIOR)
         base_theta = np.array([typ[int(w)] for w in w_arr])
         raw = np.clip((C + np.nan_to_num(extra) + C0 * base_theta) / (C + C0), 0.3, 3.5)
@@ -539,15 +564,17 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
         done = C + np.where(measured, np.nan_to_num(extra), (base_theta - 1) * C)
         occ_now = 1 - np.exp(-np.maximum(done, 0) / nu)
         occ_fin = 1 - np.exp(-np.maximum(done + city * (C[0] - C), 0) / nu)
-        return {"curve": curve, "days": days_n, "nu": nu, "C": [round(float(x), 4) for x in C], "theta": theta,
+        return {"curve": curve, "days": days_n, "nu": nu, "live_weight": round(float(weight_live), 3),
+                "C": [round(float(x), 4) for x in C], "theta": theta,
                 "theta_city": [round(float(x), 3) for x in city], "typical_theta": {str(k): round(v, 3) for k, v in typ.items()},
                 "u_now": [round(float(x), 3) for x in occ_now], "u_fin": [round(float(x), 3) for x in np.maximum(occ_fin, occ_now)],
                 "unavailable": [round(float(x), 3) for x in expit(curve_at(curve, lead.astype(float)) )],
                 "measured": [bool(x) for x in measured]}
 
     zero_adj = {"seg": {s: np.zeros(n) for s in SEG_CLASSES}, "grp": {g: np.zeros(n) for g in GROUPS}}
+    C_prior = prior_pace(calib, n - 1)
     if cn.empty:
-        return finish(empty_curve, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
+        return finish(empty_curve, C_prior, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
 
     cn = cn.copy()
     cn["count"] = pd.to_numeric(cn["count"], errors="coerce")
@@ -581,38 +608,40 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
         return a
 
     city = unavailable("city")
+    city = city[city["lead"] >= 0]
     if city.empty:
-        return finish(empty_curve, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
-    curve = booking_curve(city[city["lead"] >= 0])
+        return finish(empty_curve, C_prior, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
+    curve = booking_curve(city)
+    days_n = int(city["scan"].nunique())
+    ln_ref, C, w_live = reference_curve(city, curve, calib, n - 1, days_n)
 
-    def nightly(u: pd.DataFrame, max_age: int = 4) -> np.ndarray:
-        """Per notte: scarto (in logit) tra la quota non disponibile letta e quella tipica a pari anticipo."""
-        dev = np.full(n, np.nan)
+    def nightly(u: pd.DataFrame, value, max_age: int = 4) -> np.ndarray:
+        """Media per notte di un valore calcolato su ogni finestra letta di recente; NaN dove non c'è lettura."""
+        out = np.full(n, np.nan)
         if u.empty:
-            return dev
+            return out
         recent = u[u["sc"] >= t_ord - max_age].sort_values("sc").drop_duplicates("checkin", keep="last")
         acc: dict[int, list] = {}
         for ci, sc, U in zip(recent["ci"], recent["sc"], recent["U"]):
-            dv = float(logit(U) - curve_at(curve, ci - sc))
+            v = value(float(U), int(np.clip(ci - sc, 0, n - 1)))
             for j in range(nights_per):
                 k = ci + j - t_ord
                 if 0 <= k < n:
-                    acc.setdefault(k, []).append(dv)
+                    acc.setdefault(k, []).append(v)
         for k, v in acc.items():
-            dev[k] = float(np.mean(v))
-        return dev
+            out[k] = float(np.mean(v))
+        return out
 
-    dev_city = nightly(city)
-    measured = ~np.isnan(dev_city)
-    U_curve = expit(curve_at(curve, lead.astype(float)))
-    U_now = expit(logit(U_curve) + np.nan_to_num(dev_city))
-    extra = np.where(measured, np.log((1 - U_curve) / np.maximum(1 - U_now, 1e-4)), np.nan)
+    # quanto la notte è più "consumata" del tipico a pari anticipo (0 = come il tipico)
+    extra = nightly(city, lambda U, L: float(ln_ref[L] - math.log(max(1 - U, 1e-4))))
+    measured = ~np.isnan(extra)
+    lg_city = nightly(city, lambda U, L: float(logit(U)))
 
     adj = {"seg": {s: np.zeros(n) for s in SEG_CLASSES}, "grp": {g: np.zeros(n) for g in GROUPS}}
 
     def relative(u: pd.DataFrame) -> np.ndarray:
         """Quanto una taglia o una fascia è più tirata della città per quella notte, tolta la sua differenza abituale."""
-        d = nightly(u) - dev_city
+        d = nightly(u, lambda U, L: float(logit(U))) - lg_city
         ok = ~np.isnan(d)
         if ok.sum() < 5:
             return np.zeros(n)
@@ -652,7 +681,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
         if not np.any(adj["grp"]["fuori"]):
             adj["grp"]["fuori"] = adj["grp"]["periferia"]
 
-    return finish(curve, extra, measured, adj, int(city["scan"].nunique()))
+    return finish(curve, C, extra, measured, adj, days_n, w_live)
 
 
 def _beta_from_census(store: Store, cn: pd.DataFrame, lst: pd.DataFrame, c: dict, zones: Zones, today: date, mcfg: dict) -> dict:

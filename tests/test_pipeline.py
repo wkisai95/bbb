@@ -5,31 +5,12 @@ from datetime import date, timedelta
 import numpy as np
 import pytest
 
-from bnb import model, pricing, publish, scan
+from bnb import pricing, publish, scan
 from bnb.config import load_settings
 from bnb.sim import TRUE, SimClient, SimMarket
 from bnb.store import Store
 
-START = date(2026, 11, 16)
-DAYS = 16
-
-
-@pytest.fixture(scope="module")
-def world(tmp_path_factory):
-    cfg = load_settings()
-    cfg["model"]["nu"] = 2.0                       # nel simulatore le notti si prenotano una per una
-    secret = START + timedelta(days=DAYS + 20)     # un evento che il calendario non conosce
-    mk = SimMarket(START, n=1500, seed=3, beta=-3.0, days=DAYS + 5, secret_peak=secret)
-    store = Store(str(tmp_path_factory.mktemp("out")))
-    run = None
-    for i in range(DAYS):
-        today = START + timedelta(days=i)
-        run = scan.run_scan(cfg, store, SimClient(mk, today), today, log=lambda *a: None)
-        assert not run["stopped"]
-    today = START + timedelta(days=DAYS - 1)
-    m = model.build(store, cfg, today, log=lambda *a: None)
-    status = publish.publish(store, m, today, run, cfg)
-    return {"cfg": cfg, "mk": mk, "store": store, "model": m, "today": today, "secret": secret, "status": status, "run": run}
+from conftest import DAYS, START
 
 
 def test_scan_volume_is_bounded(world):
@@ -172,3 +153,29 @@ def test_budget_stop_keeps_data(tmp_path):
     run = scan.run_scan(cfg, store, SimClient(mk, START, max_requests=200), START, log=lambda *a: None)
     assert "tetto" in run["stopped"]
     assert run["prices"] > 500 and len(store.load_listings()) > 100      # salvato comunque ciò che era stato letto
+
+
+def test_first_day_is_already_usable(tmp_path):
+    """Con una sola scansione le probabilità di prenotazione non devono essere degeneri."""
+    from bnb import model
+
+    cfg = load_settings()
+    cfg["model"]["nu"] = 2.0
+    mk = SimMarket(START, n=900, seed=11, days=3)
+    store = Store(str(tmp_path))
+    run = scan.run_scan(cfg, store, SimClient(mk, START), START, log=lambda *a: None)
+    m = model.build(store, cfg, START, log=lambda *a: None)
+    assert m is not None and m["reliability"]["scan_days"] == 1
+    assert m["reliability"]["curve_live_weight"] < 0.1          # il primo giorno comanda la curva di partenza
+    assert all(a >= b for a, b in zip(m["pace"], m["pace"][1:]))  # il ritmo cumulato cresce avvicinandosi alla data
+    sells, typical = [], []
+    for k in (5, 10, 20, 40):
+        sells.append(1 - np.prod(1 - pricing.night_hazards(m, m["theta"]["c01"]["centro"][k], k)))
+        typical.append(1 - np.prod(1 - pricing.night_hazards(m, 1.0, k)))     # stessa notte "tipica", anticipi diversi
+    assert all(0.05 < s < 0.9 for s in sells), sells
+    assert typical == sorted(typical)                             # più tempo davanti, più probabilità di vendere
+    r = pricing.recommend(m, "c_maggiore", 1, 1, 2, START + timedelta(days=1), START + timedelta(days=45), "resa")
+    o = pricing.recommend(m, "c_maggiore", 1, 1, 2, START + timedelta(days=1), START + timedelta(days=45), "occupazione")
+    assert r["avg_price"] > o["avg_price"] and 0.1 < r["occupancy"] < 0.95
+    assert r["reliability"]["label"] in ("bassa", "media")
+    publish.publish(store, m, START, run, cfg)

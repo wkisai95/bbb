@@ -49,13 +49,13 @@ def main(argv=None) -> int:
             if got:
                 ia_df, ia_date = got
                 cal = state.get("calibration") or {}
-                if cal.get("snapshot") != ia_date:     # calendari: una volta per istantanea
+                if cal.get("snapshot") != ia_date or not cal.get("pace"):     # calendari: una volta per istantanea
                     n = int(cfg["scan"]["nights"])
                     ok = ia_df[(ia_df["room_type"] == cfg.get("room_type", "")) & (ia_df["min_nights"] <= n)]
                     res = insideairbnb.download_calendar_factor(ia_date, ok["id"].tolist(), n, log)
                     if res:
                         state["calibration"] = {"nu": res["nu"], "snapshot": ia_date, "source": f"Inside Airbnb {ia_date}",
-                                                "listings": res["listings"]}
+                                                "listings": res["listings"], "pace": res.get("pace")}
                         store.save_state(state)
         pages = scan.fetch_event_pages(log) if cfg["sources"].get("events_auto") else None
         run = scan.run_scan(cfg, store, AirbnbClient(cfg, log), today, log, pages=pages, inside=ia_df, inside_date=ia_date)

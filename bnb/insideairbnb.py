@@ -15,6 +15,7 @@ import pandas as pd
 INDEX_URL = "https://insideairbnb.com/get-the-data/"
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 PATH = "italy/emilia-romagna/bologna"
+PACE_LEADS = [0, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 120, 180, 240, 330]
 
 
 def find_snapshot(index_html: str, path: str = PATH) -> dict | None:
@@ -112,8 +113,14 @@ def window_factor(calendar_bytes: bytes, listing_ids, nights: int = 2) -> dict |
     if ok.sum() < 10:
         return None
     nu = float(np.median(np.log(xw[ok]) / np.log(xn[ok])))
+    # ritmo tipico di prenotazione per anticipo: disponibilità delle finestre, lisciata sulla settimana
+    sm = np.convolve(np.pad(win, 3, mode="edge"), np.ones(7) / 7, mode="valid")
+    a0 = float(sm[:241].max())
+    raw = np.maximum(np.log(a0 / np.maximum(sm, 1e-4)), 0.0)
+    C = np.maximum.accumulate(raw[::-1])[::-1]
+    leads = [L for L in PACE_LEADS if L < len(C)]
     return {"nu": round(float(np.clip(nu, 1.0, float(nights))), 3), "raw": round(nu, 3), "listings": int(M.shape[0]),
-            "leads": int(ok.sum())}
+            "leads": int(ok.sum()), "pace": [[int(L), round(float(C[L]), 4)] for L in leads]}
 
 
 def download_calendar_factor(snapshot_date: str, listing_ids, nights: int, log=print, path: str = PATH) -> dict | None:

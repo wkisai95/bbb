@@ -56,3 +56,6 @@ def test_window_factor():
     assert 1.75 < indep["nu"] <= 2.0        # notti indipendenti: la finestra pesa quasi due notti
     assert 1.2 < stays["nu"] < 1.65         # soggiorni di più notti: molto meno
     assert ia.window_factor(_calendar(20, 190, True), range(20), 2) is None      # troppo pochi annunci
+    pace = stays["pace"]
+    assert pace[0][0] == 0 and pace[0][1] > 0.3                                   # vicino alla data molto è già prenotato
+    assert all(a[1] >= b[1] for a, b in zip(pace, pace[1:]))                      # e sempre meno andando lontano
