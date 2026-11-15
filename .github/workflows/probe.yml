@@ -1,0 +1,21 @@
+name: Prova dei portali
+run-name: Prova di raggiungibilità degli altri portali
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q requests
+      - name: Una richiesta per sito, solo dove robots.txt lo consente
+        run: python tools/probe_sites.py "$GITHUB_STEP_SUMMARY"
