@@ -254,46 +254,111 @@ def curve_at(curve: dict, lead) -> np.ndarray:
     return np.interp(np.asarray(lead, dtype=float), curve["lead"], curve["logit"])
 
 
-def prior_pace(calib: dict, horizon: int) -> np.ndarray:
-    """Ritmo di prenotazione di partenza, per anticipo (0 = tutto ancora libero).
+TAIL_FILL, TAIL_DAYS = 0.1625, 100.0     # 65% di riempimento tipico × un quarto delle prenotazioni fatte con largo anticipo
 
-    Se ci sono, vale quello misurato sui calendari di Inside Airbnb; altrimenti una forma tipica:
-    tre quarti delle prenotazioni nell'ultimo mese, il resto distribuito sui mesi precedenti.
+
+def tail_pace(L, nu: float = 1.0) -> np.ndarray:
+    """Prenotazioni arrivate prima che la disponibilità tocchi il suo massimo.
+
+    Dal confronto tra date non si vedono, perché a quell'anticipo si confondono con i calendari non ancora
+    aperti: si ipotizza una coda lenta, che pesa poco e viene poi corretta dalla velocità di ogni notte.
+    È espressa per notte; una finestra di più notti la consuma nu volte più in fretta.
+    """
+    return -nu * np.log(1 - TAIL_FILL * np.exp(-np.asarray(L, dtype=float) / TAIL_DAYS))
+
+
+def prior_profile(calib: dict, horizon: int) -> np.ndarray:
+    """Disponibilità tipica di partenza per anticipo, in log e riferita al suo massimo (0).
+
+    Vicino alla data cala perché gli alloggi vengono prenotati; molto lontano cala di nuovo perché tanti
+    calendari non sono ancora aperti. Se c'è, vale la forma misurata sui calendari di Inside Airbnb;
+    altrimenti una forma tipica: tre quarti delle prenotazioni nell'ultimo mese e, oltre gli 80 giorni,
+    lo 0,4% di alloggi in meno per ogni giorno di anticipo in più.
     """
     L = np.arange(horizon + 1, dtype=float)
-    pts = calib.get("pace")
-    if pts and len(pts) >= 4:
-        x, y = [float(p[0]) for p in pts], [float(p[1]) for p in pts]
-        C = np.interp(L, x, y)
+    pts = calib.get("profile")
+    if pts and len(pts) >= 6:
+        P = np.interp(L, [float(p[0]) for p in pts], [float(p[1]) for p in pts])
     else:
         share = 0.75 * np.exp(-L / 21.0) + 0.25 * np.exp(-L / 100.0)
-        C = -np.log(1 - 0.65 * share)
-    return np.maximum.accumulate(C[::-1])[::-1]
+        P = np.log(1 - 0.65 * share) - 0.004 * np.maximum(L - 80.0, 0.0)
+    return P - float(P[: min(len(P), 241)].max())
 
 
-def reference_curve(city: pd.DataFrame, curve: dict, calib: dict, horizon: int, days_n: int):
+def pace_from_profile(ln_typ: np.ndarray, nu: float = 1.0):
+    """Ritmo cumulato di prenotazione C[L] (0 = ancora tutto libero) dalla disponibilità tipica per anticipo.
+
+    Conta come prenotazione solo il calo tra l'anticipo in cui la disponibilità è massima e la data.
+    Più lontano la disponibilità scende per i calendari chiusi, non per le prenotazioni: lì resta soltanto
+    la coda ipotizzata. Restituisce anche l'anticipo del massimo.
+    """
+    ln_typ = np.asarray(ln_typ, dtype=float)
+    n = len(ln_typ)
+    peak = int(np.argmax(ln_typ[: min(n, 241)]))
+    tail = tail_pace(np.arange(n), nu)
+    C = tail.copy()
+    near = np.maximum(ln_typ[peak] - ln_typ[: peak + 1], 0.0)
+    C[: peak + 1] = tail[peak] + np.maximum.accumulate(near[::-1])[::-1]
+    return C, peak
+
+
+def squeeze(P: np.ndarray, peak: int, tau: float) -> np.ndarray:
+    """Stessa forma di partenza, ma con il calo finale concentrato negli ultimi tau·peak giorni."""
+    out = P.copy()
+    L = np.arange(peak + 1, dtype=float)
+    out[: peak + 1] = np.interp(np.minimum(L / tau, float(peak)), L, P[: peak + 1])
+    return out
+
+
+def fit_prior(P: np.ndarray, ln_obs: np.ndarray, lead: np.ndarray):
+    """Adatta la forma di partenza a ciò che si vede: livello, ampiezza e durata del calo finale.
+
+    Tre numeri soltanto. Il livello è la mediana sulle date in cui la forma conta poco; ampiezza e durata
+    si scelgono tra poche alternative, tenendo quelle che lasciano gli scarti più piccoli (in bassa
+    stagione si prenota meno e più sotto data che in alta). Gli scarti grandi contano fino a un tetto,
+    così un fine settimana pieno non trascina la stima.
+    """
+    peak = int(np.argmax(P[: min(len(P), 241)]))
+    zone = lead <= peak
+    best = None
+    for tau in (1.0, 0.7, 0.5, 0.35):
+        Pt = squeeze(P, peak, tau)
+        flat = Pt[lead] > -0.12
+        use = flat if flat.sum() >= 8 else np.ones(len(lead), dtype=bool)
+        level = float(np.median(ln_obs[use] - Pt[lead[use]]))
+        if zone.sum() < 12:                                   # troppo poche letture per scegliere: forma così com'è
+            best = (0.0, tau, 1.0, level, Pt)
+            break
+        y, x = ln_obs[zone] - level, Pt[lead[zone]]
+        err, scale = min((float(np.minimum(np.abs(y - sc * x), 0.3).mean()), float(sc)) for sc in np.arange(0.2, 2.01, 0.1))
+        if best is None or err < 0.95 * best[0]:              # si cambia durata solo se gli scarti calano davvero
+            best = (err, tau, scale, level, Pt)
+    _, tau, scale, level, Pt = best
+    Pt = Pt.copy()
+    Pt[: peak + 1] *= scale
+    return level + Pt, {"level": round(level, 4), "tau": tau, "scale": round(scale, 2)}
+
+
+def reference_curve(city: pd.DataFrame, curve: dict, calib: dict, horizon: int, days_n: int, nu: float = 1.0):
     """Disponibilità tipica (in log) per anticipo e ritmo cumulato C.
 
     Il primo giorno una sola lettura non basta a distinguere l'effetto dell'anticipo da quello delle
-    singole date: si parte quindi dalla forma di riferimento, portata al livello di oggi, e ci si sposta
-    verso la curva osservata man mano che i giorni di scansione si accumulano (pieno peso a 21 giorni).
+    singole date: si parte quindi dalla forma di riferimento adattata a ciò che si vede oggi e ci si
+    sposta verso la curva osservata man mano che i giorni di scansione si accumulano (pieno peso a 14 giorni).
     """
     L = np.arange(horizon + 1, dtype=float)
-    Cp = prior_pace(calib, horizon)
-    ln_obs = np.log(np.clip(1 - city["U"].to_numpy(), 1e-4, 1.0))
+    ln_obs = np.log(np.clip(1 - city["U"].to_numpy(dtype=float), 1e-4, 1.0))
     lead = np.clip(city["lead"].to_numpy(), 0, horizon).astype(int)
-    level = float(np.median(ln_obs + Cp[lead]))
-    ln_prior = level - Cp
+    ln_prior, _ = fit_prior(prior_profile(calib, horizon), ln_obs, lead)
     ln_live = np.log(np.clip(1 - expit(curve_at(curve, L)), 1e-4, 1.0))
-    w = min(1.0, days_n / 21.0) * min(1.0, curve.get("n", 0) / 400.0)
+    w = min(1.0, days_n / 14.0) * min(1.0, curve.get("n", 0) / 400.0)
     ln_ref = (1 - w) * ln_prior + w * ln_live
-    a0 = float(ln_ref[: min(len(ln_ref), 241)].max())
-    raw = np.maximum(a0 - ln_ref, 0.0)
-    C = np.maximum.accumulate(raw[::-1])[::-1]
+    C, _ = pace_from_profile(ln_ref, nu)
     return ln_ref, C, w
 
 
 THETA_PRIOR = {0: 1.0, 1: 1.0, 2: 1.1, 3: 1.3, 4: 1.6, 5: 2.0}
+BUSY_WEIGHT = 4   # da questo peso in su (grandi fiere) una data non entra nella stima del "tipico"
 C0 = 0.25      # quanta "evidenza" serve prima di credere al ritmo di una singola data
 
 
@@ -530,7 +595,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     """Domanda: ritmo tipico di prenotazione per anticipo e, per ogni notte, quanto corre rispetto al tipico.
 
     La ricerca dice, per ogni finestra di date, quanti alloggi sono ancora disponibili. Da qui:
-      C[L]     ritmo tipico cumulato (vedi pace_curve);
+      C[L]     ritmo tipico cumulato (vedi pace_from_profile);
       theta    velocità della singola notte: 1 = come il tipico, 2 = si riempie al doppio della velocità;
       nu       quante "notti indipendenti" pesa una finestra di più notti (1 = le notti si prenotano
                sempre insieme, 2 = del tutto separate); stimato dai calendari aperti di Inside Airbnb.
@@ -572,7 +637,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
                 "measured": [bool(x) for x in measured]}
 
     zero_adj = {"seg": {s: np.zeros(n) for s in SEG_CLASSES}, "grp": {g: np.zeros(n) for g in GROUPS}}
-    C_prior = prior_pace(calib, n - 1)
+    C_prior, _ = pace_from_profile(prior_profile(calib, n - 1), nu)
     if cn.empty:
         return finish(empty_curve, C_prior, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
 
@@ -611,9 +676,14 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     city = city[city["lead"] >= 0]
     if city.empty:
         return finish(empty_curve, C_prior, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
-    curve = booking_curve(city)
+    # il "tipico" si stima senza le date delle grandi fiere, che lo scanner legge apposta e che quindi
+    # pesano più del dovuto tra le date lontane; se ne restano troppo poche si usano tutte
+    busy = np.array([max(weights.get(int(ci) + j, 0) for j in range(nights_per)) >= BUSY_WEIGHT for ci in city["ci"]], dtype=bool)
+    calm = city[~busy]
+    typical = calm if len(calm) >= max(20, 0.5 * len(city)) else city
+    curve = booking_curve(typical)
     days_n = int(city["scan"].nunique())
-    ln_ref, C, w_live = reference_curve(city, curve, calib, n - 1, days_n)
+    ln_ref, C, w_live = reference_curve(typical, curve, calib, n - 1, days_n, nu)
 
     def nightly(u: pd.DataFrame, value, max_age: int = 4) -> np.ndarray:
         """Media per notte di un valore calcolato su ogni finestra letta di recente; NaN dove non c'è lettura."""

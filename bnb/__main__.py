@@ -8,7 +8,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from . import insideairbnb, model, publish, scan
@@ -17,7 +17,42 @@ from .store import Store
 
 
 def log(*a):
-    print(datetime.utcnow().strftime("%H:%M:%S"), *a, flush=True)
+    print(datetime.now(timezone.utc).strftime("%H:%M:%S"), *a, flush=True)
+
+
+def inside_airbnb(cfg: dict, store: Store, today: date, with_listings: bool):
+    """Dati aperti di Inside Airbnb: l'elenco degli annunci ogni N giorni, i calendari una volta per istantanea.
+
+    I calendari servono a tarare il modello della domanda (quanto pesa una finestra di più notti, come cambia
+    la disponibilità con l'anticipo). Se la taratura manca si riprova, al massimo una volta ogni due giorni.
+    Restituisce (tabella, data) quando l'elenco va riversato nel catalogo, altrimenti (None, "").
+    """
+    if not cfg["sources"].get("inside_airbnb"):
+        return None, ""
+    state = store.load_state()
+    ia = state.get("inside_airbnb") or {}
+    cal = state.get("calibration") or {}
+    every = int(cfg["sources"].get("inside_airbnb_every_days", 7))
+    due = with_listings and (not ia.get("merged") or (today - date.fromisoformat(ia["merged"])) >= timedelta(days=every))
+    tried = state.get("calibration_tried") or ""
+    need_cal = not cal.get("profile") and (not tried or (today - date.fromisoformat(tried)) >= timedelta(days=2))
+    if not (due or need_cal):
+        return None, ""
+    got = insideairbnb.download(log)
+    if not got:
+        return None, ""
+    ia_df, ia_date = got
+    if need_cal or cal.get("snapshot") != ia_date:
+        n = int(cfg["scan"]["nights"])
+        ok = ia_df[(ia_df["room_type"] == cfg.get("room_type", "")) & (ia_df["min_nights"] <= n)]
+        res = insideairbnb.download_calendar_factor(ia_date, ok["id"].tolist(), n, log)
+        state = store.load_state()
+        state["calibration_tried"] = today.isoformat()
+        if res:
+            state["calibration"] = {"nu": res["nu"], "snapshot": ia_date, "source": f"Inside Airbnb {ia_date}",
+                                    "listings": res["listings"], "profile": res.get("profile")}
+        store.save_state(state)
+    return (ia_df, ia_date) if due else (None, "")
 
 
 def main(argv=None) -> int:
@@ -39,26 +74,11 @@ def main(argv=None) -> int:
     if args.cmd in ("all", "scan"):
         from .airbnb import AirbnbClient
 
-        state = store.load_state()
-        ia_df, ia_date = None, ""
-        ia = state.get("inside_airbnb") or {}
-        every = int(cfg["sources"].get("inside_airbnb_every_days", 7))
-        due = not ia.get("merged") or (today - date.fromisoformat(ia["merged"])) >= timedelta(days=every)
-        if cfg["sources"].get("inside_airbnb") and due and not args.no_inside:
-            got = insideairbnb.download(log)
-            if got:
-                ia_df, ia_date = got
-                cal = state.get("calibration") or {}
-                if cal.get("snapshot") != ia_date or not cal.get("pace"):     # calendari: una volta per istantanea
-                    n = int(cfg["scan"]["nights"])
-                    ok = ia_df[(ia_df["room_type"] == cfg.get("room_type", "")) & (ia_df["min_nights"] <= n)]
-                    res = insideairbnb.download_calendar_factor(ia_date, ok["id"].tolist(), n, log)
-                    if res:
-                        state["calibration"] = {"nu": res["nu"], "snapshot": ia_date, "source": f"Inside Airbnb {ia_date}",
-                                                "listings": res["listings"], "pace": res.get("pace")}
-                        store.save_state(state)
+        ia_df, ia_date = (None, "") if args.no_inside else inside_airbnb(cfg, store, today, with_listings=True)
         pages = scan.fetch_event_pages(log) if cfg["sources"].get("events_auto") else None
         run = scan.run_scan(cfg, store, AirbnbClient(cfg, log), today, log, pages=pages, inside=ia_df, inside_date=ia_date)
+    elif args.cmd == "model" and not args.no_inside:
+        inside_airbnb(cfg, store, today, with_listings=False)      # solo la taratura, se manca
 
     if args.cmd in ("all", "model"):
         if run is None:

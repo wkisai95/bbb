@@ -44,14 +44,17 @@ simili per quella notte, e comunque non oltre il 25% sotto o il 40% sopra la lor
    misurato; per le altre l'effetto tipico di eventi dello stesso peso, che il modello impara col tempo.
    Se una data costa molto più del normale senza un evento noto, la segnala come «picco rilevato».
 5. **Domanda.** Dai conteggi degli alloggi liberi ricava il ritmo con cui ogni data si riempie e la
-   probabilità giornaliera che una notte libera venga prenotata.
+   probabilità giornaliera che una notte libera venga prenotata. Conta come prenotazione solo il calo
+   nelle ultime settimane prima della data: molto più lontano gli alloggi liberi sono meno perché tanti
+   calendari non sono ancora aperti, e quello non viene scambiato per domanda.
 6. **Sensibilità al prezzo.** Confrontando due letture complete della stessa data, vede chi è sparito
    (prenotato) rispetto al proprio prezzo relativo.
 7. **App.** Scarica `public/model.json` dal ramo `data` e fa i conti sul telefono (`app/web/pricing.js`,
    identico a `bnb/pricing.py`: un test confronta i risultati).
 
 **Migliora da solo.** Ogni stima parte da un valore prudente e si sposta verso i dati man mano che si
-accumulano: la curva di prenotazione ha pieno peso dopo 21 giorni, lo storico dopo 45. L'app mostra
+accumulano: la curva di prenotazione osservata sostituisce quella di partenza in 14 giorni; l'attendibilità
+considera piena la domanda dopo 21 giorni di dati e lo storico dopo 45. L'app mostra
 un'**attendibilità** (bassa, media, alta) e in Dati l'errore del modello giorno per giorno.
 
 ## I dati e il backup
@@ -90,7 +93,9 @@ write*. Incollalo in Dati → Token di accesso. In alternativa la scansione si a
 - **I prezzi sono quelli chiesti, non quelli incassati**, per soggiorni di due notti, pulizie e commissioni
   incluse, tassa di soggiorno esclusa.
 - **Probabilità e incassi attesi sono stime** che dipendono da ipotesi sul comportamento degli ospiti. Nei
-  primi giorni contano molto i valori di partenza; guardare l'attendibilità.
+  primi giorni contano molto i valori di partenza; guardare l'attendibilità. Il ritmo di prenotazione è
+  quello medio del mercato: chi resta libero fino all'ultimo è spesso chi chiede troppo, quindi per un
+  alloggio a prezzo giusto la probabilità reale sotto data tende a essere un po' più alta di quella indicata.
 - Solo **appartamenti interi**; le date degli eventi vengono da calendari pubblici e vanno verificate
   (quella di Ultimo allo stadio, giugno 2027, è riportata in modo discorde dalle fonti).
 

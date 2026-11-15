@@ -52,7 +52,8 @@ class SimMarket:
         self.value = rng.normal(0, 0.07, n)        # qualità che non si vede: alza prezzo E domanda
         self.markup = rng.normal(0, 0.20, n)       # puro ricarico: alza il prezzo, abbassa le prenotazioni
         self.min_n = rng.choice([1, 2, 3, 5], size=n, p=[0.2, 0.68, 0.08, 0.04])
-        self.open_days = np.where(rng.random(n) < 0.15, 180, 9999)
+        # calendari non ancora aperti: come nel mercato vero, a 300 giorni è prenotabile meno della metà degli alloggi
+        self.open_days = rng.choice([100, 130, 170, 210, 260, 320, 9999], size=n, p=[0.08, 0.10, 0.10, 0.10, 0.10, 0.10, 0.42])
         self.rank = self.value - 0.5 * self.markup + rng.normal(0, 0.3, n)
         self.ids = 1_000_000 + np.arange(n)
         self.base = (4.42 + np.array([self.zone_eff.get(z, -0.2) for z in self.zone]) + np.vectorize(TRUE["br"].get)(self.br)

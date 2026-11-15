@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import gzip
 import io
+import math
 import re
 
 import numpy as np
@@ -15,7 +16,7 @@ import pandas as pd
 INDEX_URL = "https://insideairbnb.com/get-the-data/"
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 PATH = "italy/emilia-romagna/bologna"
-PACE_LEADS = [0, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 120, 180, 240, 330]
+PROFILE_LEADS = [0, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 75, 90, 105, 120, 150, 180, 210, 240, 270, 300, 330, 360]
 
 
 def find_snapshot(index_html: str, path: str = PATH) -> dict | None:
@@ -109,18 +110,39 @@ def window_factor(calendar_bytes: bytes, listing_ids, nights: int = 2) -> dict |
     upto = min(240, len(night))
     xn, xw = night[:upto] / night[:upto].max(), win[:upto] / win[:upto].max()
     ok = (xn < 0.92) & (xn > 0.05) & (xw > 0.02)
-    ok[150:] = False
+    # solo il tratto in cui la disponibilità cala perché si prenota: più lontano del suo massimo cala per i
+    # calendari non ancora aperti, che chiudono la notte e la finestra allo stesso modo e falserebbero il rapporto
+    sm = np.convolve(np.pad(win, 3, mode="edge"), np.ones(7) / 7, mode="valid")
+    peak = int(np.argmax(sm[:241]))
+    near = ok.copy()
+    near[min(150, peak):] = False
+    if near.sum() >= 10:
+        ok = near
+    else:
+        ok[150:] = False
     if ok.sum() < 10:
         return None
     nu = float(np.median(np.log(xw[ok]) / np.log(xn[ok])))
-    # ritmo tipico di prenotazione per anticipo: disponibilità delle finestre, lisciata sulla settimana
-    sm = np.convolve(np.pad(win, 3, mode="edge"), np.ones(7) / 7, mode="valid")
-    a0 = float(sm[:241].max())
-    raw = np.maximum(np.log(a0 / np.maximum(sm, 1e-4)), 0.0)
-    C = np.maximum.accumulate(raw[::-1])[::-1]
-    leads = [L for L in PACE_LEADS if L < len(C)]
     return {"nu": round(float(np.clip(nu, 1.0, float(nights))), 3), "raw": round(nu, 3), "listings": int(M.shape[0]),
-            "leads": int(ok.sum()), "pace": [[int(L), round(float(C[L]), 4)] for L in leads]}
+            "leads": int(ok.sum()), "profile": availability_profile(win)}
+
+
+def availability_profile(win: np.ndarray) -> list:
+    """Disponibilità tipica per anticipo, in log e riferita al suo massimo (0 = il momento più "aperto").
+
+    Vicino alla data cala perché gli alloggi vengono prenotati; molto lontano cala di nuovo perché tanti
+    calendari non sono ancora aperti. Media sulla settimana e mediana su una fascia di giorni, per non farsi
+    trascinare da un fine settimana o da una fiera.
+    """
+    sm = np.convolve(np.pad(np.asarray(win, dtype=float), 3, mode="edge"), np.ones(7) / 7, mode="valid")
+    pts = []
+    for L in PROFILE_LEADS:
+        if L >= len(sm):
+            break
+        half = 0 if L <= 3 else 2 if L <= 10 else 5 if L <= 30 else 10
+        pts.append((L, float(np.median(sm[max(0, L - half): L + half + 1]))))
+    top = max(v for L, v in pts if L <= 240)
+    return [[int(L), round(math.log(max(v, 1e-4) / max(top, 1e-4)), 4)] for L, v in pts]
 
 
 def download_calendar_factor(snapshot_date: str, listing_ids, nights: int, log=print, path: str = PATH) -> dict | None:
