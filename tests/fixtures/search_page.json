@@ -1,0 +1,3192 @@
+{
+ "data": {
+  "presentation": {
+   "staysSearch": {
+    "results": {
+     "searchResults": [
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.77 (190)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Historic 1100s walls near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Family apartment in the center of Bologna"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "SUPERHOST"
+         },
+         "text": "Superhost"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "6 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€187 for 2 nights",
+         "price": "€187",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €95.50",
+             "priceString": "€191.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€4.78"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€186.22"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTcyNjMzNTg=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4984,
+          "longitude": 11.3447
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Family apartment in the center of Bologna"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.82 (1232)",
+       "title": "Bed and breakfast in Bologna",
+       "subtitle": "Ilaria Silvia's B&B",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Ilaria Silvia's B&B"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "SUPERHOST"
+         },
+         "text": "Superhost"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 room left",
+          "type": "PROPERTYINFO"
+         },
+         {
+          "body": "3 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "OrderedDisplayPriceLine",
+         "accessibilityLabel": "€196 for 2 nights, originally €217",
+         "orderedComponents": [
+          {
+           "__typename": "OriginalPriceDisplayPriceLineComponent",
+           "originalPrice": "€217"
+          },
+          {
+           "__typename": "DiscountedPriceDisplayPriceLineComponent",
+           "discountedPrice": "€196"
+          },
+          {
+           "__typename": "QualifierDisplayPriceLineComponent",
+           "qualifier": "for 2 nights"
+          }
+         ]
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €98.00",
+             "priceString": "€196.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MjI4MDMxMQ==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4987,
+          "longitude": 11.3368
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Ilaria Silvia's B&B, Triple Room"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.97 (36)",
+       "title": "Shared room in Bologna",
+       "subtitle": "Rooftop terrace with Bologna skyline views",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "ACasa Umile XL – Bed in a mixed-gender dormitory"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "SUPERHOST"
+         },
+         "text": "Superhost"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "4 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 shared bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€125 for 2 nights",
+         "price": "€125",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €63.90",
+             "priceString": "€127.80"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€3.20"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€124.60"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTQ2MTU0OTg1Nzk0ODMxOTI2Ng==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.5,
+          "longitude": 11.3498
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "ACasa Umile XL – Bed in a mixed-gender dormitory"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.83 (87)",
+       "title": "Condo in Bologna",
+       "subtitle": "Steps from the Two Towers, historic center",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Apartment at the Two Towers"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 double beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€291 for 2 nights",
+         "price": "€291",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €149.00",
+             "priceString": "€298.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€7.45"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€290.55"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTA2NDExMjI1MDA4MzU0MjMw",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4947,
+          "longitude": 11.3467
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Apartment at the Two Towers"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.78 (135)",
+       "title": "Room in Bologna",
+       "subtitle": "Rooftop terrace with views of Bologna",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Ostello Umile – “The Office” Private Bedroom"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€218 for 2 nights",
+         "price": "€218",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €111.60",
+             "priceString": "€223.20"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€5.58"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€217.62"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NDEzNjg5MzY=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49957,
+          "longitude": 11.34912
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Ostello Umile – “The Office” Private Bedroom"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.92 (368)",
+       "title": "Bed and breakfast in Bologna",
+       "subtitle": "A stone's throw away",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "A stone's throw away"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 rooms available",
+          "type": "PROPERTYINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "OrderedDisplayPriceLine",
+         "accessibilityLabel": "€297 for 2 nights",
+         "orderedComponents": [
+          {
+           "__typename": "DiscountedPriceDisplayPriceLineComponent",
+           "discountedPrice": "€297"
+          },
+          {
+           "__typename": "QualifierDisplayPriceLineComponent",
+           "qualifier": "for 2 nights"
+          }
+         ]
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €148.50",
+             "priceString": "€297.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NTAxMzM5MQ==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4946,
+          "longitude": 11.3387
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "A stone's throw away, Sun Room"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "5.0 (28)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Private rooftop terrace near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Luxury Rooftop + Terrace | Herb Market"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€355 for 2 nights, originally €452",
+         "originalPrice": "€452",
+         "discountedPrice": "€355",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €225.55",
+             "priceString": "€451.10"
+            },
+            {
+             "description": "Special offer",
+             "priceString": "-€96.53"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€354.57"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTY4ODg1OTYxMTgxNTIwMjg3NA==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4977,
+          "longitude": 11.3397
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Luxury Rooftop + Terrace | Herb Market"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.84 (303)",
+       "title": "Condo in Bologna",
+       "subtitle": "Private terrace with red rooftop views",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Turris Apartments.SKYLINE Historic center Bologna"
+       },
+       "badges": [],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 small double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€193 for 2 nights, originally €231",
+         "originalPrice": "€231",
+         "discountedPrice": "€193",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €96.20",
+             "priceString": "€192.40"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NTM2NDk1NTg=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.5005,
+          "longitude": 11.3432
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Turris Apartments.SKYLINE Historic center Bologna"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.94 (89)",
+       "title": "Room in Bologna",
+       "subtitle": "Historic building near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Historic building in the Center with Private Bathroom "
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "No bathroom",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€255 for 2 nights",
+         "price": "€255",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €127.50",
+             "priceString": "€255.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODExMzcwNDg1MDQ2OTUzNjAw",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49393,
+          "longitude": 11.34158
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Historic building in the Center with Private Bathroom "
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.92 (467)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Panoramic terrace over Bologna’s red rooftops",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Charming Wood Attic Bologna Center"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "3 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€349 for 2 nights",
+         "price": "€349",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €178.50",
+             "priceString": "€357.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€8.93"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€348.07"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MzE3MDUzOTg=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4997,
+          "longitude": 11.347
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Charming Wood Attic Bologna Center"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.97 (483)",
+       "title": "Home in Bologna",
+       "subtitle": "Renovated 2-level home near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "An independent house close to Piazza Maggiore"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€392 for 2 nights",
+         "price": "€392",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €196.00",
+             "priceString": "€392.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MjI4NzcxNzU=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49392,
+          "longitude": 11.34062
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "An independent house close to Piazza Maggiore"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.93 (57)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Zen-inspired penthouse with a private terrace",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Kimono Penthouse [100m della Piazza]"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€503 for 2 nights, originally €626",
+         "originalPrice": "€626",
+         "discountedPrice": "€503",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €251.20",
+             "priceString": "€502.40"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTYyMTgyOTYyOTgzOTgwNTA2Nw==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4934,
+          "longitude": 11.341
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Kimono Penthouse [100m della Piazza]"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.71 (575)",
+       "title": "Condo in Bologna",
+       "subtitle": "Newly renovated, steps from Bologna’s towers",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Ines Apartment, in the center of Bologna"
+       },
+       "badges": [],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€241 for 2 nights",
+         "price": "€241",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €123.30",
+             "priceString": "€246.60"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€6.17"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€240.43"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTk5MzgzNTU=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4946,
+          "longitude": 11.3476
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Ines Apartment, in the center of Bologna"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.97 (200)",
+       "title": "Condo in Bologna",
+       "subtitle": "Facing the Basilica di San Francesco",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Open space San Francesco"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€287 for 2 nights, originally €338",
+         "originalPrice": "€338",
+         "discountedPrice": "€287",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €143.50",
+             "priceString": "€287.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MzE5MTM5NjE=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49585,
+          "longitude": 11.33675
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Open space San Francesco"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.97 (114)",
+       "title": "Apartment in Bologna",
+       "subtitle": "High wooden ceilings near the Two Towers",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "The Brothers' House"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€375 for 2 nights",
+         "price": "€375",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €192.00",
+             "priceString": "€384.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€9.60"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€374.40"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTI1Njk5MTcyODI1MzAxMDE3Ng==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4986,
+          "longitude": 11.3482
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "The Brothers' House"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.9 (10)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Art-filled retreat with complimentary wine",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Auraluce Suites • Art&Love in the Heart of Bologna"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 queen beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€387 for 2 nights, originally €459",
+         "originalPrice": "€459",
+         "discountedPrice": "€387",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €193.50",
+             "priceString": "€387.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTY5MjA2NTc2Mzg2NTE1NTQ3OA==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49592,
+          "longitude": 11.33658
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Auraluce Suites • Art&Love in the Heart of Bologna"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "New",
+       "title": "Vacation home in Bologna",
+       "subtitle": "D'Azeglio's Balcony – BeMyHost",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "D'Azeglio's Balcony – BeMyHost"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "SUPERHOST"
+         },
+         "text": "Superhost"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€264 for 2 nights, originally €330",
+         "originalPrice": "€330",
+         "discountedPrice": "€264",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €165.00",
+             "priceString": "€330.00"
+            },
+            {
+             "description": "Special offer",
+             "priceString": "-€66.00"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€264.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTgxODQ2ODE2MTg3OTY2MDcyOA==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4927,
+          "longitude": 11.3421
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "D'Azeglio's Balcony – BeMyHost"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.9 (219)",
+       "title": "Condo in Bologna",
+       "subtitle": "Exposed beams and rooftop views downtown",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "The Fossato's attic"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€286 for 2 nights, originally €333",
+         "originalPrice": "€333",
+         "discountedPrice": "€286",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €143.00",
+             "priceString": "€286.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NTQxMjAzNTE=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4906,
+          "longitude": 11.3362
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "The Fossato's attic"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.95 (42)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Balcony over Via Indipendenza, near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Central Elegant Stay • Balcony"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "3 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€471 for 2 nights, originally €613",
+         "originalPrice": "€613",
+         "discountedPrice": "€471",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €235.10",
+             "priceString": "€470.20"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTY3ODM5ODM5NTQ0MTA1MDk3Ng==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4989,
+          "longitude": 11.3436
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Central Elegant Stay • Balcony"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.94 (247)",
+       "title": "Condo in Bologna",
+       "subtitle": "Historic building with a piano and terrace",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Marsala Charme - Bologna City Centre"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€314 for 2 nights",
+         "price": "€314",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €160.70",
+             "priceString": "€321.40"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€8.04"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€313.36"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NTI1MDYyNjQ=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4975,
+          "longitude": 11.3436
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Marsala Charme - Bologna City Centre"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.98 (321)",
+       "title": "Loft in Bologna",
+       "subtitle": "Towering ceilings and a 1600s fresco",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Charming Loft with a view on the Seven Churches"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "4 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1.5 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€526 for 2 nights, originally €625",
+         "originalPrice": "€625",
+         "discountedPrice": "€526",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €262.90",
+             "priceString": "€525.80"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NDA2Njk5ODY=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4925,
+          "longitude": 11.3487
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Charming Loft with a view on the Seven Churches"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.96 (293)",
+       "title": "Condo in Bologna",
+       "subtitle": "Restored home in a historic building",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Bologna Boutique Home, exclusive living experience"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "3 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€406 for 2 nights",
+         "price": "€406",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €208.00",
+             "priceString": "€416.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€10.40"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€405.60"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MzI2ODkzOTQ=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49513,
+          "longitude": 11.34882
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Bologna Boutique Home, exclusive living experience"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.95 (106)",
+       "title": "Condo in Bologna",
+       "subtitle": "Rooftop views from a 16th-century palace",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Castiglione Loft -balcony-view on the roofs"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€310 for 2 nights, originally €450",
+         "originalPrice": "€450",
+         "discountedPrice": "€310",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €155.00",
+             "priceString": "€310.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTAzOTcxMzM2NTQ4MzQwNjA1Mw==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.489,
+          "longitude": 11.3472
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Castiglione Loft -balcony-view on the roofs"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.91 (233)",
+       "title": "Room in Bologna",
+       "subtitle": "200 meters from Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Room 200 meters from Piazza Maggiore"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€185 for 2 nights, originally €213",
+         "originalPrice": "€213",
+         "discountedPrice": "€185",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €92.50",
+             "priceString": "€185.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6Mjg2MDM4NzY=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49629,
+          "longitude": 11.33986
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Room 200 meters from Piazza Maggiore"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.93 (46)",
+       "title": "Condo in Bologna",
+       "subtitle": "Modern design near the Two Towers",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Design in the Historic Center"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€342 for 2 nights",
+         "price": "€342",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €175.28",
+             "priceString": "€350.55"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€8.76"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€341.79"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTI1MTQxMzE5Njk3OTE0MDcxMg==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4956,
+          "longitude": 11.3462
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Design in the Historic Center"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.9 (182)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Private courtyard near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Cartoleria 24 - Ground floor"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€304 for 2 nights",
+         "price": "€304",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €152.00",
+             "priceString": "€304.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MjQxNjQ5NDI=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4892,
+          "longitude": 11.3488
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Cartoleria 24 - Ground floor"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.96 (345)",
+       "title": "Condo in Bologna",
+       "subtitle": "A piano and private terrace downtown",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Marsala 3F Charm - Bologna City Center"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€348 for 2 nights",
+         "price": "€348",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €178.20",
+             "priceString": "€356.40"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€8.91"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€347.49"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MzQ3NDgyMzI=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4975,
+          "longitude": 11.3436
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Marsala 3F Charm - Bologna City Center"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.77 (98)",
+       "title": "Room in Bologna",
+       "subtitle": "Elegant apartment near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "[Centro-B&Bart #1]: lovely room with bathroom"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "SUPERHOST"
+         },
+         "text": "Superhost"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 single beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€207 for 2 nights, originally €249",
+         "originalPrice": "€249",
+         "discountedPrice": "€207",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €103.50",
+             "priceString": "€207.00"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTExOTY3NDI3MDU0NzgxMTk3Nw==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4894,
+          "longitude": 11.3489
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "[Centro-B&Bart #1]: lovely room with bathroom"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.96 (306)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Original 1380 beams near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Clavature Luxury Apartment- 100 sqm Piazza Maggiore"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "3 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "4 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€551 for 2 nights",
+         "price": "€551",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €275.50",
+             "priceString": "€551.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MjgxMDY3NjM=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49228,
+          "longitude": 11.34347
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Clavature Luxury Apartment- 100 sqm Piazza Maggiore"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.97 (100)",
+       "title": "Apartment in Bologna",
+       "subtitle": "18th-century palazzo with a private patio",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "The Winter Garden Bologna"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "4 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€532 for 2 nights",
+         "price": "€532",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €272.50",
+             "priceString": "€545.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€13.63"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€531.37"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTExNTAwMDkwODcyNDYzMTA4Mw==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.497,
+          "longitude": 11.3475
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "The Winter Garden Bologna"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.89 (92)",
+       "title": "Room in Bologna",
+       "subtitle": "Historic building, 5 min from Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Retro Suite - room with private bathroom"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€209 for 2 nights",
+         "price": "€209",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €106.95",
+             "priceString": "€213.90"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€5.35"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€208.55"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODM3NTk4NDMyMDg0NzYwMTA4",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4985,
+          "longitude": 11.3445
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Retro Suite - room with private bathroom"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.89 (397)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Historic 1500s mansion on the Moline canal",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Sottosopra Tourist House - Bologna City Center"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "SUPERHOST"
+         },
+         "text": "Superhost"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1.5 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€291 for 2 nights",
+         "price": "€291",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €148.75",
+             "priceString": "€297.50"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€7.44"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€290.06"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MjIwNzYxNjU=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4993,
+          "longitude": 11.3473
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Sottosopra Tourist House - Bologna City Center"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.83 (139)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Exposed beams overlooking the Moline Canal",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Casa Bertiera"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€323 for 2 nights",
+         "price": "€323",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €165.50",
+             "priceString": "€331.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€8.28"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€322.72"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODQyNzIyNDI2OTI4MTI1NjY2",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4985,
+          "longitude": 11.3445
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Casa Bertiera"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.9 (58)",
+       "title": "Condo in Bologna",
+       "subtitle": "Elegant top-floor flat, early 1900s building",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Domus Etra"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€280 for 2 nights",
+         "price": "€280",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €143.50",
+             "priceString": "€287.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€7.18"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€279.82"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTE5MDMwODczNTIyNTIxMDE2NA==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4989,
+          "longitude": 11.3484
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Domus Etra"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.95 (88)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Private terrace with rooftop views in Bologna",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Sunset Terrace: Central 2-Bedroom with Views"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "5 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€418 for 2 nights, originally €530",
+         "originalPrice": "€530",
+         "discountedPrice": "€418",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €265.00",
+             "priceString": "€530.00"
+            },
+            {
+             "description": "Long stay discount",
+             "priceString": "-€112.50"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€417.50"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTQxNjQ0MzczMjYwNDQ0NjIwNg==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.5003,
+          "longitude": 11.3418
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Sunset Terrace: Central 2-Bedroom with Views"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.95 (145)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Sunny terrace near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Ginkgo's - peacefull apartment in city center"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 queen bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€367 for 2 nights",
+         "price": "€367",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €188.00",
+             "priceString": "€376.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€9.40"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€366.60"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MjQyNDUxMDc=",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4974,
+          "longitude": 11.348
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Ginkgo's - peacefull apartment in city center"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.93 (128)",
+       "title": "Condo in Bologna",
+       "subtitle": "5-minute walk to Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "CellinBo"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "2 bedrooms",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€386 for 2 nights",
+         "price": "€386",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €193.00",
+             "priceString": "€386.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTExMjAzMDE5MDM5MTM0OTg4OA==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.49875,
+          "longitude": 11.33995
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "CellinBo"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "5.0 (23)",
+       "title": "Vacation home in Bologna",
+       "subtitle": "Rooftop loft with a private terrace",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Stylish Rooftop Retreat • Historic Centre"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 baths",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "DiscountedDisplayPriceLine",
+         "accessibilityLabel": "€444 for 2 nights, originally €492",
+         "originalPrice": "€492",
+         "discountedPrice": "€444",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €221.95",
+             "priceString": "€443.90"
+            }
+           ]
+          },
+          {
+           "items": []
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTY4ODg0NTQwMzc2MzE2MTQ4NQ==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4977,
+          "longitude": 11.3397
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Stylish Rooftop Retreat • Historic Centre"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.97 (30)",
+       "title": "Apartment in Bologna",
+       "subtitle": "16th-century palazzo near Piazza Maggiore",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "The Pearl of Bologna"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "TOP_X_GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 double bed",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€306 for 2 nights",
+         "price": "€306",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €153.00",
+             "priceString": "€306.00"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTUwMDgyNDMwMzQxMDA3MjA3OQ==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.497,
+          "longitude": 11.3413
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "The Pearl of Bologna"
+         }
+        }
+       }
+      },
+      {
+       "__typename": "StaySearchResult",
+       "avgRatingLocalized": "4.94 (110)",
+       "title": "Apartment in Bologna",
+       "subtitle": "Historic building in Bologna’s city center",
+       "nameLocalized": {
+        "__typename": "UGCText",
+        "localizedStringWithTranslationPreference": "Bologna City Center via del Borgo 1"
+       },
+       "badges": [
+        {
+         "loggingContext": {
+          "badgeType": "GUEST_FAVORITE"
+         },
+         "text": "Guest favorite"
+        }
+       ],
+       "structuredContent": {
+        "primaryLine": [
+         {
+          "body": "1 bedroom",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "2 beds",
+          "type": "BEDINFO"
+         },
+         {
+          "body": "1 bath",
+          "type": "BATHROOMINFO"
+         }
+        ]
+       },
+       "structuredDisplayPrice": {
+        "primaryLine": {
+         "__typename": "QualifiedDisplayPriceLine",
+         "accessibilityLabel": "€332 for 2 nights",
+         "price": "€332",
+         "qualifier": "for 2 nights"
+        },
+        "explanationData": {
+         "priceDetails": [
+          {
+           "items": [
+            {
+             "description": "2 nights x €170.00",
+             "priceString": "€340.00"
+            },
+            {
+             "description": "Discount from Airbnb",
+             "priceString": "-€8.50"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "description": "Price after discount",
+             "priceString": "€331.50"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "demandStayListing": {
+        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTE2ODU5NDc1MTU4NTYzMzE5OA==",
+        "location": {
+         "__typename": "DemandStayListingLocation",
+         "coordinate": {
+          "__typename": "Coordinate",
+          "latitude": 44.4981,
+          "longitude": 11.3481
+         }
+        },
+        "description": {
+         "__typename": "DemandStayListingDescription",
+         "name": {
+          "__typename": "UGCText",
+          "localizedStringWithTranslationPreference": "Bologna City Center via del Borgo 1"
+         }
+        }
+       }
+      }
+     ],
+     "paginationInfo": {
+      "__typename": "StaysSearchPaginationInfo",
+      "pageCursors": [
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjowLCJ2ZXJzaW9uIjoxfQ==",
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0Ijo0MCwidmVyc2lvbiI6MX0=",
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0Ijo4MCwidmVyc2lvbiI6MX0=",
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxMjAsInZlcnNpb24iOjF9",
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxNjAsInZlcnNpb24iOjF9",
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoyMDAsInZlcnNpb24iOjF9",
+       "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoyNDAsInZlcnNpb24iOjF9"
+      ]
+     },
+     "filters": {
+      "filterPanel": {
+       "resultCount": 248,
+       "searchButtonText": "Show 248 places"
+      }
+     }
+    }
+   }
+  }
+ }
+}

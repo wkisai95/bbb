@@ -1,0 +1,181 @@
+"""Prezzo consigliato per un alloggio e un periodo. L'app fa lo stesso identico calcolo (app/web/pricing.js).
+
+Per ogni notte il modello dà:
+  m      prezzo mediano dei comparabili per quella notte (caratteristiche × effetto della data)
+  h[L]   probabilità che, a L giorni dalla data, una notte libera venga prenotata quel giorno a prezzo m
+  beta   quanto la probabilità scende alzando il prezzo (e sale abbassandolo)
+
+MASSIMA RESA: programmazione dinamica. A ogni giorno che manca si sceglie il prezzo che rende massimo
+  [probabilità di vendere oggi × incasso] + [probabilità di non vendere × valore delle occasioni future].
+  Lontano dalla data conviene tenere alto (ci sono ancora molte occasioni); avvicinandosi, se la notte è
+  ancora libera, il prezzo scende. Il prezzo mostrato è quello da impostare oggi.
+
+MASSIMA OCCUPAZIONE: il prezzo più alto che, tenuto fermo fino alla data, lascia almeno l'obiettivo
+  (90%) di probabilità di vendere la notte; se non basta nemmeno il minimo, il minimo.
+
+In entrambi i casi il prezzo resta in una fascia attorno al mercato (percentili dei comparabili,
+e comunque non oltre -25% / +40%).
+"""
+from __future__ import annotations
+
+import math
+from datetime import date, timedelta
+
+import numpy as np
+
+GRID = 25
+H_MIN = 0.0005     # anche nei giorni più fiacchi resta una piccola probabilità di prenotazione
+
+
+def seg_class(bedrooms: int) -> str:
+    return "c01" if bedrooms <= 1 else "c2" if bedrooms == 2 else "c3"
+
+
+def _logit(p):
+    p = np.clip(p, 1e-6, 1 - 1e-6)
+    return np.log(p / (1 - p))
+
+
+def _expit(x):
+    return 1 / (1 + np.exp(-x))
+
+
+def attr_level(model: dict, zone: str, bedrooms: int, baths: float, guests: int, quality: str = "media") -> float:
+    c = model["coef"]
+    return (c["intercept"] + c["zone"].get(zone, 0.0) + c["bedrooms"][str(min(max(int(bedrooms), 0), 4))]
+            + c["bath"] * (min(max(float(baths), 0.5), 4.0) - 1.0)
+            + c["guests"] * math.log(min(max(float(guests), 1.0), 12.0) / 4.0)
+            + c["quality"].get(quality, c["quality"]["media"]))
+
+
+def price_band(model: dict) -> tuple[float, float]:
+    """Estremi (in log) del prezzo relativo ai comparabili."""
+    q = dict(zip(model["q_levels"], model["q_values"]))
+    lo = max(q[model["band"][0]], math.log(1 - model.get("max_discount", 0.25)))
+    hi = min(q[model["band"][1]], math.log(1 + model.get("max_premium", 0.40)))
+    return lo, max(hi, lo + 0.05)
+
+
+def night_hazards(model: dict, theta: float, lead0: int) -> np.ndarray:
+    """h[j] = probabilità di prenotazione nel giorno in cui mancano lead0-j giorni (a prezzo di mercato).
+
+    Ritmo tipico di quel giorno (differenza della curva `pace`) × velocità della notte (theta),
+    riportato dalla finestra di più notti alla singola notte (nu).
+    """
+    if lead0 <= 0:
+        return np.zeros(0)
+    C = np.asarray(model["pace"], dtype=float)
+    L = np.arange(lead0, 0, -1)
+    dC = np.maximum(C[L - 1] - C[L], 0.0)
+    return np.clip(1 - np.exp(-(theta / model["nu"]) * dC), H_MIN, 0.95)
+
+
+def default_cost(model: dict, attr: float) -> float:
+    """Costo variabile di partenza per notte prenotata: una quota del prezzo tipico dei comparabili."""
+    base = sorted(model["base"][:45])
+    return round(model.get("cost_share", 0.30) * math.exp(attr + base[len(base) // 2]))
+
+
+def solve_night(h: np.ndarray, beta: float, m: float, lo: float, hi: float, strategy: str, target: float,
+                cost: float = 0.0, floor_price: float = 0.0) -> dict:
+    """Prezzo di oggi per una notte, con probabilità di venderla e incasso atteso."""
+    lo_eff = max(lo, math.log(max(floor_price, 1e-9) / m))     # mai sotto il prezzo minimo dell'utente
+    hi_eff = max(hi, lo_eff)
+    lnr = np.linspace(lo_eff, hi_eff, GRID)
+    r = np.exp(lnr)
+    if len(h) == 0:
+        return {"rel": float(r[0]), "sell": 0.0, "gross": 0.0, "net": 0.0, "sell_market": 0.0, "plan": []}
+    lg = _logit(h)
+    sell_market = float(1 - np.prod(1 - h))
+    if strategy == "occupazione":
+        hr = _expit(lg[:, None] + beta * lnr[None, :])          # giorni × prezzi
+        sell = 1 - np.prod(1 - hr, axis=0)
+        ok = np.flatnonzero(sell >= target)
+        j = int(ok[-1]) if len(ok) else 0
+        return {"rel": float(r[j]), "sell": float(sell[j]), "gross": float(r[j] * m * sell[j]),
+                "net": float((r[j] * m - cost) * sell[j]), "sell_market": sell_market, "plan": []}
+    V = G = Q = 0.0
+    policy = []
+    for k in range(len(h) - 1, -1, -1):                          # dall'ultimo giorno utile a oggi
+        hr = _expit(lg[k] + beta * lnr)
+        val = hr * (r * m - cost) + (1 - hr) * V
+        j = int(np.argmax(val))
+        G = hr[j] * r[j] * m + (1 - hr[j]) * G
+        Q = hr[j] + (1 - hr[j]) * Q
+        V = float(val[j])
+        policy.append(float(r[j]))
+    policy.reverse()                                             # policy[i]: prezzo quando mancano len(h)-i giorni
+    lead0 = len(h)
+    plan = [{"lead": L, "rel": policy[lead0 - L]} for L in (30, 14, 7, 3, 1) if L < lead0]
+    return {"rel": policy[0], "sell": float(Q), "gross": float(G), "net": float(V), "sell_market": sell_market, "plan": plan}
+
+
+def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, start: date, end: date,
+              strategy: str = "resa", quality: str = "media", min_price: float = 0.0, cost: float | None = None) -> dict:
+    """Notti da `start` a `end` comprese. `cost` = costo variabile per notte prenotata (None = valore di partenza)."""
+    t0 = date.fromisoformat(model["start"])
+    lo, hi = price_band(model)
+    q = dict(zip(model["q_levels"], model["q_values"]))
+    beta = float(model["beta"])
+    target = float(model["target_occupancy"])
+    attr = attr_level(model, zone, bedrooms, baths, guests, quality)
+    grp = next((z["group"] for z in model["zones"] if z["id"] == zone), "cintura")
+    thetas = model["theta"][seg_class(int(bedrooms))][grp]
+    if cost is None:
+        cost = default_cost(model, attr)
+    ev_by_night: dict[str, list] = {}
+    for e in model["events"]:
+        a, b = date.fromisoformat(e["night_first"]), date.fromisoformat(e["night_last"])
+        for i in range((b - a).days + 1):
+            ev_by_night.setdefault((a + timedelta(days=i)).isoformat(), []).append(e)
+    nights = []
+    d = start
+    while d <= end:
+        k = (d - t0).days
+        if 0 <= k < len(model["idx"]):
+            m = math.exp(attr + model["idx"][k])
+            s = solve_night(night_hazards(model, thetas[k], k), beta, m, lo, hi, strategy, target, cost, min_price)
+            price = max(1, round(s["rel"] * m))
+            evs = sorted(ev_by_night.get(d.isoformat(), []), key=lambda e: -e["weight"])
+            nights.append({
+                "date": d.isoformat(), "lead": k, "price": int(price), "sell": round(s["sell"], 3),
+                "gross": round(s["gross"], 1), "net": round(s["net"], 1),
+                "market": round(m), "sell_market": round(s["sell_market"], 3),
+                "low": round(m * math.exp(q[25])), "high": round(m * math.exp(q[75])),
+                "floor": round(m * math.exp(lo)), "cap": round(m * math.exp(hi)),
+                "uplift": round(math.exp(model["idx"][k] - model["base"][k]) - 1, 3),
+                "occ_now": model["occ_now"][k], "occ_fin": model["occ_fin"][k],
+                "measured": model["cov"][k] >= 6, "events": [e["name"] for e in evs],
+                "weight": evs[0]["weight"] if evs else 0,
+                "plan": [{"lead": p["lead"], "price": int(round(p["rel"] * m))} for p in s["plan"]],
+            })
+        d += timedelta(days=1)
+    n = len(nights)
+    return {
+        "strategy": strategy, "cost": cost, "nights": nights,
+        "avg_price": round(sum(x["price"] for x in nights) / n) if n else 0,
+        "occupancy": round(sum(x["sell"] for x in nights) / n, 3) if n else 0.0,
+        "revenue": round(sum(x["gross"] for x in nights)),
+        "net": round(sum(x["net"] for x in nights)),
+        "market_avg": round(sum(x["market"] for x in nights) / n) if n else 0,
+        "market_occupancy": round(sum(x["sell_market"] for x in nights) / n, 3) if n else 0.0,
+        "market_revenue": round(sum(x["market"] * x["sell_market"] for x in nights)),
+        "reliability": reliability(model, zone, int(bedrooms), nights),
+    }
+
+
+def reliability(model: dict, zone: str, bedrooms: int, nights: list) -> dict:
+    """Quanto fidarsi: storico raccolto, numero di comparabili, notti misurate davvero, domanda, sensibilità."""
+    rel = model["reliability"]
+    comp = ((model["market"].get("zone_bedrooms") or {}).get(zone) or {}).get(str(min(bedrooms, 4)), {}).get("n", 0)
+    parts = {
+        "storico": min(1.0, rel["scan_days"] / 45),
+        "comparabili": min(1.0, comp / 30),
+        "date": (sum(1 for x in nights if x["measured"]) / len(nights)) if nights else 0.0,
+        "domanda": min(1.0, (rel.get("demand_days") or 0) / 21),
+        "sensibilita": float((rel.get("beta") or {}).get("weight", 0.0)),
+    }
+    score = (0.25 * parts["storico"] + 0.25 * parts["comparabili"] + 0.25 * parts["date"]
+             + 0.15 * parts["domanda"] + 0.10 * parts["sensibilita"])
+    label = "alta" if score >= 0.7 else "media" if score >= 0.4 else "bassa"
+    return {"score": round(score, 3), "label": label, "parts": {k: round(v, 3) for k, v in parts.items()}, "comparables": int(comp)}

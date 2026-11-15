@@ -1,0 +1,59 @@
+{
+  "note": "Zone di lavoro, approssimate: ogni annuncio va alla zona con il centro più vicino. Dentro i viali valgono solo le zone del centro. Airbnb sposta le coordinate di circa 100-150 m, quindi gli annunci sul confine possono finire nella zona accanto. Centri e nomi si possono modificare liberamente.",
+  "max_km": 4.5,
+  "ring": [
+    [44.4990, 11.3285],
+    [44.5028, 11.3342],
+    [44.5050, 11.3410],
+    [44.5042, 11.3447],
+    [44.5030, 11.3520],
+    [44.4985, 11.3562],
+    [44.4945, 11.3572],
+    [44.4912, 11.3572],
+    [44.4848, 11.3557],
+    [44.4837, 11.3485],
+    [44.4842, 11.3415],
+    [44.4855, 11.3360],
+    [44.4893, 11.3318],
+    [44.4946, 11.3290]
+  ],
+  "groups": {
+    "centro": "Centro storico",
+    "cintura": "Prima cintura",
+    "periferia": "Periferia",
+    "fuori": "Fuori comune"
+  },
+  "zones": [
+    {"id": "c_maggiore", "name": "Centro · Piazza Maggiore e Quadrilatero", "short": "Piazza Maggiore", "group": "centro", "ring": true, "lat": 44.4938, "lon": 11.3435},
+    {"id": "c_universita", "name": "Centro · Zona universitaria", "short": "Zona universitaria", "group": "centro", "ring": true, "lat": 44.4972, "lon": 11.3515},
+    {"id": "c_stazione", "name": "Centro · Indipendenza e Stazione", "short": "Indipendenza-Stazione", "group": "centro", "ring": true, "lat": 44.5015, "lon": 11.3440},
+    {"id": "c_marconi", "name": "Centro · Marconi e Manifattura delle Arti", "short": "Marconi-MAMbo", "group": "centro", "ring": true, "lat": 44.4995, "lon": 11.3360},
+    {"id": "c_pratello", "name": "Centro · Pratello e San Felice", "short": "Pratello", "group": "centro", "ring": true, "lat": 44.4950, "lon": 11.3325},
+    {"id": "c_saragozza", "name": "Centro · Saragozza e San Mamolo", "short": "Saragozza (centro)", "group": "centro", "ring": true, "lat": 44.4885, "lon": 11.3385},
+    {"id": "c_sstefano", "name": "Centro · Santo Stefano e Castiglione", "short": "Santo Stefano", "group": "centro", "ring": true, "lat": 44.4885, "lon": 11.3505},
+    {"id": "bolognina", "name": "Bolognina", "short": "Bolognina", "group": "cintura", "ring": false, "lat": 44.5125, "lon": 11.3465},
+    {"id": "fiera", "name": "Fiera e San Donato", "short": "Fiera", "group": "cintura", "ring": false, "lat": 44.5080, "lon": 11.3660},
+    {"id": "sanvitale", "name": "San Vitale, Cirenaica e Sant'Orsola", "short": "San Vitale", "group": "cintura", "ring": false, "lat": 44.4940, "lon": 11.3660},
+    {"id": "mazzini", "name": "Mazzini e Fossolo", "short": "Mazzini", "group": "cintura", "ring": false, "lat": 44.4830, "lon": 11.3760},
+    {"id": "murri", "name": "Murri e Giardini Margherita", "short": "Murri", "group": "cintura", "ring": false, "lat": 44.4775, "lon": 11.3590},
+    {"id": "colli", "name": "Colli", "short": "Colli", "group": "cintura", "ring": false, "lat": 44.4730, "lon": 11.3370},
+    {"id": "saragozza", "name": "Saragozza fuori porta e Stadio", "short": "Saragozza-Stadio", "group": "cintura", "ring": false, "lat": 44.4895, "lon": 11.3200},
+    {"id": "saffi", "name": "Saffi e Ospedale Maggiore", "short": "Saffi", "group": "cintura", "ring": false, "lat": 44.5030, "lon": 11.3190},
+    {"id": "santaviola", "name": "Santa Viola e Barca", "short": "Santa Viola-Barca", "group": "periferia", "ring": false, "lat": 44.5000, "lon": 11.2950},
+    {"id": "borgopanigale", "name": "Borgo Panigale e Aeroporto", "short": "Borgo Panigale", "group": "periferia", "ring": false, "lat": 44.5210, "lon": 11.2800},
+    {"id": "navile", "name": "Lame, Arcoveggio e Navile", "short": "Navile", "group": "periferia", "ring": false, "lat": 44.5230, "lon": 11.3380},
+    {"id": "corticella", "name": "Corticella", "short": "Corticella", "group": "periferia", "ring": false, "lat": 44.5400, "lon": 11.3560},
+    {"id": "pilastro", "name": "San Donato esterno e Pilastro", "short": "Pilastro", "group": "periferia", "ring": false, "lat": 44.5130, "lon": 11.3900},
+    {"id": "savena", "name": "San Ruffillo e Savena", "short": "Savena", "group": "periferia", "ring": false, "lat": 44.4650, "lon": 11.3700},
+    {"id": "casalecchio", "name": "Casalecchio di Reno (Unipol Arena)", "short": "Casalecchio", "group": "fuori", "ring": false, "lat": 44.4760, "lon": 11.2700},
+    {"id": "sanlazzaro", "name": "San Lazzaro di Savena", "short": "San Lazzaro", "group": "fuori", "ring": false, "lat": 44.4710, "lon": 11.4080}
+  ],
+  "venues": {
+    "BolognaFiere": [44.5108, 11.3622],
+    "Bologna Congress Center": [44.5112, 11.3640],
+    "Unipol Arena": [44.4725, 11.2450],
+    "Stadio Dall'Ara": [44.4922, 11.3099],
+    "Piazza Maggiore": [44.4938, 11.3426],
+    "Stazione Centrale": [44.5058, 11.3431]
+  }
+}

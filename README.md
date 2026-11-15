@@ -1,3 +1,4 @@
-# bbb
+# bbb · prezzi Airbnb a Bologna
 
-Monitor dei prezzi Airbnb a Bologna (in costruzione).
+Scanner giornaliero dei prezzi degli appartamenti su Airbnb a Bologna, con modello di prezzo e app Android.
+Documentazione completa in arrivo con l'app.

@@ -1,0 +1,96 @@
+# Eventi che spostano la domanda di alloggi a Bologna.
+#
+# peso: 1 minimo · 2 medio · 3 alto · 4 molto alto · 5 massimo (Cosmoprof, Cersaie)
+# Il peso conta solo per le notti che lo scanner non ha ancora misurato: appena legge i prezzi
+# reali di quelle date, vale l'aumento osservato sul mercato.
+#
+# Fonti, lette il 15 novembre 2026:
+#   - bolognafiere.it/calendario (fiere e congressi)
+#   - bolognawelcome.com, "Concerti da vedere a Bologna" (aggiornata il 13 novembre 2026)
+#   - siti degli organizzatori per maratona, Cinema Ritrovato e concerti allo stadio
+# Lo scanner rilegge le prime due a ogni esecuzione e aggiunge da solo gli eventi nuovi.
+# Per aggiungerne uno a mano basta copiare una riga qui sotto, oppure usare l'app (Eventi → Aggiungi).
+
+events:
+  # ---- Fiere, congressi e sport a BolognaFiere ----
+  - {name: "AIOP · Congresso internazionale", start: 2026-11-19, end: 2026-11-21, venue: "Bologna Congress Center", category: congresso, weight: 2}
+  - {name: "Mercato dei Vini dei Vignaioli Indipendenti (FIVI)", start: 2026-11-21, end: 2026-11-23, venue: BolognaFiere, category: fiera, weight: 2}
+  - {name: "Davis Cup Final 8", start: 2026-11-24, end: 2026-11-29, venue: BolognaFiere, category: sport, weight: 3}
+  - {name: "Il Mondo Creativo, WOW e fiere del fine settimana", start: 2026-11-26, end: 2026-11-29, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "Yu-Gi-Oh! Championship Series", start: 2026-12-04, end: 2026-12-06, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "Marca by BolognaFiere & ADM", start: 2027-01-13, end: 2027-01-14, venue: BolognaFiere, category: fiera, weight: 3}
+  - {name: "Orienta Emilia-Romagna (ASTER)", start: 2027-01-19, end: 2027-01-21, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "Nerd Show e Bologna Sposi", start: 2027-01-23, end: 2027-01-24, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "Arte Fiera", start: 2027-02-05, end: 2027-02-07, venue: BolognaFiere, category: fiera, weight: 3}
+  - {name: "ForumPiscine, ForumClub, BE FIRE, OUTEX", start: 2027-02-10, end: 2027-02-12, venue: BolognaFiere, category: fiera, weight: 2}
+  - {name: "Liberamente", start: 2027-02-19, end: 2027-02-21, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "Sana Food e Slow Wine Fair", start: 2027-02-21, end: 2027-02-23, venue: BolognaFiere, category: fiera, weight: 2}
+  - {name: "MATCH4 Business Matching", start: 2027-02-25, end: 2027-02-26, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "MECSPE", start: 2027-03-03, end: 2027-03-05, venue: BolognaFiere, category: fiera, weight: 4}
+  - {name: "Cosmoprof Worldwide Bologna", start: 2027-03-18, end: 2027-03-21, venue: BolognaFiere, category: fiera, weight: 5}
+  - {name: "Bologna Children's Book Fair", start: 2027-04-05, end: 2027-04-08, venue: BolognaFiere, category: fiera, weight: 4}
+  - {name: "Dronitaly", start: 2027-04-07, end: 2027-04-09, venue: "Bologna Congress Center", category: fiera, weight: 1}
+  - {name: "HealthAbility Experience", start: 2027-04-17, end: 2027-04-18, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "PLAY · Festival del Gioco", start: 2027-04-23, end: 2027-04-25, venue: BolognaFiere, category: fiera, weight: 2}
+  - {name: "Zoomark", start: 2027-05-11, end: 2027-05-13, venue: BolognaFiere, category: fiera, weight: 4}
+  - {name: "Eufonica, Guitar Show e Drum Show", start: 2027-05-14, end: 2027-05-16, venue: BolognaFiere, category: fiera, weight: 1}
+  - {name: "Autopromotec", start: 2027-05-26, end: 2027-05-29, venue: BolognaFiere, category: fiera, weight: 4}
+  - {name: "Ambiente Lavoro", start: 2027-06-08, end: 2027-06-10, venue: BolognaFiere, category: fiera, weight: 2}
+  - {name: "WMF · We Make Future", start: 2027-06-10, end: 2027-06-12, venue: BolognaFiere, category: fiera, weight: 3}
+  - {name: "Cersaie", start: 2027-09-27, end: 2027-10-01, venue: BolognaFiere, category: fiera, weight: 5}
+  - {name: "H2O e International NO DIG", start: 2027-10-11, end: 2027-10-13, venue: BolognaFiere, category: fiera, weight: 2}
+  - {name: "Refrigera", start: 2027-11-10, end: 2027-11-12, venue: BolognaFiere, category: fiera, weight: 2}
+
+  # ---- Città ----
+  - {name: "Bologna Marathon", start: 2027-03-06, end: 2027-03-07, venue: "Piazza Maggiore", category: sport, weight: 2}
+  - {name: "Il Cinema Ritrovato", start: 2027-06-19, end: 2027-06-27, venue: "Cineteca e Piazza Maggiore", category: cultura, weight: 2}
+
+  # ---- Concerti all'Unipol Arena (Casalecchio di Reno) ----
+  - {name: "Gigi D'Alessio", start: 2026-11-15, end: 2026-11-15, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Shiva", start: 2026-11-21, end: 2026-11-21, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Cesare Cremonini", start: 2026-12-02, end: 2026-12-02, venue: "Unipol Arena", category: concerto, weight: 2}
+  - {name: "Cesare Cremonini", start: 2026-12-05, end: 2026-12-06, venue: "Unipol Arena", category: concerto, weight: 2}
+  - {name: "Anna", start: 2026-12-17, end: 2026-12-17, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Irama", start: 2026-12-19, end: 2026-12-19, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Il Volo", start: 2026-12-20, end: 2026-12-20, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Tedua", start: 2027-01-23, end: 2027-01-23, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Max Pezzali", start: 2027-02-05, end: 2027-02-06, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Max Pezzali", start: 2027-02-08, end: 2027-02-08, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Sfera Ebbasta", start: 2027-02-13, end: 2027-02-13, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Gabry Ponte", start: 2027-02-27, end: 2027-02-27, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Gianna Nannini", start: 2027-04-09, end: 2027-04-09, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Simple Minds", start: 2027-04-17, end: 2027-04-17, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Gazzelle", start: 2027-04-18, end: 2027-04-18, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Thirty Seconds To Mars", start: 2027-05-08, end: 2027-05-08, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Elodie", start: 2027-05-22, end: 2027-05-22, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Tananai", start: 2027-10-10, end: 2027-10-10, venue: "Unipol Arena", category: concerto, weight: 1}
+  - {name: "Artie 5ive", start: 2027-10-17, end: 2027-10-17, venue: "Unipol Arena", category: concerto, weight: 1}
+
+  # ---- Concerti allo Stadio Dall'Ara ----
+  - {name: "Achille Lauro", start: 2027-06-06, end: 2027-06-06, venue: "Stadio Dall'Ara", category: concerto, weight: 3}
+  - {name: "Pinguini Tattici Nucleari", start: 2027-06-08, end: 2027-06-08, venue: "Stadio Dall'Ara", category: concerto, weight: 3}
+  # Le fonti non concordano: alcune indicano solo il 13 giugno, altre il 13 e il 14.
+  - {name: "Ultimo", start: 2027-06-13, end: 2027-06-14, venue: "Stadio Dall'Ara", category: concerto, weight: 3, note: "data da verificare: 13 giugno, forse anche 14"}
+  - {name: "Olly", start: 2027-06-19, end: 2027-06-19, venue: "Stadio Dall'Ara", category: concerto, weight: 3}
+
+# Pesi assegnati agli eventi trovati in automatico: la prima parola chiave contenuta nel nome vince.
+auto_weights:
+  - {match: "cosmoprof worldwide", weight: 5}
+  - {match: "cersaie", weight: 5}
+  - {match: "eima", weight: 4}
+  - {match: "mecspe", weight: 4}
+  - {match: "autopromotec", weight: 4}
+  - {match: "children's book", weight: 4}
+  - {match: "zoomark", weight: 4}
+  - {match: "marca by", weight: 3}
+  - {match: "saie", weight: 3}
+  - {match: "sana", weight: 3}
+  - {match: "arte fiera", weight: 3}
+  - {match: "artefiera", weight: 3}
+  - {match: "wmf", weight: 3}
+  - {match: "davis cup", weight: 3}
+  - {match: "auto e moto d'epoca", weight: 3}
+  - {match: "cosmofarma", weight: 3}
+  - {match: "exposanit", weight: 3}
+  - {match: "farete", weight: 2}
+  - {match: "stadio", weight: 3}

@@ -1,0 +1,107 @@
+name: Scansione
+run-name: Scansione prezzi · ${{ github.event_name == 'schedule' && 'giornaliera' || 'avviata a mano' }}
+
+on:
+  schedule:
+    - cron: "23 3 * * *"          # ogni giorno alle 03:23 UTC (04:23 o 05:23 in Italia)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "all = scansione + modello · model = solo ricalcolo dai dati già raccolti"
+        type: choice
+        options: [all, model]
+        default: all
+      max_requests:
+        description: "Tetto di richieste per questa esecuzione (vuoto = quello di config/settings.yaml)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Dipendenze
+        run: pip install -q -r requirements.txt
+
+      - name: Test
+        run: |
+          pip install -q pytest
+          python -m pytest tests -q -x
+
+      - name: Riprendi i dati già raccolti
+        id: restore
+        run: |
+          mkdir -p out
+          if git ls-remote --exit-code origin refs/heads/data >/dev/null 2>&1; then
+            git fetch --depth 1 origin data
+            git archive FETCH_HEAD | tar -x -C out
+            echo "Dati esistenti: $(ls out/data/prices 2>/dev/null | wc -l) giorni di prezzi"
+          else
+            echo "Prima esecuzione: nessun dato precedente"
+          fi
+
+      - name: Scansione, modello e file per l'app
+        run: |
+          EXTRA=""
+          if [ -n "${{ inputs.max_requests }}" ]; then EXTRA="--max-requests ${{ inputs.max_requests }}"; fi
+          python -m bnb ${{ inputs.mode || 'all' }} --out out $EXTRA
+
+      - name: Salva sul ramo data
+        if: always() && steps.restore.outcome == 'success'
+        run: |
+          if [ ! -f out/data/listings.csv ] && [ ! -f out/public/status.json ]; then
+            echo "Niente da salvare"; exit 0
+          fi
+          cd out
+          printf 'backup/\n' > .gitignore
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          if git ls-remote --exit-code origin refs/heads/data >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin data
+            git reset -q --soft FETCH_HEAD
+          fi
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nessuna novità"
+          else
+            git commit -q -m "Dati del $(date -u +%F)"
+            git push -q origin data
+          fi
+
+      - name: Backup scaricabile
+        if: always() && steps.restore.outcome == 'success'
+        run: |
+          if [ ! -f out/backup/bbb-backup.zip ]; then
+            python -m bnb backup --out out || exit 0
+          fi
+          gh release view backup >/dev/null 2>&1 || gh release create backup --latest=false \
+            --title "Backup dei dati" \
+            --notes "Archivio completo dei dati raccolti, aggiornato a ogni scansione. Scarica bbb-backup.zip per una copia offline."
+          gh release upload backup out/backup/bbb-backup.zip --clobber
+
+      - name: Riepilogo
+        if: always()
+        run: |
+          {
+            echo "### Scansione"
+            if [ -f out/public/status.json ]; then echo '```json'; cat out/public/status.json; echo '```'; fi
+          } >> "$GITHUB_STEP_SUMMARY"

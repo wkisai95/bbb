@@ -1,0 +1,71 @@
+# Impostazioni dello scanner. Tutto ciò che non è scritto qui usa i valori predefiniti in bnb/config.py.
+
+city: Bologna
+currency: EUR
+timezone: Europe/Rome
+
+# Rettangolo che contiene il Comune di Bologna (più Casalecchio e San Lazzaro ai bordi)
+bbox: {sw_lat: 44.421, sw_lon: 11.230, ne_lat: 44.556, ne_lon: 11.433}
+
+# Solo alloggi interi ("appartamenti"). Per includere le stanze: ["Entire home/apt", "Private room"]
+room_type: "Entire home/apt"
+
+scan:
+  nights: 2                  # durata dei soggiorni campione: il minimo più comune a Bologna
+  near_days: 60              # ogni notte dei prossimi 60 giorni viene letta a giorni alterni
+  mid_days: 180              # da 60 a 180 giorni: un fine settimana e un infrasettimanale per settimana, a rotazione
+  far_days: 365              # da 180 a 365 giorni: una coppia di finestre al mese, più tutte le date con eventi
+  mid_share: 2               # ogni finestra "media" viene letta un giorno ogni 2
+  far_share: 4               # ogni finestra "lontana" o con evento viene letta un giorno ogni 4
+  census_leads: [[1, 2], [7, 8], [14, 15], [28, 29]]   # a questi anticipi si leggono TUTTI gli annunci disponibili
+  census_max_pages: 60       # tetto di pagine extra per ogni censimento
+  pause: [1.2, 2.2]          # secondi di pausa tra una richiesta e l'altra (casuale nell'intervallo)
+  max_requests: 1400         # tetto di richieste per esecuzione
+  max_minutes: 55            # tetto di durata della scansione
+  details_per_run: 120       # annunci nuovi di cui leggere la capienza (ospiti) a ogni esecuzione
+  stop_after_errors: 4       # errori consecutivi dopo i quali la scansione si ferma (nessun tentativo di aggirare blocchi)
+
+# Riquadri della mappa. "core" = sempre; "outer" = zone con pochi annunci, lette a rotazione.
+tiles:
+  - {id: c11, kind: core, sw: [44.4885, 11.3315], ne: [44.4960, 11.34278]}
+  - {id: c12, kind: core, sw: [44.4885, 11.34278], ne: [44.4960, 11.35406]}
+  - {id: c13, kind: core, sw: [44.4885, 11.35406], ne: [44.4960, 11.36533]}
+  - {id: c21, kind: core, sw: [44.4960, 11.3315], ne: [44.5035, 11.34278]}
+  - {id: c22, kind: core, sw: [44.4960, 11.34278], ne: [44.5035, 11.35406]}
+  - {id: c23, kind: core, sw: [44.4960, 11.35406], ne: [44.5035, 11.36533]}
+  - {id: c31, kind: core, sw: [44.5035, 11.3315], ne: [44.5110, 11.34278]}
+  - {id: c32, kind: core, sw: [44.5035, 11.34278], ne: [44.5110, 11.35406]}
+  - {id: c33, kind: core, sw: [44.5035, 11.35406], ne: [44.5110, 11.36533]}
+  - {id: w, kind: core, sw: [44.4885, 11.29767], ne: [44.5110, 11.3315]}
+  - {id: s, kind: core, sw: [44.4660, 11.29767], ne: [44.4885, 11.36533]}
+  - {id: e, kind: core, sw: [44.4885, 11.36533], ne: [44.5110, 11.433]}
+  - {id: se, kind: core, sw: [44.4660, 11.36533], ne: [44.4885, 11.433]}
+  - {id: n, kind: core, sw: [44.5110, 11.3315], ne: [44.5560, 11.433]}
+  - {id: wo, kind: outer, sw: [44.4660, 11.230], ne: [44.5110, 11.29767]}
+  - {id: nw, kind: outer, sw: [44.5110, 11.230], ne: [44.5560, 11.3315]}
+  - {id: so, kind: outer, sw: [44.4210, 11.230], ne: [44.4660, 11.433]}
+
+# Conteggi per taglia, letti sull'intera città a ogni finestra
+segments:
+  - {id: br2, min_bedrooms: 2}
+  - {id: br3, min_bedrooms: 3}
+
+model:
+  fit_days: 21               # giorni di scansioni usati per stimare i prezzi
+  min_price: 25              # €/notte: sotto è quasi sempre un errore di lettura
+  max_price: 1500
+  ridge_zone: 6.0
+  ridge_window: 4.0
+  beta_prior: -2.2           # sensibilità delle prenotazioni al prezzo (valore di partenza): +10% di prezzo ≈ -20% di prenotazioni
+  beta_prior_sd: 0.8
+  target_occupancy: 0.90     # obiettivo della strategia "massima occupazione"
+  band: [10, 90]             # i prezzi consigliati restano tra questi percentili dei comparabili...
+  max_discount: 0.25         # ...e comunque non oltre il 25% sotto
+  max_premium: 0.40          # e il 40% sopra il prezzo mediano dei comparabili per quella notte
+  # Moltiplicatori di partenza per peso dell'evento, usati solo per le notti non ancora misurate
+  event_prior: {1: 1.03, 2: 1.10, 3: 1.25, 4: 1.50, 5: 1.90}
+
+sources:
+  inside_airbnb: true        # dati aperti trimestrali (CC BY 4.0): catalogo iniziale e capienze
+  inside_airbnb_every_days: 7
+  events_auto: true          # rilegge i calendari pubblici di BolognaFiere e Bologna Welcome
