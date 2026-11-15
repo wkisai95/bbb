@@ -34,7 +34,7 @@
     for (var i = 2; i < arguments.length; i++) if (arguments[i]) el.appendChild(typeof arguments[i] === "object" ? arguments[i] : document.createTextNode(String(arguments[i])));
     return el;
   }
-  var nf = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 0 });
+  var nf = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 0, useGrouping: "always" });
   function euro(n) { return nf.format(Math.round(n)) + " €"; }
   function pct(x) { return Math.round(x * 100) + "%"; }
   function signedPct(x) { var v = Math.round(x * 100); return (v > 0 ? "+" : "") + v + "%"; }
@@ -308,8 +308,11 @@
       var d0 = new Date(cur), y = d0.getUTCFullYear(), mo = d0.getUTCMonth();
       var daysIn = new Date(Date.UTC(y, mo + 1, 0)).getUTCDate(), lead = (d0.getUTCDay() + 6) % 7;
       var grid = h("div", { class: "grid" }), i;
-      for (i = 0; i < lead; i++) grid.appendChild(h("div", { class: "cell off" }));
-      for (i = 1; i <= daysIn; i++) {
+      // solo le settimane che contengono notti del periodo
+      var firstDay = Math.max(1, cur < first ? new Date(first).getUTCDate() : 1), lastDay = Math.min(daysIn, last < Date.UTC(y, mo, daysIn) ? new Date(last).getUTCDate() : daysIn);
+      var fromDay = firstDay - ((lead + firstDay - 1) % 7), toDay = lastDay + (6 - (lead + lastDay - 1) % 7);
+      for (i = fromDay; i <= toDay; i++) {
+        if (i < 1 || i > daysIn) { grid.appendChild(h("div", { class: "cell off" })); continue; }
         var ms = Date.UTC(y, mo, i), n = byDate[P.isoDate(ms)];
         if (!n) { grid.appendChild(h("div", { class: "cell off" }, h("span", { class: "d", text: i }))); continue; }
         var cls = "cell " + heatClass(n.uplift) + (n.measured ? "" : " guess") + (ms === today ? " today" : "");
@@ -318,8 +321,6 @@
           h("span", { class: "d", text: i }), h("span", { class: "p", text: n.price }),
           n.weight >= 2 ? h("span", { class: "e", style: "height:" + n.weight + "px" }) : null));
       }
-      var tail = (7 - (lead + daysIn) % 7) % 7;
-      for (i = 0; i < tail; i++) grid.appendChild(h("div", { class: "cell off" }));
       root.appendChild(h("section", { class: "month" }, h("h3", { text: fmtDate(cur, { month: "long", year: "numeric" }) }),
         h("div", { class: "dow", "aria-hidden": "true" }, ["L", "M", "M", "G", "V", "S", "D"].map(function (x) { return h("span", { text: x }); })), grid));
       cur = Date.UTC(y, mo + 1, 1);
@@ -350,11 +351,12 @@
       // dove cade il prezzo rispetto ai comparabili
       var lo = Math.min(n.floor, n.price, n.low), hi = Math.max(n.cap, n.price, n.high), span = Math.max(1, hi - lo);
       function x(v) { return ((v - lo) / span * 100).toFixed(2) + "%"; }
+      var pos = (n.price - lo) / span * 100;
       body.appendChild(h("div", { class: "band-fig", role: "img", "aria-label": "Il prezzo consigliato è " + n.price + " euro; metà dei comparabili sta tra " + n.low + " e " + n.high + " euro, mediana " + n.market },
-        h("span", { class: "lab top", style: "left:" + x(n.price), text: "consigliato" }),
+        h("span", { class: "lab up" + (pos < 14 ? " l" : pos > 86 ? " r" : ""), style: pos < 14 || pos > 86 ? "" : "left:" + x(n.price), text: "consigliato" }),
         h("span", { class: "rail" }), h("span", { class: "iqr", style: "left:" + x(n.low) + ";width:" + ((n.high - n.low) / span * 100).toFixed(2) + "%" }),
         h("span", { class: "med", style: "left:" + x(n.market) }), h("span", { class: "you", style: "left:" + x(n.price) }),
-        h("span", { class: "lab bot l", text: euro(lo) }), h("span", { class: "lab bot r", text: euro(hi) })));
+        h("span", { class: "lab dn l", text: euro(lo) }), h("span", { class: "lab dn r", text: euro(hi) })));
       body.appendChild(h("p", { class: "note", text: "Fascia colorata: metà degli appartamenti simili (" + euro(n.low) + "–" + euro(n.high) + "). Tacca: la loro mediana, " + euro(n.market) + "." }));
 
       var dl = h("dl", { class: "kv" });
@@ -366,7 +368,7 @@
       kv("Mercato occupato alla data (previsione)", pct(n.occFin));
       kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(alt.price));
       body.appendChild(dl);
-      if (n.plan.length) {
+      if (n.plan.length >= 2) {
         body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la notte resta libera" }));
         body.appendChild(h("div", { class: "plan" }, n.plan.map(function (p) {
           return h("div", {}, h("b", { text: euro(p.price) }), h("span", { text: "a " + p.lead + (p.lead === 1 ? " giorno" : " giorni") }));
@@ -508,7 +510,7 @@
         var br = r[ix.bedrooms];
         ul.appendChild(h("li", {}, h("button", { class: "row", onclick: function () { openExternal("https://www.airbnb.it/rooms/" + r[ix.id]); } },
           h("div", { class: "main" }, h("div", { class: "t", text: r[ix.name] || "Annuncio " + r[ix.id] }),
-            h("div", { class: "s", text: zoneName(zoneIds[r[ix.zone]], true) + ", " + (br === 0 ? "monolocale" : br + " cam.") + ", " + String(r[ix.baths]).replace(".", ",") + " bagni, " + r[ix.guests] + (r[ix.guests_est] ? " ospiti (stima)" : " ospiti") + (r[ix.rating] ? ", " + String(r[ix.rating]).replace(".", ",") + " su " + r[ix.reviews] + " rec." : "") })),
+            h("div", { class: "s", text: zoneName(zoneIds[r[ix.zone]], true) + ", " + (br === 0 ? "monolocale" : br + " cam.") + ", " + String(r[ix.baths]).replace(".", ",") + (r[ix.baths] === 1 ? " bagno, " : " bagni, ") + r[ix.guests] + (r[ix.guests_est] ? " ospiti (stima)" : " ospiti") + (r[ix.rating] ? ", " + String(r[ix.rating]).replace(".", ",") + " su " + r[ix.reviews] + " rec." : "") })),
           h("div", { class: "side" }, r[ix.price] + " €", h("small", { text: "apri" })))));
       });
       body.appendChild(ul);
@@ -518,7 +520,7 @@
 
   // ------------------------------------------------------------------ grafico a linee
   function lineChart(host, o) {
-    var W = Math.max(280, host.clientWidth || 320), H = o.height || 190, mL = 38, mR = 10, mT = 16, mB = 22;
+    var W = Math.max(280, host.clientWidth || 320), H = o.height || 200, mL = 38, mR = 10, mT = 22, mB = 22;
     var n = o.series[0].values.length, all = [];
     o.series.forEach(function (s) { s.values.forEach(function (v) { if (v !== null && isFinite(v)) all.push(v); }); });
     var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), pad = (hi - lo) * 0.08 || 1;
@@ -533,16 +535,15 @@
       s.appendChild(svg("text", { class: "axis", x: mL - 6, y: Y(v) + 4, "text-anchor": "end" }, o.yFmt(v)));
     });
     (o.xTicks || []).forEach(function (tk) { s.appendChild(svg("text", { class: "axis", x: X(tk[0]), y: H - 5, "text-anchor": tk[2] || "middle" }, tk[1])); });
-    (o.marks || []).forEach(function (i) { s.appendChild(svg("line", { class: "evt", x1: X(i), x2: X(i), y1: mT - 10, y2: mT - 3 })); });
     o.series.slice().reverse().forEach(function (se) {
       var d = "", pen = false;
       se.values.forEach(function (v, i) { if (v === null || !isFinite(v)) { pen = false; return; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); pen = true; });
       s.appendChild(svg("path", { class: "line " + (se.cls || ""), d: d }));
     });
-    if (o.peak !== undefined && o.peak !== null) {
-      var pv = o.series[0].values[o.peak], px = X(o.peak);
-      s.appendChild(svg("text", { class: "dlabel", x: Math.min(Math.max(px, mL + 40), W - mR - 40), y: Y(pv) - 7, "text-anchor": "middle" }, o.peakLabel));
-    }
+    (o.labels || []).forEach(function (lb) {
+      var px = X(lb[0]), anchor = px < mL + 50 ? "start" : px > W - mR - 50 ? "end" : "middle";
+      s.appendChild(svg("text", { class: "dlabel", x: px, y: Math.max(11, Y(o.series[0].values[lb[0]]) - 8), "text-anchor": anchor }, lb[1]));
+    });
     var cross = svg("line", { class: "cross", y1: mT, y2: H - mB, visibility: "hidden" }), dot = svg("circle", { class: "mark", r: 5, visibility: "hidden" });
     s.appendChild(cross); s.appendChild(dot);
     var tip = h("div", { class: "tip", hidden: true });
@@ -569,20 +570,33 @@
     var m = model();
     if (!m) return emptyState(root);
     var a = apt(), attr = P.attrLevel(m, a.zone, a.bedrooms, a.baths, a.guests, a.quality), t0 = P.parseDate(m.start);
-    var price = m.idx.map(function (v) { return Math.exp(attr + v); }), normal = m.base.map(function (v) { return Math.exp(attr + v); });
-    var evs = P.eventsByNight(m), marks = [], peak = 0;
-    price.forEach(function (v, i) { if (v > price[peak]) peak = i; var l = evs[P.isoDate(t0 + i * DAY)]; if (l && l[0].weight >= 4 && (!marks.length || i - marks[marks.length - 1] > 6)) marks.push(i); });
-    var xt = [], d = new Date(t0), i;
-    for (i = 0; i < price.length; i++) { var dd = new Date(t0 + i * DAY); if (dd.getUTCDate() === 1 && dd.getUTCMonth() % 2 === 0) xt.push([i, fmtDate(dd.getTime(), { month: "short" }).replace(".", "") + (dd.getUTCMonth() === 0 ? " " + String(dd.getUTCFullYear()).slice(2) : "")]); }
+    var evs = P.eventsByNight(m), weeks = [], i;
+    // una media per settimana: giorno per giorno il fine settimana farebbe un dente di sega illeggibile
+    for (i = 0; i + 6 < m.idx.length; i += 7) {
+      var sp = 0, sn = 0, mx = 0, top = null;
+      for (var j = i; j < i + 7; j++) {
+        var pr = Math.exp(attr + m.idx[j]); sp += pr; sn += Math.exp(attr + m.base[j]); mx = Math.max(mx, pr);
+        var l = evs[P.isoDate(t0 + j * DAY)];
+        if (l && (!top || l[0].weight > top.weight)) top = l[0];
+      }
+      weeks.push({ start: t0 + i * DAY, price: sp / 7, normal: sn / 7, max: mx, ev: top });
+    }
+    var xt = [], seen = -1;
+    weeks.forEach(function (w, k) { var d = new Date(w.start + 3 * DAY), mo = d.getUTCMonth(); if (mo !== seen && mo % 2 === 0 && k > 1) { xt.push([k, fmtDate(d.getTime(), { month: "short" }).replace(".", "") + (mo === 0 ? " " + String(d.getUTCFullYear()).slice(2) : "")]); } seen = mo; });
+    var order = weeks.map(function (w, k) { return k; }).sort(function (x, y) { return weeks[y].price / weeks[y].normal - weeks[x].price / weeks[x].normal; });
+    var labels = [];
+    order.forEach(function (k) {
+      var w = weeks[k];
+      if (labels.length < 3 && w.ev && w.ev.weight >= 3 && w.price / w.normal > 1.08 && labels.every(function (q) { return Math.abs(q[0] - k) >= 7; })) labels.push([k, w.ev.name.split(/[·,(]/)[0].trim().slice(0, 18)]);
+    });
     root.appendChild(h("h2", { style: "margin-top:6px", text: "Quanto costano i comparabili nei prossimi 12 mesi" }));
-    root.appendChild(h("p", { class: "note", text: a.name + ": prezzo mediano a notte degli appartamenti simili, giorno per giorno. Scorri col dito per leggere una data." }));
+    root.appendChild(h("p", { class: "note", text: a.name + ": prezzo mediano a notte degli appartamenti simili, media di ogni settimana. Scorri col dito sul grafico per leggere i valori." }));
     var host = h("div", { class: "chart" });
     root.appendChild(host);
-    var pe = evs[P.isoDate(t0 + peak * DAY)];
-    lineChart(host, { label: "Prezzo mediano dei comparabili per notte, prossimi 12 mesi", series: [{ values: price }, { values: normal, cls: "ref" }], xTicks: xt, marks: marks,
-      yFmt: function (v) { return nf.format(v); }, peak: peak, peakLabel: euro(price[peak]) + (pe ? " · " + pe[0].name.slice(0, 22) : ""),
-      tip: function (k) { var l = evs[P.isoDate(t0 + k * DAY)] || []; return [euro(price[k]), fmtDate(t0 + k * DAY, { weekday: "short", day: "numeric", month: "short" }) + ", normale " + euro(normal[k])].concat(l.slice(0, 2).map(function (e) { return e.name; })); } });
-    root.appendChild(h("div", { class: "keys" }, h("span", { text: "Prezzo dei comparabili" }), h("span", { class: "ref", text: "Livello normale" }), h("span", { class: "evk", text: "Grande evento" })));
+    lineChart(host, { label: "Prezzo mediano dei comparabili per notte, media settimanale dei prossimi 12 mesi", series: [{ values: weeks.map(function (w) { return w.price; }) }, { values: weeks.map(function (w) { return w.normal; }), cls: "ref" }],
+      xTicks: xt, labels: labels, yFmt: function (v) { return nf.format(v); },
+      tip: function (k) { var w = weeks[k]; return [euro(w.price), "settimana del " + fmtDate(w.start) + ", normale " + euro(w.normal), "notte più cara " + euro(w.max)].concat(w.ev && w.ev.weight >= 2 ? [w.ev.name] : []); } });
+    root.appendChild(h("div", { class: "keys" }, h("span", { text: "Prezzo dei comparabili" }), h("span", { class: "ref", text: "Livello normale" })));
 
     root.appendChild(h("h2", { text: "Eventi in calendario" }));
     root.appendChild(h("div", { class: "chips" },
@@ -673,7 +687,7 @@
       if (st && st.last_scan) kv("Ultima scansione", fmtDate(P.parseDate(st.last_scan), { day: "numeric", month: "long", year: "numeric" }));
       if (st && st.run) { kv("Prezzi letti nell'ultima scansione", nf.format(st.run.prices || 0)); kv("Richieste ad Airbnb, errori", nf.format(st.run.requests || 0) + ", " + (st.run.errors || 0)); }
       if (rel) { kv("Giorni di storico", String(rel.scan_days)); kv("Appartamenti con prezzi", nf.format(rel.n_listings)); kv("Prezzi usati dal modello", nf.format(rel.n_obs)); }
-      if (st && st.inside_airbnb) kv("Catalogo di partenza (Inside Airbnb)", st.inside_airbnb.snapshot || "sì");
+      if (st && st.inside_airbnb) kv("Catalogo di partenza (Inside Airbnb)", st.inside_airbnb.snapshot ? fmtDate(P.parseDate(st.inside_airbnb.snapshot), { day: "numeric", month: "long", year: "numeric" }) : "sì");
       root.appendChild(h("h2", { style: "margin-top:8px", text: "Stato" })); root.appendChild(dl);
     }
     if (rel) {

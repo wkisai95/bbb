@@ -322,9 +322,15 @@ def merge(seed: list[Event], custom: list[Event], auto: list[Event], hol: list[E
     """Curati e manuali vincono; un evento automatico entra solo se non è già coperto."""
     kept: list[Event] = list(custom) + list(seed)
 
+    curated = list(kept)
+
     def covered(e: Event) -> bool:
         for k in kept:
             if k.start <= e.end + timedelta(days=1) and e.start <= k.end + timedelta(days=1) and similar(k.name, e.name):
+                return True
+        for k in curated:      # salone "ospite" nelle stesse date e nella stessa sede di un evento già in elenco
+            if (k.venue and slug(k.venue) == slug(e.venue) and k.weight >= e.weight
+                    and e.start >= k.start - timedelta(days=1) and e.end <= k.end + timedelta(days=1)):
                 return True
         return False
 
