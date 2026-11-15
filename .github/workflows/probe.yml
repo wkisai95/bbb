@@ -1,0 +1,45 @@
+name: Probe (diagnostica)
+run-name: Probe · prova delle fonti dati
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "tools/probe.py"
+      - ".github/workflows/probe.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -q pyairbnb curl_cffi requests beautifulsoup4
+
+      - name: Probe
+        run: python tools/probe.py
+
+      - name: Publish results on the debug branch
+        if: always()
+        run: |
+          cd debug_out
+          git init -q -b debug
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "probe ${{ github.run_id }}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" debug
