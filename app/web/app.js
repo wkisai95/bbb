@@ -280,8 +280,8 @@
     root.appendChild(h("div", { class: "sum" },
       h("div", {}, h("b", { text: euro(rec.avgPrice) }), h("span", { text: "prezzo medio a notte" })),
       h("div", {}, h("b", { text: pct(rec.occupancy) }), h("span", { text: "notti che ti aspetti di vendere" })),
-      h("div", {}, h("b", { text: euro(rec.revenue) }), h("span", { text: "incasso atteso nel periodo" }))));
-    root.appendChild(h("p", { class: "alt" }, "Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(other.avgPrice) + " a notte, " + pct(other.occupancy) + " di notti vendute, " + euro(other.revenue) + ". ",
+      h("div", {}, h("b", { text: euro(rec.net) }), h("span", { text: "guadagno atteso, tolti i costi" }))));
+    root.appendChild(h("p", { class: "alt" }, "Incasso atteso " + euro(rec.revenue) + ", costi " + euro(rec.cost) + " per notte venduta" + (a.cost === null || a.cost === undefined || a.cost === "" ? " (stima)" : "") + ". Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(other.avgPrice) + " a notte, " + pct(other.occupancy) + " di notti vendute, guadagno " + euro(other.net) + ". ",
       h("button", { onclick: function () { state.strategy = other.strategy; saveState(); render(); }, text: "Passa a questa" })));
 
     var r = rec.reliability, dots = r.label === "alta" ? 3 : r.label === "media" ? 2 : 1;
