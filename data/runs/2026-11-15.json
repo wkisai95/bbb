@@ -1,29 +1,44 @@
 {
  "date": "2026-11-15",
- "started": "2026-11-15T15:45:19Z",
- "stopped": "tetto di richieste o di tempo raggiunto",
- "windows": 13,
- "census": 0,
- "prices": 7534,
- "details": 0,
+ "started": "2026-11-15T17:45:13Z",
+ "stopped": "",
+ "windows": 59,
+ "census": 4,
+ "prices": 29211,
+ "details": 120,
  "phases": [
   {
    "name": "offerta",
    "requests": 20,
-   "secs": 35.4
+   "secs": 33.2
   },
   {
    "name": "date vicine",
-   "requests": 238,
-   "secs": 407.6
+   "requests": 540,
+   "secs": 923.9
+  },
+  {
+   "name": "censimenti",
+   "requests": 164,
+   "secs": 277.6
+  },
+  {
+   "name": "date lontane ed eventi",
+   "requests": 222,
+   "secs": 372.4
+  },
+  {
+   "name": "capienze",
+   "requests": 120,
+   "secs": 205.8
   }
  ],
- "requests": 260,
+ "requests": 1068,
  "errors": 0,
  "error_samples": [],
- "listings": 4170,
- "secs": 446.0,
- "finished": "2026-11-15T15:52:45Z",
+ "listings": 4206,
+ "secs": 1816.8,
+ "finished": "2026-11-15T18:15:30Z",
  "windows_planned": 59,
  "source": "AirbnbClient"
 }

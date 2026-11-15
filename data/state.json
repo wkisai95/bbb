@@ -16,12 +16,12 @@
  "last_scan": "2026-11-15",
  "last_run": {
   "date": "2026-11-15",
-  "requests": 260,
+  "requests": 1068,
   "errors": 0,
-  "prices": 7534,
-  "windows": 13,
-  "census": 0,
-  "stopped": "tetto di richieste o di tempo raggiunto",
-  "secs": 446.0
+  "prices": 29211,
+  "windows": 59,
+  "census": 4,
+  "stopped": "",
+  "secs": 1816.8
  }
 }
