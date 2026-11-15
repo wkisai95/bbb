@@ -96,6 +96,11 @@ write*. Incollalo in Dati → Token di accesso. In alternativa la scansione si a
   primi giorni contano molto i valori di partenza; guardare l'attendibilità. Il ritmo di prenotazione è
   quello medio del mercato: chi resta libero fino all'ultimo è spesso chi chiede troppo, quindi per un
   alloggio a prezzo giusto la probabilità reale sotto data tende a essere un po' più alta di quella indicata.
+- **GitHub può saltare o sospendere le esecuzioni programmate.** Nelle ore di punta una scansione può partire
+  in ritardo o non partire affatto; nei repository pubblici il programma giornaliero viene disattivato dopo
+  60 giorni senza attività. I salvataggi quotidiani sul ramo `data` dovrebbero contare come attività, ma non è
+  garantito: se l'app avvisa che la scansione non gira da giorni, apri Actions → Scansione su GitHub e
+  riattivala, oppure avviala dall'app.
 - Solo **appartamenti interi**; le date degli eventi vengono da calendari pubblici e vanno verificate
   (quella di Ultimo allo stadio, giugno 2027, è riportata in modo discorde dalle fonti).
 
