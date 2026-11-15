@@ -74,13 +74,12 @@ def test_profile_sees_calendars_not_yet_open():
     P = model.prior_profile({"profile": prof}, 365)
     C, peak = model.pace_from_profile(P)
     assert 45 <= peak <= 90
+    assert abs(P[300] - ys[xs.index(300)]) < 0.1                    # lontano vale la forma misurata sui calendari
     assert all(a >= b - 1e-12 for a, b in zip(C, C[1:]))            # il ritmo cumulato cresce solo avvicinandosi alla data
     assert C[300] < 0.05 and C[peak] < 0.12                         # i calendari chiusi non contano come prenotazioni
-    true_near = -np.log((1 - booked[0]) / (1 - booked[60]))
-    assert abs((C[0] - C[60]) - true_near) < 0.12                   # il calo dell'ultimo tratto invece sì
-    # senza taratura c'è la forma generica, con le stesse proprietà
     G, gpeak = model.pace_from_profile(model.prior_profile({}, 365))
-    assert 60 <= gpeak <= 100 and G[0] > 0.8 and G[300] < 0.02
+    assert 60 <= gpeak <= 100 and G[0] > 0.8 and G[300] < 0.02      # senza taratura: stessa logica, forma generica
+    assert abs((C[0] - C[30]) - (G[0] - G[30])) < 0.02              # vicino alla data la forma di partenza è la stessa
 
 
 def test_start_curve_adapts_to_a_last_minute_market():

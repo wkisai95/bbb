@@ -270,18 +270,24 @@ def tail_pace(L, nu: float = 1.0) -> np.ndarray:
 def prior_profile(calib: dict, horizon: int) -> np.ndarray:
     """Disponibilità tipica di partenza per anticipo, in log e riferita al suo massimo (0).
 
-    Vicino alla data cala perché gli alloggi vengono prenotati; molto lontano cala di nuovo perché tanti
-    calendari non sono ancora aperti. Se c'è, vale la forma misurata sui calendari di Inside Airbnb;
-    altrimenti una forma tipica: tre quarti delle prenotazioni nell'ultimo mese e, oltre gli 80 giorni,
-    lo 0,4% di alloggi in meno per ogni giorno di anticipo in più.
+    Vicino alla data cala perché gli alloggi vengono prenotati: si parte da una forma tipica (tre quarti
+    delle prenotazioni nell'ultimo mese), che fit_prior adatta poi ai dati del giorno. Quella dei calendari
+    di Inside Airbnb qui non si usa: fotografa una sola settimana, e se era una settimana di fiera inganna.
+    Molto lontano cala di nuovo perché tanti calendari non sono ancora aperti: questo dipende dalle abitudini
+    di chi affitta e cambia poco, quindi vale la forma misurata sui calendari di Inside Airbnb; se manca,
+    lo 0,4% di alloggi in meno per ogni giorno oltre gli 80.
     """
     L = np.arange(horizon + 1, dtype=float)
+    share = 0.75 * np.exp(-L / 21.0) + 0.25 * np.exp(-L / 100.0)
+    booked = np.log(1 - 0.65 * share)
     pts = calib.get("profile")
     if pts and len(pts) >= 6:
-        P = np.interp(L, [float(p[0]) for p in pts], [float(p[1]) for p in pts])
+        measured = np.interp(L, [float(p[0]) for p in pts], [float(p[1]) for p in pts])
+        peak = int(np.clip(np.argmax(measured[: min(len(measured), 241)]), 45, 150))
+        closed = np.where(L > peak, np.minimum(measured - measured[min(peak, horizon)], 0.0), 0.0)
     else:
-        share = 0.75 * np.exp(-L / 21.0) + 0.25 * np.exp(-L / 100.0)
-        P = np.log(1 - 0.65 * share) - 0.004 * np.maximum(L - 80.0, 0.0)
+        closed = -0.004 * np.maximum(L - 80.0, 0.0)
+    P = booked + closed
     return P - float(P[: min(len(P), 241)].max())
 
 
@@ -323,7 +329,7 @@ def fit_prior(P: np.ndarray, ln_obs: np.ndarray, lead: np.ndarray):
     best = None
     for tau in (1.0, 0.7, 0.5, 0.35):
         Pt = squeeze(P, peak, tau)
-        flat = Pt[lead] > -0.12
+        flat = (Pt[lead] > -0.12) & (lead <= peak + 20)      # attorno al massimo: né prenotazioni né calendari chiusi
         use = flat if flat.sum() >= 8 else np.ones(len(lead), dtype=bool)
         level = float(np.median(ln_obs[use] - Pt[lead[use]]))
         if zone.sum() < 12:                                   # troppo poche letture per scegliere: forma così com'è
