@@ -1,0 +1,82 @@
+{
+ "descrizione": "Vettori di prova del formato bbb-cifrato v1 (docs/cifratura.md). Ogni implementazione deve: ricavare chiave_hex e id dal codice (anche scritto diversamente), cifrare testo con nonce_hex ottenendo esattamente file.dati, e decifrare file riottenendo testo. I casi in da_rifiutare devono dare errore.",
+ "vettori": [
+  {
+   "nome": "byte da 00 a 0e",
+   "codice": "000G-40R4-0M30-E209-185G-R38E",
+   "codice_scritto_diversamente": [
+    "ooog 4or4 om3o e2o9 l85g r38e",
+    "000G40R40M30E209185GR38E"
+   ],
+   "codice_hex": "000102030405060708090a0b0c0d0e",
+   "chiave_hex": "15f3374c5d7f330caf9d77b2ad725a7df37322e67804a34269aed80a5cbd7a52",
+   "id": "3e78da9d20d34ee0",
+   "aad": "bbb-cifrato-v1:3e78da9d20d34ee0",
+   "nonce_hex": "000102030405060708090a0b",
+   "testo": "{\"tipo\":\"proprietario\",\"proprietario\":\"Niccolò Bianchi\",\"totale\":1234.5}",
+   "file": {
+    "formato": "bbb-cifrato",
+    "versione": 1,
+    "id": "3e78da9d20d34ee0",
+    "nonce": "AAECAwQFBgcICQoL",
+    "dati": "gYkEnxnkRCmOF+JuwSXn7Oi+eU8u9EcTc03E44P1xhfEm/CUOLJ0HitGPZzYgvl+o9RE15jH2JPosTi9zJAeKHc7nwYLVqjxU6o2brvj9YEdFFLcf+ear7k="
+   }
+  },
+  {
+   "nome": "codice casuale",
+   "codice": "KZ92-ZJE7-0FTC-YKFH-FM83-GFWF",
+   "codice_scritto_diversamente": [
+    "kz92 zje7 oftc ykfh fm83 gfwf",
+    "KZ92ZJE70FTCYKFHFM83GFWF"
+   ],
+   "codice_hex": "9fd22fc9c703f4cf4df17d10383f8f",
+   "chiave_hex": "232c8728a6ca15d42951ba15e3aeb00de6d503154661cf1c265e8d5d02abf425",
+   "id": "234d7af00a97fc24",
+   "aad": "bbb-cifrato-v1:234d7af00a97fc24",
+   "nonce_hex": "7474c1e7ed929af580fe66e4",
+   "testo": "{\"tipo\":\"gestore\",\"versione\":1,\"appartamenti\":[{\"id\":\"a1\",\"name\":\"Via dell'Indipendenza\",\"owner\":\"Zoë\"}]}",
+   "file": {
+    "formato": "bbb-cifrato",
+    "versione": 1,
+    "id": "234d7af00a97fc24",
+    "nonce": "dHTB5+2SmvWA/mbk",
+    "dati": "XCWYQQHtiHaW2U8bIqnuxJXSmH6lEFL7dGc+pB5If7DauGf39CYAlh+WUXxahCmDpBGVSCY7FNlY1x1Fn0cfMrpCNLsT5YxH+Vu/7TS3mabwjJNvxKdYH4Zx8qxdhwZ+/+f93WFmfd2OUqFslvm3XeJgjyrZkIKB7xA="
+   }
+  }
+ ],
+ "da_rifiutare": [
+  {
+   "motivo": "codice di un altro file",
+   "codice": "1QGM-HEVD-R61P-1XFC-GYVN-5JNH",
+   "file": {
+    "formato": "bbb-cifrato",
+    "versione": 1,
+    "id": "3e78da9d20d34ee0",
+    "nonce": "AAECAwQFBgcICQoL",
+    "dati": "gYkEnxnkRCmOF+JuwSXn7Oi+eU8u9EcTc03E44P1xhfEm/CUOLJ0HitGPZzYgvl+o9RE15jH2JPosTi9zJAeKHc7nwYLVqjxU6o2brvj9YEdFFLcf+ear7k="
+   }
+  },
+  {
+   "motivo": "un bit cambiato nei dati",
+   "codice": "000G-40R4-0M30-E209-185G-R38E",
+   "file": {
+    "formato": "bbb-cifrato",
+    "versione": 1,
+    "id": "3e78da9d20d34ee0",
+    "nonce": "AAECAwQFBgcICQoL",
+    "dati": "gIkEnxnkRCmOF+JuwSXn7Oi+eU8u9EcTc03E44P1xhfEm/CUOLJ0HitGPZzYgvl+o9RE15jH2JPosTi9zJAeKHc7nwYLVqjxU6o2brvj9YEdFFLcf+ear7k="
+   }
+  },
+  {
+   "motivo": "codice di 23 caratteri",
+   "codice": "000G-40R4-0M30-E209-185G-R38",
+   "file": {
+    "formato": "bbb-cifrato",
+    "versione": 1,
+    "id": "3e78da9d20d34ee0",
+    "nonce": "AAECAwQFBgcICQoL",
+    "dati": "gYkEnxnkRCmOF+JuwSXn7Oi+eU8u9EcTc03E44P1xhfEm/CUOLJ0HitGPZzYgvl+o9RE15jH2JPosTi9zJAeKHc7nwYLVqjxU6o2brvj9YEdFFLcf+ear7k="
+   }
+  }
+ ]
+}

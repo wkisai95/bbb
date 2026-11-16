@@ -3,6 +3,8 @@ package com.wkisai.bbb
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -180,6 +182,28 @@ class MainActivity : Activity() {
             packageManager.getPackageInfo(packageName, 0).versionName ?: "?"
         } catch (e: Exception) {
             "?"
+        }
+
+        /** Apre la condivisione di Android (WhatsApp, email…) con un testo, per mandare un codice. */
+        @JavascriptInterface
+        fun shareText(text: String) {
+            runOnUiThread {
+                try {
+                    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+                    startActivity(Intent.createChooser(send, null))
+                } catch (e: Exception) {
+                    // nessuna app per condividere: il testo resta copiabile dall'app
+                }
+            }
+        }
+
+        /** Copia un testo negli appunti. */
+        @JavascriptInterface
+        fun copyText(text: String) {
+            runOnUiThread {
+                val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                cm.setPrimaryClip(ClipData.newPlainText("bbb", text))
+            }
         }
     }
 

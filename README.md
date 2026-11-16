@@ -17,7 +17,7 @@ quando ne esce una nuova e la scarica con il numero nel nome (per esempio `bbb-1
 | **Prezzi** | Imposti il tuo appartamento (zona, camere, bagni, ospiti, qualità, prezzo minimo, costi, **portale e commissione**, ospiti che pagano la tassa di soggiorno) e scegli **Massima resa**, **Massima occupazione** o **Aggressiva**, con una tabella che le mette a confronto. Calendario dei prossimi 30, 60, 90 giorni o di un anno con il prezzo da impostare oggi per ogni notte; toccando una notte vedi dove cade rispetto ai comparabili, la probabilità di venderla, **quanto ti resta tolta la commissione, la tassa di soggiorno e chi la riscuote**, il prezzo da mettere sugli altri portali per avere lo stesso netto. I prezzi si possono vedere **al lordo** (quelli da mettere sul portale) o **al netto della commissione**. Esporta in CSV. Con più appartamenti si indica il **proprietario** di ciascuno, e quelli dello stesso proprietario si possono vedere insieme: incasso, commissioni e guadagno sommati, il confronto appartamento per appartamento, i prezzi notte per notte affiancati e un unico CSV. **Resa per proprietario** mostra in una tabella incasso, notti vendute e guadagno previsti di ogni proprietario e il totale, anche sull'anno intero, esportabile in CSV. |
 | **Mercato** | Il catalogo: fascia di prezzo e mediana per zona, camere, bagni, ospiti, quartiere. Toccando una riga, l'elenco degli annunci con il link ad Airbnb. In fondo, **chi viene prenotato**: quante prenotazioni sono state rilevate e a che prezzo, rispetto a chi è rimasto libero. |
 | **Eventi** | Livello dei prezzi nei prossimi 12 mesi e calendario di fiere, concerti, ponti, con l'aumento dei prezzi misurato o stimato. Puoi aggiungere i tuoi eventi. |
-| **Dati** | Stato dell'ultima scansione, precisione del modello, avvio di una scansione, **backup completo in ZIP**, esportazione e importazione delle impostazioni. |
+| **Dati** | Stato dell'ultima scansione, precisione del modello, avvio di una scansione, **backup completo in ZIP**, esportazione e importazione delle impostazioni, **file cifrati** su GitHub con i codici da mandare ai proprietari. |
 
 ## Le strategie
 
@@ -132,10 +132,28 @@ aggiornato anche un archivio unico:
 (lo stesso che scarichi dall'app in Dati → Scarica il backup completo). Sono CSV e JSON leggibili con Excel
 o qualunque programma.
 
+## Appartamenti, proprietari e stime: file cifrati
+
+Gli appartamenti, i nomi dei proprietari e le stime di guadagno stanno sul telefono, ma l'app ne salva anche una
+copia **cifrata** nella repository, nella cartella [`config/cifrati`](config/cifrati): la repository è pubblica,
+quindi senza codice i file non si leggono e dal nome di un file non si capisce di chi è.
+
+- **Il file del gestore** contiene tutto e si apre con il tuo codice da gestore (Dati → File cifrati su GitHub →
+  Il tuo codice da gestore). Con quel codice ritrovi appartamenti e proprietari su un altro telefono.
+- **Ogni proprietario** con un nome ha un file suo, con i suoi appartamenti, le stime per le tre strategie su 30,
+  60, 90 notti e un anno, e la tassa di soggiorno da versare. Si apre solo con il suo codice, che gli mandi
+  dall'app («Invia il codice»): è pensato per un'app dei proprietari separata.
+- I file si aggiornano da soli quando cambi un appartamento e una volta al giorno con i dati nuovi, quando apri
+  l'app. Serve il token con *Contents: Read and write*.
+
+Il formato (AES-256-GCM, HKDF-SHA256, codici di 24 caratteri) è descritto in [`docs/cifratura.md`](docs/cifratura.md),
+con vettori di prova e implementazioni di riferimento in JavaScript, Python e Java, per scrivere l'app dei
+proprietari. Dal computer: `python tools/apri_cifrato.py CODICE --scarica` (con un invito `bbb1:…`).
+
 ## Avviare una scansione e salvare eventi dall'app
 
-Per leggere i prezzi l'app non ha bisogno di nulla. Per **avviare una scansione** o **salvare su GitHub gli
-eventi** che aggiungi serve un token: su github.com → Settings → Developer settings → Fine-grained tokens →
+Per leggere i prezzi l'app non ha bisogno di nulla. Per **avviare una scansione**, **salvare su GitHub gli
+eventi** che aggiungi o salvare i **file cifrati** serve un token: su github.com → Settings → Developer settings → Fine-grained tokens →
 Generate new token, solo sul repository `bbb`, con permessi *Actions: Read and write* e *Contents: Read and
 write*. Incollalo in Dati → Token di accesso. In alternativa la scansione si avvia da
 [Actions → Scansione → Run workflow](https://github.com/wkisai95/bbb/actions/workflows/scan.yml).
@@ -182,7 +200,9 @@ write*. Incollalo in Dati → Token di accesso. In alternativa la scansione si a
 bnb/            scanner, modello, prezzi, pubblicazione (Python)
 app/web/        interfaccia dell'app (HTML, CSS, JavaScript senza dipendenze)
 android/        guscio Android (Kotlin) che include app/web nell'APK
-config/         impostazioni, zone, eventi, confini dei quartieri
+config/         impostazioni, zone, eventi, confini dei quartieri; config/cifrati: file cifrati dall'app
+docs/           formato dei file cifrati, esempio in Java
+tools/          apri_cifrato.py (apre un file cifrato), vettori_cifratura.py, prove dei portali
 tests/          test, compresa una prova d'insieme su un mercato simulato di cui si conosce la verità
 .github/workflows/scan.yml      scansione giornaliera, ramo data, backup
 .github/workflows/android.yml   build e firma dell'APK, release
@@ -190,8 +210,8 @@ tests/          test, compresa una prova d'insieme su un mercato simulato di cui
 ```
 
 ```
-pip install -r requirements.txt pytest
-python -m pytest tests -q            # 45 test, mezzo minuto
+pip install -r requirements.txt pytest cryptography
+python -m pytest tests -q            # 50 test, mezzo minuto
 python -m bnb all --out out          # scansione + modello + file per l'app + backup
 python -m bnb model --out out        # solo ricalcolo dai dati già raccolti
 ```

@@ -39,6 +39,11 @@
   function pct(x) { return Math.round(x * 100) + "%"; }
   function signedPct(x) { var v = Math.round(x * 100); return (v > 0 ? "+" : "") + v + "%"; }
   function fmtDate(ms, opts) { opts = opts || { day: "numeric", month: "short" }; opts.timeZone = "UTC"; return new Intl.DateTimeFormat("it-IT", opts).format(new Date(ms)); }
+  /* "16 nov alle 17:42" (ora del telefono) */
+  function fmtWhen(iso) {
+    var d = new Date(iso); if (isNaN(d)) return "";
+    return new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short" }).format(d) + " alle " + new Intl.DateTimeFormat("it-IT", { hour: "2-digit", minute: "2-digit" }).format(d);
+  }
   function longDate(ms) { return fmtDate(ms, { weekday: "long", day: "numeric", month: "long" }); }
   function todayMs() { var n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); }
   function icon(kind) {
@@ -61,7 +66,8 @@
   function defaults() {
     return { repo: { owner: DEFAULT_REPO.owner, name: DEFAULT_REPO.name, branch: DEFAULT_REPO.branch, token: "" },
       apartments: [{ id: "a1", name: "Il mio appartamento", zone: "c_maggiore", bedrooms: 1, baths: 1, guests: 3, quality: "media", minPrice: 0, cost: null, channel: "airbnb", fee: null, vat: null, payers: 2 }],
-      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", selection: [], aggressive: null, customEvents: [] };
+      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", selection: [], aggressive: null, customEvents: [],
+      vault: null };
   }
   function loadState() {
     var d = defaults();
@@ -75,7 +81,9 @@
     } catch (e) { /* stato illeggibile: si riparte dai valori predefiniti */ }
     return d;
   }
-  function saveState() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { toast("Spazio insufficiente per salvare le impostazioni"); } }
+  function saveStateQuiet() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { toast("Spazio insufficiente per salvare le impostazioni"); } }
+  /* ogni modifica salvata sul telefono fa ripartire (dopo qualche secondo) il salvataggio dei file cifrati su GitHub */
+  function saveState() { saveStateQuiet(); scheduleVault(); }
   var state = loadState();
   var data = { model: null, status: null, listings: null, error: "", loading: false, run: null, fetched: 0 };
   var ui = { tab: "prezzi", view: "cal", dim: "zone", evAll: false };
@@ -130,6 +138,7 @@
     }).catch(function (e) { data.error = String(e.message || e); }).then(function () {
       data.loading = false; render();
       if (force) toast(data.error && data.error !== "nodata" ? "Aggiornamento non riuscito" : "Dati aggiornati");
+      scheduleVault(4000);
     });
   }
 
@@ -197,12 +206,16 @@
     return "Prezzo di mercato finché mancano più di " + steps[0][0] + (steps[0][0] === 1 ? " giorno" : " giorni") + "; poi, se la notte è ancora libera, " + list + ". Mai sotto il prezzo minimo dell'appartamento.";
   }
   var recCache = { m: null, map: {}, n: 0 };
-  function recommend(strategy, days, from, which) {
-    var m = model(), a = which || apt(), f = aptFees(a);
-    var start = from === undefined ? Math.max(todayMs(), P.parseDate(m.start)) : from;
-    var p = { zone: a.zone, bedrooms: a.bedrooms, baths: a.baths, guests: a.guests, quality: a.quality,
+  function recParams(strategy, days, start, a) {
+    var f = aptFees(a);
+    return { zone: a.zone, bedrooms: a.bedrooms, baths: a.baths, guests: a.guests, quality: a.quality,
       minPrice: a.minPrice || 0, cost: blank(a.cost) ? null : +a.cost, fee: f.share, payers: f.payers, taxMode: f.ch.tax,
       steps: aggSteps(), strategy: strategy, start: P.isoDate(start), end: P.isoDate(start + (days - 1) * DAY) };
+  }
+  function firstNight() { return Math.max(todayMs(), P.parseDate(model().start)); }
+  function recommend(strategy, days, from, which) {
+    var m = model(), a = which || apt();
+    var p = recParams(strategy, days, from === undefined ? firstNight() : from, a);
     if (recCache.m !== m || recCache.n > 400) recCache = { m: m, map: {}, n: 0 };
     var key = JSON.stringify(p);
     if (!recCache.map[key]) { recCache.map[key] = P.recommend(m, p); recCache.n++; }
@@ -507,6 +520,265 @@
     var name = "bbb-" + update.version + ".apk";            // il numero nel nome evita di riaprire un file vecchio
     if (native && native.download) { native.download(update.url, name, ""); toast("Scarico " + name + ": quando è finito tocca la notifica per installarla"); }
     else openExternal(update.url);
+  }
+
+  function shareText(text) {
+    if (native && native.shareText) { native.shareText(text); return; }
+    if (navigator.share) { navigator.share({ text: text }).catch(function () { /* annullato */ }); return; }
+    copyText(text, "Copiato: incollalo nel messaggio");
+  }
+  function copyText(text, msg) {
+    if (native && native.copyText) { native.copyText(text); toast(msg || "Copiato"); return; }
+    var ta = h("textarea", { style: "position:fixed;opacity:0" }); ta.value = text; document.body.appendChild(ta); ta.select();
+    var ok = false; try { ok = document.execCommand("copy"); } catch (e) { /* non supportato */ }
+    document.body.removeChild(ta);
+    toast(ok ? (msg || "Copiato") : "Non riesco a copiare: tieni premuto sul codice per selezionarlo");
+  }
+
+  // ------------------------------------------------------------------ file cifrati su GitHub (docs/cifratura.md)
+  /* Il file del gestore (codice del gestore) contiene tutto: appartamenti, proprietari con i loro codici, stime.
+     Ogni proprietario con un nome ha un file suo (codice suo) con i suoi appartamenti, le stime e la tassa di
+     soggiorno: lo apre un'altra app. Ogni salvataggio è un solo commit in config/cifrati sul ramo principale. */
+  var K = window.BBBCifrato || null;
+  var EST_PERIODS = [30, 60, 90, 365];
+  var vaultTimer = null, vaultBusy = false, vaultAgain = false, vaultInfo = { status: "", error: "" };
+  function vault() { if (!state.vault) state.vault = { manager: "", owners: {}, files: [], saved: null }; return state.vault; }
+  function vaultCodes() { var v = state.vault; return v && v.manager ? { manager: v.manager, owners: v.owners, files: v.files } : null; }
+  function vaultReady() { return !!(K && window.crypto && window.crypto.subtle && state.repo.token && state.configured && model()); }
+  function scheduleVault(delay) {
+    if (!vaultReady()) return;
+    clearTimeout(vaultTimer);
+    vaultTimer = setTimeout(function () { saveVault(false); }, delay === undefined ? 5000 : delay);
+  }
+  /* un codice per il gestore e uno per ogni proprietario con un nome; chi non c'è più perde il suo */
+  function ensureCodes() {
+    var v = vault(), changed = false, keep = {};
+    if (!v.manager) { v.manager = K.nuovoCodice(); changed = true; }
+    var groups = ownerGroups().filter(function (g) { return g.key; });
+    groups.forEach(function (g) {
+      var o = v.owners[g.key];
+      if (!o) { v.owners[g.key] = { name: g.name, code: K.nuovoCodice() }; changed = true; }
+      else if (o.name !== g.name) { o.name = g.name; changed = true; }
+      keep[g.key] = 1;
+    });
+    Object.keys(v.owners).forEach(function (k) { if (!keep[k]) { delete v.owners[k]; changed = true; } });
+    if (changed) saveStateQuiet();
+    return groups;
+  }
+  function hashStr(s) { var x = 5381; for (var i = 0; i < s.length; i++) x = ((x * 33) ^ s.charCodeAt(i)) >>> 0; return x.toString(36) + "." + s.length; }
+  function vaultSig() {
+    var v = vault(), m = model();
+    return hashStr(JSON.stringify([state.apartments, aggSteps(), m.generated, m.start, P.isoDate(firstNight()), v.manager,
+      Object.keys(v.owners).sort().map(function (k) { return [k, v.owners[k].code]; }), state.repo.owner, state.repo.name]));
+  }
+  function isoLocal(d) {
+    var off = -d.getTimezoneOffset(), p = function (n) { return ("0" + Math.floor(Math.abs(n))).slice(-2); };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) +
+      (off >= 0 ? "+" : "-") + p(off / 60) + ":" + p(off % 60);
+  }
+  /* stime grezze di un appartamento: 3 strategie × 4 periodi; un appartamento per volta per non bloccare l'app */
+  function computeEstimates() {
+    var list = state.apartments.slice(), out = {}, i = 0, m = model(), start = firstNight();
+    return new Promise(function (resolve, reject) {
+      (function next() {
+        try {
+          if (i >= list.length) { resolve({ start: start, apts: out }); return; }
+          var a = list[i++], portal = aptFees(a).ch.tax === "portal", e = {};
+          STRATS.forEach(function (s) {
+            e[s[0]] = {};
+            EST_PERIODS.forEach(function (d) {
+              var r = P.recommend(m, recParams(s[0], d, start, a));
+              e[s[0]][d] = { nights: r.nights.length, sold: r.nights.reduce(function (t, x) { return t + x.sell; }, 0), price: r.avgPrice * r.nights.length,
+                inc: r.revenue, fees: r.fees, net: r.net, taxHost: portal ? 0 : r.tax, taxPortal: portal ? r.tax : 0 };
+            });
+          });
+          out[a.id] = e;
+          setTimeout(next, 0);
+        } catch (err) { reject(err); }
+      })();
+    });
+  }
+  function estOut(x) {
+    return { notti: x.nights, notti_vendute: Math.round(x.sold * 10) / 10, prezzo_medio: x.nights ? Math.round(x.price / x.nights) : 0,
+      incasso_lordo: Math.round(x.inc), commissioni: Math.round(x.fees), costi: Math.round(x.inc - x.fees - x.net), guadagno: Math.round(x.net),
+      tassa_soggiorno_da_versare: Math.round(x.taxHost), tassa_soggiorno_del_portale: Math.round(x.taxPortal) };
+  }
+  function estOf(raw, ids) {         // somma degli appartamenti indicati, per strategia e periodo
+    var o = {};
+    STRATS.forEach(function (s) {
+      o[s[0]] = {};
+      EST_PERIODS.forEach(function (d) {
+        var t = { nights: 0, sold: 0, price: 0, inc: 0, fees: 0, net: 0, taxHost: 0, taxPortal: 0 };
+        ids.forEach(function (id) { var x = raw.apts[id][s[0]][d]; Object.keys(t).forEach(function (k) { t[k] += x[k]; }); });
+        o[s[0]][d] = estOut(t);
+      });
+    });
+    return o;
+  }
+  function aptForOwner(a, raw) {
+    var f = aptFees(a);
+    return { id: a.id, nome: a.name || "", zona: zoneName(a.zone), camere: a.bedrooms, bagni: a.baths, ospiti: a.guests, qualita: a.quality,
+      portale: f.ch.name, commissione_percentuale: f.pct, iva_sulla_commissione: f.vat, tassa_soggiorno: f.ch.tax === "portal" ? "portale" : "proprietario",
+      stime: estOf(raw, [a.id]) };
+  }
+  function buildDocs(groups, raw, ids) {
+    var v = vault(), m = model();
+    var common = { versione: 1, salvato: isoLocal(new Date()), dati_del: m.generated || m.start, dal: P.isoDate(raw.start), valuta: "EUR", periodi: EST_PERIODS,
+      strategie: STRATS.map(function (s) { var x = { id: s[0], nome: s[1] }; if (s[0] === "aggressiva") x.sconti = aggSteps(); return x; }),
+      strategia_gestore: state.strategy };
+    var all = state.apartments.map(function (a) { return a.id; });
+    var docs = [{ code: v.manager, doc: Object.assign({ tipo: "gestore" }, common, {
+      app: myVersion(), appartamenti: state.apartments,
+      proprietari: groups.map(function (g) { return { nome: g.name, codice: v.owners[g.key].code, file: ids[g.key], appartamenti: g.list.map(function (a) { return a.id; }) }; }),
+      impostazioni: { strategia: state.strategy, sconti_aggressiva: aggSteps(), prezzi: state.priceView },
+      stime: all.reduce(function (o, id) { o[id] = estOf(raw, [id]); return o; }, {}), totali: estOf(raw, all),
+      file: [ids[""]].concat(groups.map(function (g) { return ids[g.key]; })) }) }];
+    groups.forEach(function (g) {
+      docs.push({ code: v.owners[g.key].code, doc: Object.assign({ tipo: "proprietario", proprietario: g.name }, common, {
+        appartamenti: g.list.map(function (a) { return aptForOwner(a, raw); }), totali: estOf(raw, g.list.map(function (a) { return a.id; })) }) });
+    });
+    return docs;
+  }
+  function httpErr(r) { var e = new Error("GitHub ha risposto " + r.status); e.status = r.status; return e; }
+  function okJson(r) { if (!r.ok) throw httpErr(r); return r.json(); }
+  /* scrive tutti i file in un solo commit (e toglie quelli dei codici non più validi) */
+  function commitFiles(files, previous) {
+    var branch, head;
+    return gh("").then(okJson).then(function (repo) {
+      branch = repo.default_branch || "main";
+      return gh("/git/ref/heads/" + encodeURIComponent(branch)).then(okJson);
+    }).then(function (ref) {
+      head = ref.object.sha;
+      return Promise.all([gh("/git/commits/" + head).then(okJson),
+        gh("/contents/" + K.CARTELLA + "?ref=" + encodeURIComponent(branch)).then(function (r) { return r.status === 404 ? [] : okJson(r); })]);
+    }).then(function (res) {
+      var have = {}, now = {};
+      (Array.isArray(res[1]) ? res[1] : []).forEach(function (x) { have[x.name] = 1; });
+      var tree = files.map(function (f) { now[f.id] = 1; return { path: K.percorso(f.id), mode: "100644", type: "blob", content: JSON.stringify(f.busta, null, 1) + "\n" }; });
+      (previous || []).forEach(function (id) { if (!now[id] && have[id + ".json"]) tree.push({ path: K.percorso(id), mode: "100644", type: "blob", sha: null }); });
+      return gh("/git/trees", { method: "POST", body: { base_tree: res[0].tree.sha, tree: tree } }).then(okJson);
+    }).then(function (t) {
+      return gh("/git/commits", { method: "POST", body: { message: "File cifrati aggiornati dall'app", tree: t.sha, parents: [head] } }).then(okJson);
+    }).then(function (c) {
+      return gh("/git/refs/heads/" + encodeURIComponent(branch), { method: "PATCH", body: { sha: c.sha, force: false } }).then(okJson);
+    });
+  }
+  function vaultError(e) {
+    var s = e && e.status;
+    if (s === 401) return "Il token non è valido o è scaduto: creane uno nuovo (Collegamento a GitHub, qui sotto).";
+    if (s === 403 || s === 404) return "Il token non permette di scrivere su GitHub: serve il permesso Contents «Read and write».";
+    if (s === 409 || s === 422) return "GitHub ha rifiutato il salvataggio perché nel frattempo è cambiato qualcosa: riprova.";
+    if (s) return "Salvataggio non riuscito (GitHub ha risposto " + s + ").";
+    return "Salvataggio non riuscito: controlla la connessione.";
+  }
+  function saveVault(force) {
+    if (!vaultReady()) return Promise.resolve(false);
+    if (vaultBusy) { vaultAgain = true; return Promise.resolve(false); }
+    var groups = ensureCodes(), v = vault(), sig = vaultSig();
+    if (!force && v.saved && v.saved.sig === sig && !vaultInfo.error) return Promise.resolve(false);
+    vaultBusy = true; vaultInfo = { status: "Calcolo le stime…", error: "" }; refreshVaultView();
+    var ids = {}, raw;
+    var codes = [["", v.manager]].concat(groups.map(function (g) { return [g.key, v.owners[g.key].code]; }));
+    return Promise.all(codes.map(function (c) { return K.idFile(c[1]).then(function (id) { ids[c[0]] = id; }); })).then(computeEstimates).then(function (r) {
+      raw = r; vaultInfo.status = "Cifro e salvo su GitHub…"; refreshVaultView();
+      return Promise.all(buildDocs(groups, raw, ids).map(function (d) { return K.cifra(d.doc, d.code).then(function (b) { return { id: b.id, busta: b }; }); }));
+    }).then(function (files) {
+      var once = function () { return commitFiles(files, v.files); };
+      return once().catch(function (e) { if (e.status === 409 || e.status === 422) return once(); throw e; }).then(function () { return files; });
+    }).then(function (files) {
+      v.files = files.map(function (f) { return f.id; });
+      v.saved = { at: new Date().toISOString(), sig: sig, files: files.length, owners: groups.length, apartments: state.apartments.length };
+      saveStateQuiet(); vaultInfo = { status: "", error: "" };
+      return true;
+    }).catch(function (e) {
+      vaultInfo = { status: "", error: vaultError(e) };
+      if (window.console) console.warn(e);
+      return false;
+    }).then(function (ok) {
+      vaultBusy = false; refreshVaultView();
+      if (vaultAgain) { vaultAgain = false; scheduleVault(1000); }
+      return ok;
+    });
+  }
+  function refreshVaultView() { if (ui.tab === "dati" && !sheetStack.length) render(); }
+  function fetchVaultFile(id) {
+    if (state.repo.token) return gh("/contents/" + K.percorso(id), { raw: true }).then(function (r) { if (r.status === 404) return null; return okJson(r); });
+    return fetch(K.indirizzo(state.repo.owner, state.repo.name, "main", id), { cache: "no-store" }).then(function (r) { if (r.status === 404) return null; return okJson(r); });
+  }
+  /* recupero su un altro telefono (o dopo aver cancellato gli appartamenti) con il codice del gestore */
+  function restoreVault(text) {
+    var inv = K.leggiInvito(text), code = inv ? inv.codice : text;
+    if (!K.codiceValido(code)) { toast("Il codice deve avere 24 caratteri (lettere e numeri)"); return; }
+    code = K.normalizza(code);
+    toast("Cerco il file su GitHub…");
+    K.idFile(code).then(fetchVaultFile).then(function (busta) {
+      if (!busta) { toast("Su GitHub non c'è un file per questo codice"); return; }
+      return K.decifra(busta, code).then(function (doc) {
+        if (doc.tipo !== "gestore") { toast("È il codice di un proprietario: apre solo i suoi dati"); return; }
+        openSheet("Recupera dal file cifrato", function (body) {
+          var n = (doc.appartamenti || []).length, k = (doc.proprietari || []).length;
+          body.appendChild(h("p", { text: "Nel file salvato il " + fmtWhen(doc.salvato) + " ci sono " + n + (n === 1 ? " appartamento" : " appartamenti") + " e " + k + (k === 1 ? " proprietario" : " proprietari") + ". Li metto al posto di quelli sul telefono?" }));
+          body.appendChild(h("div", { class: "stack" },
+            h("button", { class: "btn primary block", onclick: function () {
+              var owners = {};
+              (doc.proprietari || []).forEach(function (p) { owners[String(p.nome).trim().toLowerCase()] = { name: p.nome, code: p.codice }; });
+              state.apartments = doc.appartamenti; state.current = doc.appartamenti[0].id; state.selection = []; state.configured = true;
+              if (doc.impostazioni && Array.isArray(doc.impostazioni.sconti_aggressiva)) state.aggressive = doc.impostazioni.sconti_aggressiva;
+              state.vault = { manager: code, owners: owners, files: doc.file || [], saved: null };
+              saveState(); eff = null; closeSheet(); render(); toast("Recuperati " + n + " appartamenti e i codici dei proprietari");
+            }, text: "Sostituisci" }),
+            h("button", { class: "btn block", onclick: function () { closeSheet(); }, text: "Annulla" })));
+        });
+      });
+    }).catch(function (e) { toast(e && e.tipo ? e.message : "Non riesco a leggere il file da GitHub"); });
+  }
+  function ownerInvite(o) { return K.invito(state.repo.owner, state.repo.name, "main", o.code); }
+  function shareOwner(o) {
+    shareText("Ciao " + o.name + ", ecco il codice per vedere nell'app dei proprietari le stime dei tuoi appartamenti:\n" + ownerInvite(o) +
+      "\nTienilo per te: chi ha il codice vede i tuoi dati.");
+  }
+  function newOwnerCode(key) {
+    var o = vault().owners[key];
+    openSheet("Nuovo codice per " + o.name, function (body) {
+      body.appendChild(h("p", { text: "Al prossimo salvataggio il codice attuale smette di aprire i dati aggiornati e il suo file viene tolto da GitHub (le versioni passate restano nella cronologia della repository). Poi mandagli il codice nuovo." }));
+      body.appendChild(h("div", { class: "stack" },
+        h("button", { class: "btn primary block", onclick: function () { o.code = K.nuovoCodice(); saveState(); closeSheet(); render(); toast("Codice nuovo creato: mandalo a " + o.name); }, text: "Crea un codice nuovo" }),
+        h("button", { class: "btn block", onclick: function () { closeSheet(); }, text: "Annulla" })));
+    });
+  }
+  function vaultSection(root) {
+    root.appendChild(h("h2", { text: "File cifrati su GitHub" }));
+    root.appendChild(h("p", { class: "note", text: "Appartamenti, proprietari e stime di guadagno vengono salvati cifrati nella repository, nella cartella config/cifrati. Ogni proprietario ha un codice che apre solo il suo file, da usare nell'app dei proprietari; il tuo codice da gestore apre tutto. Senza codice i file non si leggono." }));
+    if (!K || !window.crypto || !window.crypto.subtle) { root.appendChild(banner("bad", "Questo telefono non permette di cifrare i file.")); return; }
+    if (!state.repo.token) root.appendChild(banner("warn", "Per salvarli serve il token di accesso (qui sotto, in Collegamento a GitHub) con il permesso Contents «Read and write»."));
+    else if (!state.configured) root.appendChild(banner("warn", "Imposta prima i tuoi appartamenti in Prezzi."));
+    if (vaultInfo.error) root.appendChild(banner("bad", vaultInfo.error));
+    var s = state.vault && state.vault.saved;
+    root.appendChild(h("p", { class: "alt", text: vaultInfo.status || (s ? "Ultimo salvataggio " + fmtWhen(s.at) + ": " + s.apartments + (s.apartments === 1 ? " appartamento, " : " appartamenti, ") + s.owners + (s.owners === 1 ? " proprietario, " : " proprietari, ") + s.files + " file. Si aggiornano da soli quando cambi un appartamento e ogni giorno con i dati nuovi." : "Non ancora salvati.") }));
+    root.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", disabled: !vaultReady() || !!vaultInfo.status, onclick: function () {
+      saveVault(true).then(function (ok) { if (ok) toast("File cifrati salvati su GitHub"); });
+    }, text: "Salva adesso" })));
+    var groups = ownerGroups().filter(function (g) { return g.key; });
+    if (groups.length) {
+      ensureCodes();
+      root.appendChild(h("ul", { class: "rows" }, groups.map(function (g) {
+        var o = state.vault.owners[g.key];
+        return h("li", {}, h("div", { class: "row owner" },
+          h("div", { class: "main" }, h("div", { class: "t", text: g.name }), h("div", { class: "s code", text: o.code }))),
+          h("div", { class: "links" }, h("button", { class: "btn quiet", onclick: function () { shareOwner(o); }, text: "Invia il codice" }),
+            h("button", { class: "btn quiet", onclick: function () { newOwnerCode(g.key); }, text: "Nuovo codice" })));
+      })));
+    } else {
+      root.appendChild(h("p", { class: "note", text: "Scrivi il proprietario nella scheda di ogni appartamento (Prezzi, Modifica): per ognuno l'app crea un codice da mandargli." }));
+    }
+    var inp = h("input", { type: "text", id: "v-code", autocapitalize: "characters", autocomplete: "off", spellcheck: "false", placeholder: "XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" });
+    var mine = state.vault && state.vault.manager;
+    root.appendChild(h("details", {}, h("summary", { text: "Il tuo codice da gestore" }),
+      h("p", { class: "note", text: "Con questo codice ritrovi appartamenti, proprietari e codici su un altro telefono. Conservalo in un posto sicuro (per esempio un gestore di password): chi lo ha vede tutto. È anche nel file di «Esporta appartamenti ed eventi»." }),
+      mine ? h("p", { class: "code big", text: mine }) : h("p", { class: "alt", text: "Viene creato al primo salvataggio." }),
+      mine ? h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () { copyText(mine, "Codice copiato"); }, text: "Copia il codice" })) : null,
+      h("div", { class: "field" }, h("label", { for: "v-code", text: "Recupera da un codice salvato" }), inp),
+      h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () { restoreVault(inp.value); }, text: "Recupera dal file su GitHub" }))));
   }
 
   // ------------------------------------------------------------------ schede dal basso
@@ -1132,10 +1404,12 @@
       h("button", { class: "btn primary block", disabled: data.loading, onclick: function () { loadData(true); loadRun(); checkUpdate(); }, text: data.loading ? "Aggiorno…" : "Aggiorna i dati" }),
       h("button", { class: "btn block", onclick: startScan, text: "Avvia una scansione adesso" }),
       h("button", { class: "btn block", onclick: function () { downloadUrl(base + "/releases/download/backup/bbb-backup.zip", "bbb-backup.zip"); }, text: "Scarica il backup completo (ZIP)" }),
-      h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period, priceView: state.priceView, aggressive: state.aggressive }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
+      h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period, priceView: state.priceView, aggressive: state.aggressive, vault: vaultCodes() }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
       h("button", { class: "btn block", onclick: importSettings, text: "Importa appartamenti ed eventi" }),
       h("button", { class: "btn block", onclick: function () { openExternal(base + "/actions"); }, text: "Apri le esecuzioni su GitHub" })));
     root.appendChild(h("p", { class: "note", text: "Il backup contiene tutto lo storico: prezzi giorno per giorno, catalogo, conteggi, modello. Finisce nella cartella Download del telefono." }));
+
+    vaultSection(root);
 
     root.appendChild(h("h2", { text: "Collegamento a GitHub" }));
     var owner = h("input", { type: "text", id: "r-owner", value: state.repo.owner, autocapitalize: "off", autocomplete: "off" });
@@ -1143,7 +1417,7 @@
     var token = h("input", { type: "password", id: "r-token", value: state.repo.token, autocomplete: "off", placeholder: "facoltativo" });
     root.appendChild(h("div", { class: "two" }, h("div", { class: "field" }, h("label", { for: "r-owner", text: "Utente" }), owner), h("div", { class: "field" }, h("label", { for: "r-name", text: "Repository" }), name)));
     root.appendChild(h("div", { class: "field" }, h("label", { for: "r-token", text: "Token di accesso" }), token,
-      h("span", { class: "hint", text: "Serve solo per avviare una scansione dall'app e per salvare su GitHub gli eventi che aggiungi. Per leggere i prezzi non serve. Resta su questo telefono." })));
+      h("span", { class: "hint", text: "Serve per avviare una scansione dall'app e per salvare su GitHub gli eventi che aggiungi e i file cifrati con appartamenti e stime. Per leggere i prezzi non serve. Resta su questo telefono." })));
     root.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () {
       state.repo.owner = owner.value.trim() || DEFAULT_REPO.owner; state.repo.name = name.value.trim() || DEFAULT_REPO.name; state.repo.token = token.value.trim();
       saveState(); data.model = null; data.status = null; data.listings = null; eff = null; localStorage.removeItem(KEY + ".model"); loadData(true); loadRun(); }, text: "Salva il collegamento" })));
@@ -1181,6 +1455,7 @@
           var j = JSON.parse(String(rd.result));
           if (!Array.isArray(j.apartments) || !j.apartments.length) throw new Error("vuoto");
           state.apartments = j.apartments; state.current = j.apartments[0].id; state.selection = []; state.customEvents = Array.isArray(j.customEvents) ? j.customEvents : [];
+          if (j.vault && j.vault.manager && K && K.codiceValido(j.vault.manager)) state.vault = { manager: j.vault.manager, owners: j.vault.owners || {}, files: j.vault.files || [], saved: null };
           state.configured = true; saveState(); eff = null; render(); toast("Importati " + j.apartments.length + " appartamenti");
         } catch (e) { toast("File non valido"); }
       };

@@ -70,7 +70,7 @@ jobs:
       - name: Test
         if: steps.guard.outputs.skip != 'true'
         run: |
-          pip install -q pytest
+          pip install -q pytest cryptography
           python -m pytest tests -q -x
 
       - name: Scansione, modello e file per l'app
