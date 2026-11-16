@@ -3,143 +3,153 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>Tasse proprietario</title>
 <style>
-:root{--bg:#f6f5f1;--card:#fff;--ink:#1d1d1b;--mute:#6b6a66;--line:#e4e2db;--acc:#3b3f6b;
---c-net:#1f5c4a;--c-tax:#c0532b;--c-inps:#e0a23a;--c-mgmt:#5b6fa8;--c-fee:#9a9790;--warn:#fff4e0;--bad:#fde8e4}
-@media (prefers-color-scheme:dark){:root{--bg:#151614;--card:#1f201e;--ink:#ecebe6;--mute:#a19f98;--line:#33342f;--acc:#8a9be0;
---c-net:#4fae8c;--c-tax:#e07a52;--c-inps:#e8b65a;--c-mgmt:#8a9be0;--c-fee:#77756f;--warn:#3a2f1c;--bad:#3d211b}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:1100px;margin:0 auto;padding:14px 14px 60px}
-h1{font-size:21px;margin:0 0 2px}h2{font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);font-weight:600}
-.sub{color:var(--mute);font-size:13px}
-.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin-bottom:12px}
-.live{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
-.dot{width:8px;height:8px;border-radius:50%;background:#999;flex:none}.dot.on{background:#2fa36b;animation:p 2s infinite}.dot.err{background:#c0532b}
-@keyframes p{0%{box-shadow:0 0 0 0 rgba(47,163,107,.6)}70%{box-shadow:0 0 0 7px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
-.s12{grid-column:span 12}.s8{grid-column:span 8}.s4{grid-column:span 4}.s6{grid-column:span 6}
-@media (max-width:860px){.s8,.s4,.s6{grid-column:span 12}}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
-.kpi .l{font-size:12px;color:var(--mute)}.kpi .v{font-size:23px;font-weight:700;font-variant-numeric:tabular-nums}
-.kpi .n{font-size:12px;color:var(--mute)}
-.kpi.hi{border-color:var(--c-tax)}.kpi.hi .v{color:var(--c-tax)}.kpi.ok .v{color:var(--c-net)}
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right;font-size:14px}
-td:first-child,th:first-child{text-align:left}th{font-size:12px;color:var(--mute);font-weight:600}
-tr.tot td{font-weight:700;border-top:2px solid var(--ink)}tr.sub td{color:var(--mute);font-size:13px}
-.minus{color:var(--c-tax)}
-label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
-input,select,textarea{width:100%;font:inherit;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
-textarea{min-height:70px;resize:vertical}
-input[type=checkbox]{width:auto;margin-right:6px}
-.chk{display:flex;align-items:center;font-size:14px;color:var(--ink);margin:8px 0}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 11px}
-button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
-.note{font-size:12.5px;color:var(--mute)}
-.banner{background:var(--warn);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
-.banner.bad{background:var(--bad)}
-.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--mute);margin-top:6px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-#chart{width:100%;position:relative}#tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 8px;border-radius:6px;display:none;white-space:nowrap;z-index:2}
-.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line)}
-.flash{animation:f 1.2s}@keyframes f{0%{background:#fff3b0}100%{background:inherit}}
-ul.dl{padding-left:18px;margin:6px 0}ul.dl li{margin:3px 0;font-size:14px}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.link{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:14px}
-.link .c{font-family:ui-monospace,monospace;font-size:12.5px;color:var(--mute);word-break:break-all}
-.empty{max-width:640px;margin:20px auto}
-.hidden{display:none}
+:root{
+  --bg:#f4f3ef;--surface:#fff;--ink:#16181d;--ink2:#5c6068;--ink3:#8d9098;--hair:#e7e5df;--accent:#26345c;--accent-soft:#e9ecf4;
+  --k-net:#26345c;--k-tax:#b5543c;--k-inps:#d6a04f;--k-mgmt:#8e96b0;--k-fee:#cfcbc1;--warn:#8a4b0f;--warn-bg:#fbf1e3;--bad:#9b2c1f;--bad-bg:#fbe9e5;
+  --r:14px}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#111215;--surface:#1b1d22;--ink:#eceef2;--ink2:#a7abb4;--ink3:#7a7e88;--hair:#2b2e35;--accent:#9fb0e3;--accent-soft:#252b3d;
+  --k-net:#9fb0e3;--k-tax:#e08a6f;--k-inps:#e3b56c;--k-mgmt:#6d7590;--k-fee:#4a4c52;--warn:#f0c48a;--warn-bg:#33281a;--bad:#f2a596;--bad-bg:#3a201b}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.app{max-width:560px;margin:0 auto;padding:0 16px 48px}
+button,select,input,textarea{font:inherit;color:inherit}
+
+/* barra in alto */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;display:flex;align-items:center;gap:10px}
+.top h1{font-size:20px;font-weight:650;letter-spacing:-.01em;margin:0;flex:1;min-width:0}
+.owner{appearance:none;border:0;background:var(--surface);border-radius:999px;padding:7px 30px 7px 14px;font-weight:550;max-width:55%;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat;box-shadow:0 0 0 1px var(--hair)}
+.icon{width:36px;height:36px;border-radius:50%;border:0;background:var(--surface);box-shadow:0 0 0 1px var(--hair);display:grid;place-items:center;cursor:pointer;flex:none}
+.icon svg{width:18px;height:18px;stroke:var(--ink2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon.spin svg{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.status{font-size:12.5px;color:var(--ink3);margin:0 0 12px;display:flex;align-items:center;gap:6px}
+.status i{width:6px;height:6px;border-radius:50%;background:var(--ink3)}.status i.ok{background:#3c9a6e}.status i.err{background:var(--bad)}
+
+/* schede */
+.tabs{display:flex;gap:4px;background:var(--surface);box-shadow:0 0 0 1px var(--hair);border-radius:12px;padding:4px;margin-bottom:14px}
+.tabs button{flex:1;border:0;background:none;padding:8px 6px;border-radius:9px;color:var(--ink2);font-weight:550;cursor:pointer}
+.tabs button.on{background:var(--accent);color:#fff}
+@media (prefers-color-scheme:dark){.tabs button.on{color:#111215}}
+.seg{display:flex;border-bottom:1px solid var(--hair);margin:0 0 4px}
+.seg button{flex:1;border:0;background:none;padding:10px 0 9px;color:var(--ink3);font-weight:550;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.seg button.on{color:var(--ink);border-color:var(--ink)}
+
+.card{background:var(--surface);border-radius:var(--r);box-shadow:0 0 0 1px var(--hair);padding:18px;margin-bottom:12px}
+.card > h2{font-size:15px;font-weight:650;margin:0 0 4px}
+.card > .lead{font-size:13px;color:var(--ink3);margin:0 0 12px}
+.hero .label{font-size:13px;color:var(--ink2)}
+.hero .big{font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:4px 0 2px}
+.hero .sub{font-size:13px;color:var(--ink3)}
+.stack{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:16px 0 14px;background:var(--hair)}
+.stack span{display:block;height:100%}
+.rows{margin:0;padding:0;list-style:none}
+.rows li{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-top:1px solid var(--hair)}
+.rows li:first-child{border-top:0}
+.rows .k{flex:1;min-width:0;color:var(--ink)}
+.rows .k small{display:block;color:var(--ink3);font-size:12.5px;margin-top:1px}
+.rows .v{font-weight:550;white-space:nowrap}
+.rows .p{width:44px;text-align:right;color:var(--ink3);font-size:12.5px}
+.rows .neg{color:var(--ink2)}
+.rows li.total{border-top:1px solid var(--ink);margin-top:2px}
+.rows li.total .k,.rows li.total .v{font-weight:700}
+.sw{width:9px;height:9px;border-radius:2px;flex:none;align-self:center}
+.callout{background:var(--accent-soft);border-radius:10px;padding:11px 13px;font-size:13.5px;margin-top:12px}
+.alert{border-radius:10px;padding:11px 13px;font-size:13.5px;margin-bottom:12px;background:var(--warn-bg);color:var(--warn)}
+.alert.bad{background:var(--bad-bg);color:var(--bad)}
+details{border-top:1px solid var(--hair);margin-top:10px}
+details summary{list-style:none;cursor:pointer;padding:12px 0 2px;color:var(--accent);font-weight:550;font-size:14px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:" ›";display:inline-block;transition:transform .15s}
+details[open] summary::after{transform:rotate(90deg)}
+.muted{color:var(--ink3);font-size:12.5px}
+.upd{animation:upd 1.4s}@keyframes upd{0%{background:var(--accent-soft)}100%{background:transparent}}
+
+/* moduli */
+.field{display:block;margin:0 0 14px}
+.field > span{display:block;font-size:13px;color:var(--ink2);margin-bottom:6px}
+.field select,.field input,.field textarea{width:100%;border:1px solid var(--hair);background:var(--bg);border-radius:10px;padding:10px 12px;outline:none}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{min-height:76px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--hair)}
+.toggle span{flex:1}.toggle small{display:block;color:var(--ink3);font-size:12.5px}
+.toggle input{appearance:none;width:44px;height:26px;border-radius:13px;background:var(--hair);position:relative;cursor:pointer;flex:none;transition:background .15s}
+.toggle input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
+.toggle input:checked{background:var(--accent)}.toggle input:checked::after{left:21px}
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
+@media (prefers-color-scheme:dark){.btn{color:#111215}}
+.btn.ghost{background:none;color:var(--bad);padding:6px 4px;font-weight:550}
+.link{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--hair)}
+.link:first-child{border-top:0}
+.link .k{flex:1;min-width:0}.link code{font-size:12px;color:var(--ink3)}
+.prose p{margin:0 0 10px;font-size:14px;color:var(--ink2)}.prose b{color:var(--ink)}
+.empty{padding-top:28px}
+.empty h2{font-size:22px;letter-spacing:-.01em;margin:0 0 8px}
+.empty ol{padding-left:20px;color:var(--ink2);margin:0 0 18px}.empty li{margin:6px 0}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="bar">
-    <div>
-      <h1>Tasse del proprietario</h1>
-      <div class="sub">P.IVA forfettaria per affitti brevi · stime dall'app bbb (file cifrati nella repository)</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <span class="live"><span class="dot" id="dot"></span><span id="liveTxt">nessun collegamento</span></span>
-      <button id="refresh">Aggiorna</button>
-    </div>
-  </div>
-  <div id="banner"></div>
+<div class="app">
+  <header class="top">
+    <h1>Tasse</h1>
+    <select class="owner hidden" id="owner" aria-label="Proprietario"></select>
+    <button class="icon" id="refresh" aria-label="Aggiorna"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+  </header>
+  <div class="status" id="status"><i></i><span>Nessun collegamento</span></div>
+  <div id="alert"></div>
 
-  <!-- primo avvio: nessun codice -->
-  <div id="empty" class="card empty hidden">
-    <h2>Collega l'app bbb</h2>
-    <p>Incolla l'invito che ti manda bbb (inizia con <code>bbb1:</code>) oppure il codice di 24 caratteri.</p>
-    <ul class="dl">
-      <li><b>Un proprietario:</b> in bbb, Dati → File cifrati → condividi il codice del proprietario. Vedi solo i suoi appartamenti.</li>
-      <li><b>Tutti i proprietari:</b> usa il codice del gestore. Vedi tutti gli appartamenti, divisi per proprietario.</li>
-    </ul>
-    <p class="note">Puoi anche condividere l'invito da bbb direttamente a questa app. Il codice resta solo su questo telefono.</p>
-    <div class="addform"></div>
-  </div>
+  <section id="empty" class="empty hidden">
+    <h2>Collega i dati di bbb</h2>
+    <ol>
+      <li>Apri bbb e vai in <b>Dati → File cifrati</b>.</li>
+      <li>Condividi il codice del proprietario e scegli <b>Tasse</b>, oppure copialo e incollalo qui sotto.</li>
+      <li>Con il codice del gestore vedi tutti i proprietari.</li>
+    </ol>
+    <div class="card"><div class="addform"></div></div>
+    <p class="muted">Il codice resta su questo telefono e serve solo ad aprire il file cifrato su GitHub.</p>
+  </section>
 
-  <div id="main" class="hidden">
-    <div class="chips" id="owners"></div>
-    <div class="kpis" id="kpis"></div>
-    <div class="grid" style="margin-top:12px">
-      <div class="card s8">
-        <h2>Proiezione per periodo</h2>
-        <div id="chart"><div id="tip"></div></div>
-        <div class="legend">
-          <span><i style="background:var(--c-net)"></i>Resta al proprietario</span>
-          <span><i style="background:var(--c-tax)"></i>Imposta</span>
-          <span><i style="background:var(--c-inps)"></i>INPS</span>
-          <span><i style="background:var(--c-mgmt)"></i>Gestione</span>
-          <span><i style="background:var(--c-fee)"></i>Portale e costi</span>
-        </div>
-        <div class="tw"><table id="periods" style="margin-top:8px"></table></div>
-        <p class="note" id="chartNote"></p>
-      </div>
-      <div class="card s4">
-        <h2>Regime fiscale</h2>
-        <div id="ownerForm"></div>
-      </div>
-      <div class="card s6">
-        <h2>Conto economico dei prossimi 12 mesi</h2>
-        <table id="pl"></table>
-      </div>
-      <div class="card s6">
-        <h2>Calcolo dell'imposta</h2>
-        <table id="taxcalc"></table>
-        <p class="note" id="taxNote"></p>
-      </div>
-      <div class="card s12">
-        <h2>Appartamento per appartamento (12 mesi)</h2>
-        <div class="tw"><table id="apts"></table></div>
-      </div>
-      <div class="card s6">
-        <h2>Scadenze e accantonamento</h2>
-        <div id="deadlines"></div>
-      </div>
-      <div class="card s6">
-        <h2>Collegamenti a bbb</h2>
-        <div id="links"></div>
-        <div class="addform"></div>
-      </div>
-      <div class="card s12">
-        <h2>Regole usate</h2>
-        <div class="note" style="font-size:13.5px;color:var(--ink)">
-          <p><b>ATECO 2025 55.20.42</b> – case e appartamenti per vacanze (proprietario con P.IVA): coefficiente di redditività <b>40%</b> (gruppo 55, allegato 4 L. 190/2014). <b>68.32.01</b> – gestione di immobili per conto terzi (property manager): <b>86%</b>. Contributi: Gestione Commercianti INPS.</p>
-          <p><b>Imposta sostitutiva</b> 5% per i primi 5 anni di una nuova attività con i requisiti, poi 15%, su ricavi × coefficiente meno i contributi INPS versati. Limite ricavi 85.000 €. Nel forfettario le spese (portale, gestione, pulizie) <b>non si deducono</b>.</p>
-          <p><b>IVA in reverse charge</b> 22% sulle commissioni dei portali esteri: va versata con F24 entro il 16 del mese dopo, anche in forfettario, e non si detrae. bbb la include già nelle commissioni quando è dovuta.</p>
-          <p><b>INPS Commercianti 2026</b>: minimale 18.808 €, quota fissa 4.611,64 €/anno, 24,48% oltre il minimale (25,48% oltre 56.224 €), riduzione facoltativa del 35% per i forfettari. Gestione Separata 26,07%.</p>
-          <p><b>Tassa di soggiorno</b>: non è un ricavo. Quella da versare al Comune è indicata a parte.</p>
-          <p class="note">Le stime di incasso vengono da bbb (prezzi consigliati × notti che si prevede di vendere) e sono quelle dell'ultimo salvataggio dei file. Acconti calcolati come in un anno a regime. Non è consulenza fiscale: verifica con il commercialista.</p>
-        </div>
+  <main id="main" class="hidden">
+    <nav class="tabs" id="tabs">
+      <button data-v="sum" class="on">Riepilogo</button>
+      <button data-v="apt">Appartamenti</button>
+      <button data-v="set">Impostazioni</button>
+    </nav>
+
+    <div data-view="sum">
+      <div class="seg" id="period"></div>
+      <div class="card hero" id="hero"></div>
+      <div class="card" id="taxes"></div>
+      <div class="card" id="dates"></div>
+    </div>
+
+    <div data-view="apt" class="hidden">
+      <div class="seg" id="period2"></div>
+      <div class="card" id="apts"></div>
+    </div>
+
+    <div data-view="set" class="hidden">
+      <div class="card" id="regime"></div>
+      <div class="card" id="links"></div>
+      <div class="card prose">
+        <h2>Regole applicate</h2>
+        <p class="lead muted">Valori 2026</p>
+        <p><b>ATECO 55.20.42</b>, alloggi per vacanze del proprietario: coefficiente di redditività 40%. <b>68.32.01</b>, gestione per conto terzi: 86%.</p>
+        <p><b>Imposta sostitutiva</b> del 5% per i primi cinque anni di una nuova attività, poi 15%, su ricavi × coefficiente meno i contributi. Limite ricavi 85.000 €. Le spese non si deducono.</p>
+        <p><b>INPS commercianti</b>: quota fissa 4.611,64 € sul minimale di 18.808 €, 24,48% oltre il minimale (25,48% oltre 56.224 €), riduzione facoltativa del 35%. Gestione separata 26,07%.</p>
+        <p><b>IVA in reverse charge</b> del 22% sulle commissioni dei portali esteri, da versare entro il 16 del mese successivo e non detraibile. È già compresa nelle commissioni stimate da bbb.</p>
+        <p><b>Tassa di soggiorno</b>: non è un ricavo; quella da versare al Comune è indicata a parte.</p>
+        <p class="muted">Le stime di incasso sono quelle dell'ultimo salvataggio di bbb. Acconti calcolati come in un anno a regime. Non sostituisce il commercialista.</p>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 <script src="cifrato.js"></script>
 <script src="tasse.js"></script>
