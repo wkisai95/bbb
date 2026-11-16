@@ -16,7 +16,8 @@ from conftest import DAYS, START
 def test_scan_volume_is_bounded(world):
     run = world["run"]
     assert 500 < run["requests"] < 1400
-    assert run["census"] == 4 and run["windows"] >= 45
+    assert run["census"] == 15 and run["windows"] >= 45       # le 15 finestre entro 30 giorni lette per intero
+    assert run["track"]["found"] == run["track"]["expected"] > 3000
     assert run["prices"] > 5000
 
 
@@ -24,7 +25,7 @@ def test_catalog(world):
     lst = world["store"].load_listings()
     assert len(lst) > 1100
     assert (lst["zone"] != "").mean() > 0.99
-    assert lst["guests"].notna().mean() > 0.9         # capienze lette dalla pagina dell'annuncio
+    assert lst["guests"].notna().mean() > 0.6         # capienze lette dalla pagina dell'annuncio, 60 al giorno
     assert set(lst["guests_src"].unique()) <= {"pdp", "ia", "est", ""}
 
 
@@ -77,7 +78,7 @@ def test_demand_matches_true_pickup(world):
 
 def test_price_sensitivity_learned(world):
     b = world["model"]["reliability"]["beta"]
-    assert b["pairs"] >= 3 and b["n"] > 1000
+    assert b["pairs"] >= 100 and b["n"] > 50000       # ogni finestra seguita dà un confronto ogni due giorni
     assert -4.0 < world["model"]["beta"] < -1.8      # verità: -3, attenuata dalla qualità non osservata
 
 

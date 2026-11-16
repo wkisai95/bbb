@@ -83,6 +83,7 @@ class SimMarket:
             a = rng.integers(0, self.h - 30)
             self.blocked[i, a:a + rng.integers(20, 90)] = True
         self.day = self.origin
+        self.history: dict[date, np.ndarray] = {}
         self.advance(start)
 
     @staticmethod
@@ -104,6 +105,7 @@ class SimMarket:
             free = ~self.booked[:, ks] & ~self.blocked[:, ks]
             self.booked[:, ks] |= free & (self.rng.random(p.shape) < p)
             self.day += timedelta(days=1)
+        self.history[to] = self.booked.copy()             # com'era quel giorno: serve ai test per sapere la verità
 
     def price(self, i, k):
         return np.exp(self.base[i] + self.nightfx[k] + self.noise[i, k])
@@ -112,10 +114,12 @@ class SimMarket:
 class SimClient:
     """Stessa interfaccia di AirbnbClient, senza rete e senza pause."""
 
-    def __init__(self, market: SimMarket, today: date, max_requests: int = 10 ** 9):
+    def __init__(self, market: SimMarket, today: date, max_requests: int = 10 ** 9, jitter: float = 0.0):
         self.m = market
         self.today = today
         self.max_requests = max_requests
+        self.jitter = jitter                      # ordine dei risultati instabile tra una pagina e l'altra, come dal vivo
+        self.rng = np.random.default_rng(today.toordinal())
         self.requests = 0
         self.errors = 0
         self.error_samples: list = []
@@ -123,6 +127,9 @@ class SimClient:
 
     def start(self):
         self.requests += 2
+
+    def remaining(self) -> int:
+        return max(0, self.max_requests - self.requests)
 
     def search(self, box, check_in="", check_out="", cursor="", min_bedrooms=0, min_bathrooms=0, adults=0):
         from .airbnb import BudgetExhausted
@@ -143,7 +150,8 @@ class SimClient:
             k0, nn = (self.today - m.origin).days + 10, 5
             ks = np.arange(k0, k0 + nn)
         idx = np.flatnonzero(ok)
-        idx = idx[np.argsort(-m.rank[idx])]
+        rank = m.rank[idx] + (self.rng.normal(0, self.jitter, len(idx)) if self.jitter else 0.0)
+        idx = idx[np.argsort(-rank)]
         count = len(idx)
         n_pages = min(7, max(1, math.ceil(count / 40)))
         p = int(cursor[1:]) if cursor else 0

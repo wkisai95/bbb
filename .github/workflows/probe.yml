@@ -1,11 +1,14 @@
 name: Prova dei portali
 run-name: Prova di raggiungibilità degli altri portali
 
+# Avvio solo a mano. Chiede UNA volta la pagina di ricerca di ogni portale, dove robots.txt lo consente,
+# e riporta se risponde o se chiede una verifica anti-robot. Non salva nulla.
+
 on:
   workflow_dispatch:
     inputs:
-      sample:
-        description: "Salva una pagina di esempio sul ramo debug (solo per sviluppo)"
+      clean:
+        description: "Svuota il ramo debug usato durante lo sviluppo"
         type: boolean
         default: false
 
@@ -21,18 +24,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        if: ${{ !inputs.clean }}
         with:
           python-version: "3.12"
-      - run: pip install -q requests
       - name: Una richiesta per sito, solo dove robots.txt lo consente
-        if: ${{ !inputs.sample }}
-        run: python tools/probe_sites.py "$GITHUB_STEP_SUMMARY"
-      - name: Pagina di esempio
-        if: ${{ inputs.sample }}
+        if: ${{ !inputs.clean }}
         run: |
-          mkdir -p dbg && python tools/sample_page.py dbg/sample.html
-          cd dbg && git init -q -b debug
+          pip install -q requests
+          python tools/probe_sites.py "$GITHUB_STEP_SUMMARY"
+      - name: Svuota il ramo debug
+        if: ${{ inputs.clean }}
+        run: |
+          mkdir dbg && cd dbg && git init -q -b debug
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A && git commit -q -m "pagina di esempio"
+          echo "Ramo usato per prove durante lo sviluppo: è vuoto e si può eliminare." > README.md
+          git add -A && git commit -q -m "ramo di prova svuotato"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" debug

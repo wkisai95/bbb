@@ -3,7 +3,11 @@ run-name: Scansione prezzi · ${{ github.event_name == 'schedule' && 'giornalier
 
 on:
   schedule:
-    - cron: "23 3 * * *"          # ogni giorno alle 03:23 UTC (04:23 o 05:23 in Italia)
+    # GitHub a volte salta o ritarda le esecuzioni programmate: tre tentativi al giorno, e chi trova la
+    # scansione di oggi già fatta si ferma subito senza toccare Airbnb.
+    - cron: "23 3 * * *"          # 03:23 UTC (04:23 o 05:23 in Italia)
+    - cron: "53 5 * * *"
+    - cron: "23 8 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -32,19 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - name: Dipendenze
-        run: pip install -q -r requirements.txt
-
-      - name: Test
-        run: |
-          pip install -q pytest
-          python -m pytest tests -q -x
-
       - name: Riprendi i dati già raccolti
         id: restore
         run: |
@@ -57,14 +48,40 @@ jobs:
             echo "Prima esecuzione: nessun dato precedente"
           fi
 
+      - name: Già fatta oggi?
+        id: guard
+        run: |
+          TODAY=$(TZ=Europe/Rome date +%F)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "out/data/runs/$TODAY.json" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "La scansione del $TODAY c'è già: niente da fare." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.skip != 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Dipendenze
+        if: steps.guard.outputs.skip != 'true'
+        run: pip install -q -r requirements.txt
+
+      - name: Test
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          pip install -q pytest
+          python -m pytest tests -q -x
+
       - name: Scansione, modello e file per l'app
+        if: steps.guard.outputs.skip != 'true'
         run: |
           EXTRA=""
           if [ -n "${{ inputs.max_requests }}" ]; then EXTRA="--max-requests ${{ inputs.max_requests }}"; fi
           python -m bnb ${{ inputs.mode || 'all' }} --out out $EXTRA
 
       - name: Salva sul ramo data
-        if: always() && steps.restore.outcome == 'success'
+        if: always() && steps.restore.outcome == 'success' && steps.guard.outputs.skip != 'true'
         run: |
           if [ ! -f out/data/listings.csv ] && [ ! -f out/public/status.json ]; then
             echo "Niente da salvare"; exit 0
@@ -88,7 +105,7 @@ jobs:
           fi
 
       - name: Backup scaricabile
-        if: always() && steps.restore.outcome == 'success'
+        if: always() && steps.restore.outcome == 'success' && steps.guard.outputs.skip != 'true'
         run: |
           if [ ! -f out/backup/bbb-backup.zip ]; then
             python -m bnb backup --out out || exit 0

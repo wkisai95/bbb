@@ -17,12 +17,14 @@ scan:
   far_days: 365              # da 180 a 365 giorni: una coppia di finestre al mese, più tutte le date con eventi
   mid_share: 2               # ogni finestra "media" viene letta un giorno ogni 2
   far_share: 4               # ogni finestra "lontana" o con evento viene letta un giorno ogni 4
-  census_leads: [[1, 2], [7, 8], [14, 15], [28, 29]]   # a questi anticipi si leggono TUTTI gli annunci disponibili
-  census_max_pages: 60       # tetto di pagine extra per ogni censimento
+  track_days: 30             # per le date entro 30 giorni si legge l'elenco COMPLETO di chi è ancora libero:
+                             # confrontandolo con la lettura precedente si vede chi è stato prenotato
+  track_max_pages: 90        # tetto di pagine extra per ogni lettura completa
+  track_requests: 950        # tetto di richieste al giorno per le letture complete (prima le date più vicine)
   pause: [1.2, 2.2]          # secondi di pausa tra una richiesta e l'altra (casuale nell'intervallo)
-  max_requests: 1400         # tetto di richieste per esecuzione
-  max_minutes: 55            # tetto di durata della scansione
-  details_per_run: 120       # annunci nuovi di cui leggere la capienza (ospiti) a ogni esecuzione
+  max_requests: 1600         # tetto di richieste per esecuzione (di norma ne servono circa 1300)
+  max_minutes: 65            # tetto di durata della scansione
+  details_per_run: 60        # annunci nuovi di cui leggere la capienza (ospiti) a ogni esecuzione
   stop_after_errors: 4       # errori consecutivi dopo i quali la scansione si ferma (nessun tentativo di aggirare blocchi)
 
 # Riquadri della mappa. "core" = sempre; "outer" = zone con pochi annunci, lette a rotazione.

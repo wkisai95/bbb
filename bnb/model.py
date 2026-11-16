@@ -18,6 +18,7 @@ import pandas as pd
 from scipy import sparse
 
 from . import events as ev
+from . import track
 from .geo import Zones
 from .store import Store
 
@@ -493,10 +494,14 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
     calib = dict((store.load_state().get("calibration") or {}))
     if mcfg.get("nu") is not None:
         calib["nu"] = float(mcfg["nu"])
-    demand = _demand(cn, days, today, nights_per, weights, zones, cfg, calib, log)
+    # chi era libero a una lettura completa e non lo è più a quella dopo: prenotazioni rilevate
+    trk = track.detect(store, today)
+    attr = _attr(lst, c, zones)
+    demand = _demand(cn, days, today, nights_per, weights, zones, cfg, calib, log, trk["pairs"])
 
     # ---- 4. sensibilità al prezzo
-    beta = _beta_from_census(store, cn, lst, c, zones, today, mcfg)
+    beta = _beta_from_tracking(trk, attr, mcfg)
+    tracking = track.summary(trk, lst, attr, today)
 
     # ---- eventi misurati e picchi senza nome
     ev_out = []
@@ -512,7 +517,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
     ev_out += _detect_peaks(days, idx, base, cov, weights, today)
 
     # ---- mercato e catalogo
-    market, listing_rows = _market(obs, fit, lst, zones, base_arr, today)
+    market, listing_rows = _market(obs, fit, lst, zones, base_arr, today, track.per_listing(trk, today))
 
     def r3(xs):
         return [round(float(x), 3) for x in xs]
@@ -575,6 +580,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
         "zones": zones.public(),
         "groups": zones.groups,
         "market": market,
+        "tracking": tracking,
         "reliability": {
             "scan_days": len(scan_days),
             "first_scan": scan_days[0].isoformat() if scan_days else None,
@@ -587,6 +593,9 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
             "curve_n": demand["curve"]["n"],
             "demand_days": demand["days"],
             "curve_live_weight": demand.get("live_weight", 0.0),
+            "track_weight": demand.get("track_weight", 0.0),
+            "track_pairs": int(len(trk["pairs"])),
+            "track_booked": round(float(trk["pairs"]["booked"].sum()), 1) if len(trk["pairs"]) else 0.0,
             "event_n": {str(k): v for k, v in learned_n.items()},
             "nights_covered_60": int(sum(1 for x in cov[:61] if x >= 6)),
         },
@@ -597,7 +606,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
 
 
 def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, weights: dict, zones: Zones,
-            cfg: dict, calib: dict, log) -> dict:
+            cfg: dict, calib: dict, log, trk_pairs: pd.DataFrame | None = None) -> dict:
     """Domanda: ritmo tipico di prenotazione per anticipo e, per ogni notte, quanto corre rispetto al tipico.
 
     La ricerca dice, per ogni finestra di date, quanti alloggi sono ancora disponibili. Da qui:
@@ -613,7 +622,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     empty_curve = {"lead": [0.0, 30.0, 120.0, 365.0], "logit": [float(logit(0.72)), float(logit(0.55)), float(logit(0.35)), float(logit(0.3))], "n": 0}
     w_arr = np.array([min(5, weights.get(d, 0)) for d in days])
 
-    def finish(curve, C, extra, measured, theta_adj, days_n, weight_live=0.0):
+    def finish(curve, C, extra, measured, theta_adj, days_n, weight_live=0.0, weight_track=0.0):
         typ = dict(THETA_PRIOR)
         base_theta = np.array([typ[int(w)] for w in w_arr])
         raw = np.clip((C + np.nan_to_num(extra) + C0 * base_theta) / (C + C0), 0.3, 3.5)
@@ -636,6 +645,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
         occ_now = 1 - np.exp(-np.maximum(done, 0) / nu)
         occ_fin = 1 - np.exp(-np.maximum(done + city * (C[0] - C), 0) / nu)
         return {"curve": curve, "days": days_n, "nu": nu, "live_weight": round(float(weight_live), 3),
+                "track_weight": round(float(weight_track), 3),
                 "C": [round(float(x), 4) for x in C], "theta": theta,
                 "theta_city": [round(float(x), 3) for x in city], "typical_theta": {str(k): round(v, 3) for k, v in typ.items()},
                 "u_now": [round(float(x), 3) for x in occ_now], "u_fin": [round(float(x), 3) for x in np.maximum(occ_fin, occ_now)],
@@ -690,6 +700,23 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     curve = booking_curve(typical)
     days_n = int(city["scan"].nunique())
     ln_ref, C, w_live = reference_curve(typical, curve, calib, n - 1, days_n, nu)
+
+    # Dove gli alloggi vengono seguiti uno per uno (date entro track_days) il ritmo si misura direttamente:
+    # quanti dei liberi vengono prenotati ogni giorno, a ogni anticipo. È la stessa data vista più volte,
+    # quindi non risente delle differenze tra una data e l'altra; prende peso con i confronti raccolti.
+    w_track = 0.0
+    if trk_pairs is not None and len(trk_pairs):
+        tp = trk_pairs.copy()
+        ords = [date.fromisoformat(x).toordinal() for x in tp["checkin"]]
+        tp = tp[[max(weights.get(o + j, 0) for j in range(nights_per)) < BUSY_WEIGHT for o in ords]]
+        if len(tp) >= 6:
+            H = min(int(cfg["scan"].get("track_days", 30)) + 1, n - 1)
+            h_trk, wgt = track.hazard_by_lead(tp, H)
+            w = np.minimum(1.0, wgt / 60.0) * min(1.0, tp["scan"].nunique() / 6.0)
+            dC = C[:-1] - C[1:]
+            dC[:H] = (1 - w) * dC[:H] + w * h_trk
+            C = np.concatenate([np.cumsum(dC[::-1])[::-1] + C[-1], [C[-1]]])
+            w_track = float(np.mean(w[: min(H, 21)]))
 
     def nightly(u: pd.DataFrame, value, max_age: int = 4) -> np.ndarray:
         """Media per notte di un valore calcolato su ogni finestra letta di recente; NaN dove non c'è lettura."""
@@ -757,49 +784,36 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
         if not np.any(adj["grp"]["fuori"]):
             adj["grp"]["fuori"] = adj["grp"]["periferia"]
 
-    return finish(curve, C, extra, measured, adj, days_n, w_live)
+    return finish(curve, C, extra, measured, adj, days_n, w_live, w_track)
 
 
-def _beta_from_census(store: Store, cn: pd.DataFrame, lst: pd.DataFrame, c: dict, zones: Zones, today: date, mcfg: dict) -> dict:
-    """Coppie di censimenti della stessa finestra: chi non compare più è stato (quasi sempre) prenotato."""
-    prior, sd = float(mcfg["beta_prior"]), float(mcfg["beta_prior_sd"])
-    if cn.empty:
-        return fit_beta([], prior, sd)
-    cens = cn[(cn["scope"] == "census") & (pd.to_numeric(cn["complete"], errors="coerce") == 1)]
-    if cens.empty:
-        return fit_beta([], prior, sd)
-    wins = cens.groupby("checkin")["scan"].apply(lambda s: sorted(set(s)))
-    wins = wins[wins.map(len) >= 2]
-    if wins.empty:
-        return fit_beta([], prior, sd)
-    scans = sorted({s for lst_ in wins for s in lst_})
-    pr = store.load_prices(since=date.fromisoformat(scans[0]), until=date.fromisoformat(scans[-1]))
-    if pr.empty:
-        return fit_beta([], prior, sd)
-    pr["pn"] = pr["price"] / pr["nights"]
-    by = {k: g for k, g in pr.groupby(["scan", "checkin"])}
-    # parte del prezzo spiegata dalle caratteristiche
+def _attr(lst: pd.DataFrame, c: dict, zones: Zones) -> pd.Series:
+    """Parte del prezzo (in log) spiegata dalle caratteristiche di ogni alloggio."""
     L = lst[lst["zone"].isin(zones.by_id)]
-    attr = (L["zone"].map(lambda z: c.get(f"zone:{z}", 0.0) + c.get(f"grp:{zones.group_of(z)}", 0.0))
+    return (L["zone"].map(lambda z: c.get(f"zone:{z}", 0.0) + c.get(f"grp:{zones.group_of(z)}", 0.0))
             + L["bedrooms_f"].clip(upper=4).astype(int).map(lambda b: c.get(f"br:{b}", 0.0))
             + c["bath"] * (L["baths_f"].clip(0.5, 4) - 1) + c["guests"] * np.log(L["guests_f"].clip(1, 12) / 4)
             + c["rating"] * (L["rating_f"].fillna(4.8) - 4.8) + c["new"] * L["is_new"]
             + c["fav1"] * (L["fav"] == 1) + c["fav2"] * (L["fav"] == 2) + c["superhost"] * (L["superhost"] == 1))
+
+
+def _beta_from_tracking(trk: dict, attr: pd.Series, mcfg: dict) -> dict:
+    """Sensibilità al prezzo: tra gli alloggi liberi a una lettura, chi è stato prenotato prima della successiva.
+
+    A parità di date, si guarda quanto il prezzo (rispetto a quello atteso per le caratteristiche) sposta la
+    probabilità di essere prenotati.
+    """
     pairs = []
-    for w, days in wins.items():
-        for s1, s2 in zip(days[:-1], days[1:]):
-            a, b = by.get((s1, w)), by.get((s2, w))
-            if a is None or b is None:
-                continue
-            a = a[a["id"].isin(attr.index) & (a["pn"] > 0)]
-            if len(a) < 40:
-                continue
-            z = np.log(a["pn"].to_numpy()) - attr.reindex(a["id"]).to_numpy()
-            z = z - np.median(z)
-            ok = np.abs(z) < 1.2
-            y = (~a["id"].isin(set(b["id"]))).to_numpy().astype(float)
-            pairs.append((z[ok], y[ok]))
-    return fit_beta(pairs, prior, sd)
+    for sm in trk["samples"]:
+        a = attr.reindex(sm["id"]).to_numpy()
+        ok = np.isfinite(a)
+        if ok.sum() < 40:
+            continue
+        z = np.log(sm["pn"][ok]) - a[ok]
+        z = z - np.median(z)
+        keep = np.abs(z) < 1.2
+        pairs.append((z[keep], sm["y"][ok][keep]))
+    return fit_beta(pairs, float(mcfg["beta_prior"]), float(mcfg["beta_prior_sd"]))
 
 
 def _detect_peaks(days, idx, base, cov, weights, today: date) -> list:
@@ -831,7 +845,8 @@ def _detect_peaks(days, idx, base, cov, weights, today: date) -> list:
     return out
 
 
-def _market(obs: pd.DataFrame, fit: dict, lst: pd.DataFrame, zones: Zones, base_arr: list, today: date):
+def _market(obs: pd.DataFrame, fit: dict, lst: pd.DataFrame, zones: Zones, base_arr: list, today: date,
+            booked: pd.DataFrame | None = None):
     """Statistiche per zona/camere/bagni/ospiti e catalogo compatto, a prezzi di una notte normale."""
     normal = float(np.median(base_arr[:45])) if base_arr else 0.0
     o = obs.copy()
@@ -872,10 +887,13 @@ def _market(obs: pd.DataFrame, fit: dict, lst: pd.DataFrame, zones: Zones, base_
     cut = (today - timedelta(days=45)).isoformat()
     rows = []
     zidx = {z: i for i, z in enumerate(zone_order)}
+    bk = booked if booked is not None else pd.DataFrame(columns=["n", "pn"])
+    bn, bp = bk["n"].to_dict(), bk["pn"].to_dict()
     for r in L[L["last_seen"] >= cut].sort_values("typ").to_dict("records"):
-        rows.append([str(int(r["id"])), zidx.get(r["zone"], -1), int(r["brc"]), float(r["baths_f"]),
+        i = int(r["id"])
+        rows.append([str(i), zidx.get(r["zone"], -1), int(r["brc"]), float(r["baths_f"]),
                      int(round(r["guests_f"])), int(bool(r["guests_est"])), int(round(r["typ"])),
                      None if r["rating"] != r["rating"] else round(float(r["rating"]), 2), int(r["reviews"] or 0),
                      int(r["fav"] or 0), round(float(r["lat"]), 4), round(float(r["lon"]), 4),
-                     (r["name"] or "")[:60]])
+                     (r["name"] or "")[:60], int(bn.get(i, 0)), int(round(bp[i])) if i in bp else None])
     return market, rows

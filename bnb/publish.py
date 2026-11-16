@@ -12,7 +12,8 @@ from . import __version__
 from .config import CONFIG_DIR
 from .store import Store
 
-LISTING_FIELDS = ["id", "zone", "bedrooms", "baths", "guests", "guests_est", "price", "rating", "reviews", "fav", "lat", "lon", "name"]
+LISTING_FIELDS = ["id", "zone", "bedrooms", "baths", "guests", "guests_est", "price", "rating", "reviews", "fav", "lat", "lon", "name",
+                  "booked", "booked_price"]     # finestre prenotate negli ultimi 30 giorni e prezzo mediano a notte
 
 DATA_README = """# Dati raccolti (ramo `data`)
 

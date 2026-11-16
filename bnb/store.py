@@ -3,6 +3,7 @@
 out/data/listings.csv              catalogo degli annunci
 out/data/prices/AAAA-MM-GG.csv.gz  prezzi letti quel giorno (uno per annuncio e finestra di date)
 out/data/counts/AAAA-MM-GG.csv     alloggi disponibili per finestra, riquadro e taglia
+out/data/seen/AAAA-MM-GG.csv.gz    alloggi visti liberi senza prezzo nelle letture complete (gli altri sono tra i prezzi)
 out/data/runs/AAAA-MM-GG.json      diario dell'esecuzione
 out/data/history/*.csv             storico: indice dei prezzi per notte, qualità del modello
 out/data/state.json                stato tra un'esecuzione e l'altra
@@ -21,6 +22,7 @@ LISTING_COLS = ["id", "name", "kind", "lat", "lon", "zone", "district", "bedroom
                 "guests_src", "rating", "reviews", "superhost", "fav", "min_nights", "first_seen", "last_seen", "n_seen"]
 PRICE_COLS = ["id", "checkin", "nights", "price", "orig", "src"]
 COUNT_COLS = ["checkin", "nights", "scope", "count", "pages", "complete"]
+SEEN_COLS = ["checkin", "id"]
 
 
 class Store:
@@ -28,7 +30,7 @@ class Store:
         self.root = root
         self.data = os.path.join(root, "data")
         self.public = os.path.join(root, "public")
-        for d in ("prices", "counts", "runs", "history"):
+        for d in ("prices", "counts", "seen", "runs", "history"):
             os.makedirs(os.path.join(self.data, d), exist_ok=True)
         os.makedirs(self.public, exist_ok=True)
 
@@ -60,7 +62,7 @@ class Store:
 
     # ---- prezzi
     def _day_path(self, kind: str, day: date) -> str:
-        ext = "csv.gz" if kind == "prices" else "csv"
+        ext = "csv.gz" if kind in ("prices", "seen") else "csv"
         return os.path.join(self.data, kind, f"{day.isoformat()}.{ext}")
 
     def add_prices(self, day: date, rows: list[dict]) -> int:
@@ -85,8 +87,31 @@ class Store:
         new.to_csv(p, index=False)
         return len(new)
 
+    def add_seen(self, day: date, rows: list[dict]) -> int:
+        """Alloggi visti liberi ma senza prezzo in una lettura completa: servono a non scambiarli per prenotati."""
+        p = self._day_path("seen", day)
+        new = pd.DataFrame(rows, columns=SEEN_COLS)
+        if os.path.exists(p):
+            old = pd.read_csv(p, dtype={"id": "int64", "checkin": "string"})
+            new = pd.concat([old, new], ignore_index=True)
+        new = new.drop_duplicates(["checkin", "id"]).sort_values(["checkin", "id"])
+        new.to_csv(p, index=False, compression="gzip")
+        return len(new)
+
+    def load_seen(self, since: date | None = None, until: date | None = None) -> pd.DataFrame:
+        frames = []
+        for d in self.scan_days("seen"):
+            if (since and d < since) or (until and d > until):
+                continue
+            df = pd.read_csv(self._day_path("seen", d), dtype={"id": "int64", "checkin": "string"})
+            df["scan"] = d.isoformat()
+            frames.append(df)
+        if not frames:
+            return pd.DataFrame(columns=SEEN_COLS + ["scan"])
+        return pd.concat(frames, ignore_index=True)
+
     def scan_days(self, kind: str = "prices") -> list[date]:
-        ext = "csv.gz" if kind == "prices" else "csv"
+        ext = "csv.gz" if kind in ("prices", "seen") else "csv"
         out = []
         for p in glob.glob(os.path.join(self.data, kind, f"*.{ext}")):
             try:

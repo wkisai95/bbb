@@ -16,6 +16,7 @@ from .store import LISTING_COLS, Store
 
 PAGE = 40          # annunci per pagina restituiti dalla ricerca
 MAX_PAGES = 7      # pagine consultabili per riquadro
+SPLIT_DEPTH = 2    # quante volte un riquadro può essere diviso in quattro durante una lettura completa
 
 
 @dataclass
@@ -23,7 +24,7 @@ class Window:
     checkin: date
     nights: int
     kind: str            # near | mid | far | event
-    census: bool = False
+    census: bool = False     # lettura completa: tutti gli alloggi liberi, per vedere chi viene prenotato
 
     @property
     def checkout(self) -> date:
@@ -48,12 +49,13 @@ def build_windows(cfg: dict, today: date, events: list) -> list[Window]:
 
     # vicine: una finestra ogni 2 giorni; il giorno dopo l'allineamento si sposta di uno,
     # così ogni notte viene letta in coppia sia con la precedente sia con la successiva
+    # entro track_days la lettura è completa: due giorni dopo la stessa finestra viene riletta, e chi non
+    # c'è più è stato prenotato
+    track = int(sc.get("track_days", 30))
     k = 0
     while 1 + n * k <= near:
         ci = today + timedelta(days=1 + n * k)
-        lead = (ci - today).days
-        census = any(a <= lead <= b for a, b in sc.get("census_leads", []))
-        put(Window(ci, n, "near", census))
+        put(Window(ci, n, "near", (ci - today).days <= track))
         k += 1
 
     # eventi oltre l'orizzonte vicino: le loro notti, a rotazione
@@ -271,16 +273,28 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
 
     price_rows: list[dict] = []
     count_rows: list[dict] = []
-    cursors: dict[tuple, dict] = {}      # (checkin, tile id) -> {"box":…, "cursors":[…], "count":…}
-    seen_by_window: dict[str, set] = {}
+    seen_rows: list[dict] = []
+    first: dict[tuple, dict] = {}        # (checkin, riquadro) -> prima pagina: {"box", "cursors", "count", "ids"}
+    seen: dict[str, set] = {}            # finestra -> alloggi visti liberi, con o senza prezzo
+    priced: dict[str, set] = {}
+    track = {"windows": 0, "complete": 0, "requests": 0, "splits": 0, "resplits": 0, "found": 0, "expected": 0}
+    track_left = [int(sc.get("track_requests", 950))]
 
-    def take(page, w: Window | None, src: str):
+    def take(page, w: Window | None, src: str) -> set:
+        """Mette da parte ciò che c'è nella pagina; restituisce gli alloggi liberi per quella finestra."""
+        ids = set()
         for c in page.cards:
             cat.upsert(c, today)
-            if w is not None and c.price and c.nights == w.nights:
+            if w is None or (c.nights is not None and c.nights != w.nights):
+                continue
+            ids.add(c.id)
+            if c.price:
                 price_rows.append({"id": c.id, "checkin": w.key(), "nights": w.nights, "price": round(c.price, 2),
                                    "orig": round(c.orig, 2) if c.orig else None, "src": src})
-                seen_by_window.setdefault(w.key(), set()).add(c.id)
+                priced.setdefault(w.key(), set()).add(c.id)
+        if w is not None:
+            seen.setdefault(w.key(), set()).update(ids)
+        return ids
 
     def count_row(w: Window | None, scope: str, page, pages: int = 1, complete: int = 0):
         if page is not None and page.count is not None:
@@ -305,7 +319,8 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
                     take(p, None, "")
             state["tile_supply_day"] = today.isoformat()
 
-    def scan_window(w: Window, idx: int, full: bool):
+    def scan_window(w: Window, idx: int, mode: str):
+        """Conteggi e prima pagina. mode: track = tutti i riquadri · near = metà di quelli centrali · light = un terzo."""
         ci, co = w.key(), w.checkout.isoformat()
         p = client.search(city, ci, co)
         if p:
@@ -316,55 +331,85 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
             if p:
                 count_row(w, f"seg:{seg['id']}", p)
                 take(p, w, "g")
-        if full:
-            todo = list(core) + [t for i, t in enumerate(outer) if (idx + day + i) % 3 == 0]
+        if mode == "track":
+            todo = list(tiles)
+        elif mode == "near":
+            todo = ([t for i, t in enumerate(core) if (idx + day + i) % 2 == 0]
+                    + [t for i, t in enumerate(outer) if (idx + day + i) % 3 == 0])
         else:
             todo = [t for i, t in enumerate(core) if (idx + day + i) % 3 == 0]
         for t in todo:
             p = client.search(_box(t), ci, co)
             if p:
                 count_row(w, f"tile:{t['id']}", p)
-                take(p, w, "t")
-                cursors[(ci, t["id"])] = {"box": _box(t), "cursors": p.cursors, "count": p.count or 0}
+                ids = take(p, w, "t")
+                first[(ci, t["id"])] = {"box": _box(t), "cursors": p.cursors, "count": p.count or 0, "ids": ids}
         run["windows"] += 1
 
-    def census(w: Window):
-        """Tutte le pagine di tutti i riquadri: l'elenco completo di chi è ancora libero in quelle date."""
+    def complete_read(w: Window):
+        """Elenco completo di chi è ancora libero in quelle date: tutte le pagine di tutti i riquadri.
+
+        Le pagine profonde della ricerca sono le meno affidabili: qualche annuncio si ripete, qualcuno salta.
+        Un riquadro con troppi risultati per essere sfogliato, o in cui si è visto molto meno di quanto la
+        ricerca dichiara, viene diviso in quattro e riletto, al massimo due volte. Qualche alloggio sfugge
+        comunque: per questo chi "sparisce" viene contato come prenotato solo se manca anche alla lettura dopo.
+        """
         ci, co = w.key(), w.checkout.isoformat()
-        budget = int(sc.get("census_max_pages", 60))
-        for t in tiles:                       # anche i riquadri esterni saltati oggi dalla rotazione
-            if (ci, t["id"]) not in cursors and budget > 0:
-                p = client.search(_box(t), ci, co)
-                budget -= 1
+        r0 = client.requests
+        left = [int(sc.get("track_max_pages", 90))]
+        cut = [False]
+        resplit = float(sc.get("track_resplit_share", 0.06))
+        queue = [dict(first[(ci, t["id"])], depth=0) for t in tiles if (ci, t["id"]) in first]
+        if len(queue) < len(tiles):
+            cut[0] = True                                   # manca la prima pagina di un riquadro: lettura non completa
+
+        def ask(box: dict, cursor: str = ""):
+            if left[0] <= 0 or track_left[0] <= 0:
+                cut[0] = True
+                return None
+            left[0] -= 1
+            track_left[0] -= 1
+            p = client.search(box, ci, co, cursor=cursor) if cursor else client.search(box, ci, co)
+            if p is None:
+                cut[0] = True
+            return p
+
+        def split(box: dict, depth: int):
+            for q in _quarters(box):
+                p = ask(q)
                 if p:
-                    count_row(w, f"tile:{t['id']}", p)
-                    take(p, w, "c")
-                    cursors[(ci, t["id"])] = {"box": _box(t), "cursors": p.cursors, "count": p.count or 0}
-        queue = [v for (c, _tid), v in cursors.items() if c == ci]
-        while queue and budget > 0:
+                    queue.append({"box": q, "cursors": p.cursors, "count": p.count or 0, "ids": take(p, w, "c"), "depth": depth + 1})
+
+        while queue:
             item = queue.pop(0)
-            if item["count"] > PAGE * MAX_PAGES and not item.get("split"):
-                for q in _quarters(item["box"]):     # troppo pieno per 7 pagine: lo divido in quattro
-                    if budget <= 0:
-                        break
-                    p = client.search(q, ci, co)
-                    budget -= 1
-                    if p:
-                        take(p, w, "c")
-                        queue.append({"box": q, "cursors": p.cursors, "count": p.count or 0, "split": True})
+            count, ids, depth = item["count"], set(item["ids"]), item["depth"]
+            if count > PAGE * MAX_PAGES and depth < SPLIT_DEPTH:
+                track["splits"] += 1
+                split(item["box"], depth)
                 continue
             for cur in item["cursors"][1:]:
-                if budget <= 0:
-                    break
-                p = client.search(item["box"], ci, co, cursor=cur)
-                budget -= 1
+                p = ask(item["box"], cur)
                 if p:
-                    take(p, w, "c")
-        city_count = next((r["count"] for r in count_rows if r["checkin"] == ci and r["scope"] == "city"), None)
-        got = len(seen_by_window.get(ci, ()))
-        complete = int(bool(city_count) and got >= 0.9 * city_count)
-        count_rows.append({"checkin": ci, "nights": w.nights, "scope": "census", "count": got, "pages": 0, "complete": complete})
-        run["census"] += 1
+                    ids |= take(p, w, "c")
+            if count > PAGE and count - len(ids) > max(4, resplit * count) and depth < SPLIT_DEPTH and not cut[0]:
+                track["resplits"] += 1
+                split(item["box"], depth)
+        expected = next((r["count"] for r in count_rows if r["checkin"] == ci and r["scope"] == "city"), 0)
+        got = len(seen.get(ci, ()))
+        ok = int(bool(expected) and not cut[0] and got >= float(sc.get("track_min_share", 0.95)) * expected)
+        count_rows.append({"checkin": ci, "nights": w.nights, "scope": "census", "count": got,
+                           "pages": client.requests - r0, "complete": ok})
+        if ok:
+            seen_rows.extend({"checkin": ci, "id": i} for i in sorted(seen[ci] - priced.get(ci, set())))
+        track["windows"] += 1
+        track["complete"] += ok
+        track["requests"] += client.requests - r0
+        track["found"] += got
+        track["expected"] += int(expected)
+        run["census"] += ok
+
+    def left() -> int:
+        return client.remaining() if hasattr(client, "remaining") else 10 ** 9
 
     def phase(name: str, fn):
         t = time.time()
@@ -377,12 +422,25 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
     try:
         client.start()
         phase("offerta", supply)
-        phase("date vicine", lambda: [scan_window(w, i, True) for i, w in enumerate(near)])
-        phase("censimenti", lambda: [census(w) for w in near if w.census])
-        phase("date lontane ed eventi", lambda: [scan_window(w, i, False) for i, w in enumerate(light)])
+        def followed():
+            for i, w in enumerate(w for w in near if w.census):
+                scan_window(w, i, "track")
+                complete_read(w)                    # subito dopo la prima pagina: l'ordine dei risultati cambia nel tempo
+
+        def far():
+            for i, w in enumerate(light):
+                if left() < 15:                     # poche richieste rimaste: le date lontane possono aspettare domani
+                    break
+                scan_window(w, i, "light")
+
+        phase("date seguite", followed)
+        phase("date vicine", lambda: [scan_window(w, i, "near") for i, w in enumerate(w for w in near if not w.census)])
+        phase("date lontane ed eventi", far)
 
         def details():
-            for lid in cat.missing_guests(today, int(sc.get("details_per_run", 120))):
+            for lid in cat.missing_guests(today, int(sc.get("details_per_run", 60))):
+                if left() < 5:
+                    break
                 d = client.details(lid)
                 if d and d.get("guests"):
                     r = cat.rows[lid]
@@ -399,6 +457,9 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
         run["prices"] = store.add_prices(today, price_rows) if price_rows else 0
         if count_rows:
             store.add_counts(today, count_rows)
+        if seen_rows:
+            store.add_seen(today, seen_rows)
+        run["track"] = track
         cat.save()
         run.update(requests=client.requests, errors=client.errors, error_samples=getattr(client, "error_samples", []),
                    listings=len(cat.rows), secs=round(time.time() - t0, 1),
@@ -408,6 +469,7 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
         state["last_scan"] = today.isoformat()
         state["last_run"] = {k: run[k] for k in ("date", "requests", "errors", "prices", "windows", "census", "stopped", "secs")}
         store.save_state(state)
-        log(f"scansione: {run['windows']} finestre, {run['census']} censimenti, {run['prices']} prezzi, "
+        log(f"scansione: {run['windows']} finestre, {run['census']} letture complete su {track['windows']} "
+            f"({track['found']} alloggi visti su {track['expected']} dichiarati, {track['resplits']} riquadri riletti), {run['prices']} prezzi, "
             f"{client.requests} richieste, {client.errors} errori, {run['secs']} s. {run['stopped']}")
     return run

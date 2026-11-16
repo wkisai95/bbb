@@ -45,7 +45,7 @@ def test_windows_plan():
     assert len(near1) == 30 and near1[0].checkin == today + timedelta(days=1)
     # il giorno dopo l'allineamento è sfalsato: ogni notte viene letta con entrambe le vicine
     assert {w.checkin for w in near1}.isdisjoint({w.checkin for w in near2})
-    assert sum(w.census for w in near1) == 4
+    assert sum(w.census for w in near1) == 15 and all(w.census == ((w.checkin - today).days <= 30) for w in near1)
     assert all(w.nights == 2 for w in w1)
     assert len({w.checkin for w in w1}) == len(w1)
     assert 45 <= len(w1) <= 90
