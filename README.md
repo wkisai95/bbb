@@ -19,6 +19,12 @@ quando ne esce una nuova e la scarica con il numero nel nome (per esempio `bbb-1
 | **Eventi** | Livello dei prezzi nei prossimi 12 mesi e calendario di fiere, concerti, ponti, con l'aumento dei prezzi misurato o stimato. Puoi aggiungere i tuoi eventi. |
 | **Dati** | Stato dell'ultima scansione, precisione del modello, avvio di una scansione, **backup completo in ZIP**, esportazione e importazione delle impostazioni, **file cifrati** su GitHub con i codici da mandare ai proprietari. |
 
+## App Tasse proprietario
+
+Una seconda app, [`tasse.apk`](https://github.com/wkisai95/bbb/raw/apk-tasse/tasse.apk), apre i file cifrati con il
+codice di un proprietario (o del gestore) e calcola imposta sostitutiva e INPS in regime forfettario, la gestione e
+quanto resta al proprietario. Dettagli in [`tasse/README.md`](tasse/README.md).
+
 ## Le strategie
 
 - **Massima resa.** Per ogni notte sceglie il prezzo che rende massimo il guadagno atteso (prezzo, meno la

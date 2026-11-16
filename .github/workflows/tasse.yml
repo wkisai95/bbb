@@ -1,0 +1,146 @@
+name: App Tasse proprietario
+run-name: APK tasse · build ${{ github.run_number }}
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tasse/**"
+      - "app/web/cifrato.js"
+      - ".github/workflows/tasse.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tasse
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      # Firma stabile: ogni versione deve avere la stessa chiave, altrimenti Android rifiuta l'aggiornamento.
+      # In ordine: 1) i secret ANDROID_KEYSTORE_B64 & co., se impostati; 2) la chiave generata alla prima build,
+      # conservata nella cache del repository e, come copia durevole, in una release in bozza (visibile solo
+      # a chi ha accesso in scrittura al repository).
+      - name: Recupera la chiave di firma
+        uses: actions/cache@v4
+        with:
+          path: ~/.tasse-signing/release.jks
+          key: tasse-signing-key-v1
+
+      - name: Prepara la chiave di firma
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            {
+              echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.jks"
+              echo "ANDROID_KEYSTORE_PASSWORD=$KS_PASS"
+              echo "ANDROID_KEY_ALIAS=$KEY_ALIAS"
+              echo "ANDROID_KEY_PASSWORD=$KEY_PASS"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+          KS="$HOME/.tasse-signing/release.jks"
+          mkdir -p "$(dirname "$KS")"
+          if [ ! -f "$KS" ]; then
+            gh release download chiave-firma-tasse -p release.jks -D "$(dirname "$KS")" -R "$GITHUB_REPOSITORY" 2>/dev/null \
+              && echo "Chiave ripresa dalla release in bozza" || true
+          fi
+          if [ ! -f "$KS" ]; then
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -alias tasse \
+              -keyalg RSA -keysize 4096 -validity 10000 \
+              -storepass tasse-ci-key -keypass tasse-ci-key -dname "CN=tasse, O=wkisai95, C=IT"
+            echo "::notice title=Firma::Creata una nuova chiave di firma"
+          fi
+          if ! gh release view chiave-firma-tasse -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create chiave-firma-tasse "$KS" --draft -R "$GITHUB_REPOSITORY" \
+              --title "Chiave di firma dell'app Tasse (lasciare in bozza)" \
+              --notes "Copia della chiave con cui viene firmato l'APK. Serve perché gli aggiornamenti dell'app si installino sopra la versione precedente. Non pubblicare questa bozza e non cancellarla." \
+              || echo "::warning title=Firma::Non sono riuscito a salvare la copia durevole della chiave"
+          fi
+          {
+            echo "ANDROID_KEYSTORE_PATH=$KS"
+            echo "ANDROID_KEYSTORE_PASSWORD=tasse-ci-key"
+            echo "ANDROID_KEY_ALIAS=tasse"
+            echo "ANDROID_KEY_PASSWORD=tasse-ci-key"
+          } >> "$GITHUB_ENV"
+
+      - name: Build
+        run: |
+          set -o pipefail
+          gradle -p tasse/android assembleRelease --stacktrace 2>&1 | tee "$RUNNER_TEMP/build.log"
+
+      # In caso di errore pubblica i messaggi del compilatore come annotazione dell'esecuzione
+      - name: Riporta gli errori di compilazione
+        if: failure()
+        run: |
+          python3 - "$RUNNER_TEMP/build.log" <<'PY'
+          import sys
+          lines = open(sys.argv[1], errors="replace").read().splitlines()
+          errs = [l for l in lines if l.startswith("e: ") or ": error:" in l or "error: " in l[:12]]
+          if not errs:
+              i = next((k for k, l in enumerate(lines) if "What went wrong" in l), None)
+              errs = lines[i:i + 15] if i is not None else lines[-30:]
+          msg = "\n".join(e.replace("file:///home/runner/work/bbb/bbb/", "") for e in errs[:40])
+          msg = msg.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+          print(f"::error title=Errori di compilazione::{msg}")
+          PY
+
+      - name: Impronta della firma
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          FP=$("$BT/apksigner" verify --print-certs tasse/android/app/build/outputs/apk/release/app-release.apk \
+               | grep -m1 "SHA-256" | awk '{print $NF}')
+          echo "::notice title=Certificato di firma::SHA-256 $FP"
+          cp tasse/android/app/build/outputs/apk/release/app-release.apk tasse.apk
+          ls -la tasse.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tasse-apk
+          path: tasse.apk
+
+      # Tag tasse-v…: l'app bbb cerca i suoi aggiornamenti solo tra i tag app-v…, e questa release non diventa "latest"
+      - name: Pubblica la release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: tasse-v1.0.${{ github.run_number }}
+          name: App Tasse proprietario 1.0.${{ github.run_number }}
+          body: |
+            App che calcola imposta sostitutiva e INPS (forfettario) sulle stime degli appartamenti salvate da bbb.
+            Scarica `tasse.apk` sul telefono e installalo (Android 8 o successivo).
+          files: tasse.apk
+          make_latest: false
+
+      # Copia a indirizzo fisso: https://github.com/<utente>/<repo>/raw/apk-tasse/tasse.apk
+      - name: Copia dell'APK sul ramo apk-tasse
+        run: |
+          mkdir -p "$RUNNER_TEMP/apk" && cp tasse.apk "$RUNNER_TEMP/apk/" && cd "$RUNNER_TEMP/apk"
+          git init -q -b apk-tasse
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tasse.apk
+          git commit -q -m "APK tasse 1.0.${{ github.run_number }}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" apk-tasse
