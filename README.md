@@ -153,9 +153,12 @@ proprietari. Dal computer: `python tools/apri_cifrato.py CODICE --scarica` (con 
 ## Avviare una scansione e salvare eventi dall'app
 
 Per leggere i prezzi l'app non ha bisogno di nulla. Per **avviare una scansione**, **salvare su GitHub gli
-eventi** che aggiungi o salvare i **file cifrati** serve un token: su github.com → Settings → Developer settings → Fine-grained tokens →
-Generate new token, solo sul repository `bbb`, con permessi *Actions: Read and write* e *Contents: Read and
-write*. Incollalo in Dati → Token di accesso. In alternativa la scansione si avvia da
+eventi** che aggiungi o salvare i **file cifrati** serve un token. Il modo più rapido è
+[questa pagina di GitHub già compilata](https://github.com/settings/personal-access-tokens/new?name=bbb+app&description=App+bbb&expires_in=366&actions=write&contents=write)
+(da aprire nel browser, non nell'app GitHub; c'è anche in Dati → Come creare il token): resta da scegliere
+*Only select repositories* → `bbb` e toccare *Generate token*. A mano: Settings → Developer settings →
+Fine-grained tokens → Generate new token, solo sul repository `bbb`, con permessi *Actions: Read and write* e
+*Contents: Read and write*. Incollalo in Dati → Token di accesso. In alternativa la scansione si avvia da
 [Actions → Scansione → Run workflow](https://github.com/wkisai95/bbb/actions/workflows/scan.yml).
 
 ## Regolazioni

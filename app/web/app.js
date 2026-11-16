@@ -1421,11 +1421,16 @@
     root.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () {
       state.repo.owner = owner.value.trim() || DEFAULT_REPO.owner; state.repo.name = name.value.trim() || DEFAULT_REPO.name; state.repo.token = token.value.trim();
       saveState(); data.model = null; data.status = null; data.listings = null; eff = null; localStorage.removeItem(KEY + ".model"); loadData(true); loadRun(); }, text: "Salva il collegamento" })));
-    root.appendChild(h("details", {}, h("summary", { text: "Come creare il token" }), h("ol", {},
-      h("li", { text: "Su github.com apri Settings, poi Developer settings, Personal access tokens, Fine-grained tokens." }),
-      h("li", { text: "Generate new token. Repository access: Only select repositories, e scegli " + state.repo.name + "." }),
-      h("li", { text: "Permissions del repository: Actions «Read and write», Contents «Read and write»." }),
-      h("li", { text: "Genera, copia il token e incollalo qui sopra." }))));
+    /* pagina di GitHub già compilata con nome, scadenza di un anno e i due permessi; la repository va scelta a mano */
+    var tokenUrl = "https://github.com/settings/personal-access-tokens/new?name=bbb+app&description=App+bbb&expires_in=366&actions=write&contents=write";
+    root.appendChild(h("details", { open: !state.repo.token }, h("summary", { text: "Come creare il token" }),
+      h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () { openExternal(tokenUrl); }, text: "Crea il token su GitHub" })),
+      h("ol", {},
+        h("li", { text: "Si apre GitHub nel browser con nome, scadenza (un anno) e permessi già compilati. Se si apre l'app GitHub, che i token non li crea, tocca «Copia il link» e incollalo in Chrome." }),
+        h("li", { text: "In Repository access scegli Only select repositories, poi " + state.repo.name + ". In Permissions controlla che Actions e Contents siano su «Read and write»." }),
+        h("li", { text: "In fondo tocca Generate token, copia subito il token (inizia con github_pat_, poi non si vede più), incollalo qui sopra e tocca «Salva il collegamento»." })),
+      h("p", { class: "note", text: "Se GitHub non lascia creare il token, verifica l'email dell'account (Settings, Emails). Il token scade dopo un anno: l'app ti avvisa quando non funziona più." }),
+      h("div", { class: "stack" }, h("button", { class: "btn quiet", onclick: function () { copyText(tokenUrl, "Link copiato: incollalo nel browser"); }, text: "Copia il link" }))));
     root.appendChild(h("details", {}, h("summary", { text: "Da dove vengono i dati" }), h("ul", {},
       h("li", { text: "Prezzi e disponibilità: ricerca pubblica di Airbnb, letta una volta al giorno dal programma sul tuo repository GitHub." }),
       h("li", { text: "Catalogo di partenza e capienze: Inside Airbnb (dati aperti, CC BY 4.0). Confini dei quartieri: Comune di Bologna via Inside Airbnb." }),
