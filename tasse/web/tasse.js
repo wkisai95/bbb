@@ -84,7 +84,7 @@
   function openDoc(l, codice) {
     return K.idFile(codice).then(function (id) {
       return getFile(l, id).then(function (busta) {
-        if (!busta) { var e = new Error("Su GitHub non c'è il file di questo codice: è sbagliato oppure bbb l'ha sostituito con uno nuovo."); e.tipo = "assente"; throw e; }
+        if (!busta) { var e = new Error("Su GitHub non c'è ancora il file di questo codice. In bbb apri Dati → File cifrati su GitHub e tocca «Salva adesso» (serve il token), poi qui tocca Riprova. Se in bbb hai creato un codice nuovo, usa quello."); e.tipo = "assente"; throw e; }
         return K.decifra(busta, codice);
       });
     });
@@ -127,14 +127,17 @@
     busy = true; again = false;
     if (!S.links.length) { busy = false; owners = {}; status = { state: "idle" }; render(); return; }
     if (!K || !window.crypto || !window.crypto.subtle) { busy = false; note("Questo telefono non permette di aprire i file cifrati.", true); return; }
-    status.state = "loading"; setLive();
+    status.state = "loading"; setLive(); if (!Object.keys(owners).length) renderEmpty(true);
     var out = {}, errors = [];
     S.links.forEach(function (l) { delete l.errore; });
     Promise.all(S.links.map(function (l) {
       return openDoc(l, l.codice).then(function (doc) {
         l.tipo = doc.tipo; l.nome = doc.tipo === "gestore" ? "Gestore" : doc.proprietario;
         return doc.tipo === "gestore" ? ownersFromManager(out, l, doc) : ownerFromDoc(out, doc, "proprietario");
-      }).catch(function (e) { l.errore = e && e.message || "errore"; errors.push((l.nome || l.codice.slice(0, 4) + "…") + ": " + l.errore); });
+      }).catch(function (e) {
+        l.errore = e && e.tipo ? e.message : (e && /fetch|network|Failed/i.test(String(e.message)) ? "GitHub non raggiungibile: controlla la connessione." : "Non riesco a leggere il file (" + (e && e.message || "errore") + ").");
+        errors.push(l.errore);
+      });
     })).then(function () {
       busy = false;
       save();
@@ -143,7 +146,7 @@
       status = { state: errors.length && !got ? "error" : "ok", at: new Date(), msg: errors.join(" · ") };
       var sig = JSON.stringify(Object.keys(out).map(function (k) { return [k, out[k].saved]; }));
       var changed = sig !== lastSig; lastSig = sig;
-      if (errors.length) note("Non riesco ad aprire: " + errors.join(" · "), !got);
+      if (errors.length && got) note("Un codice non si apre: " + errors[0], false);
       else if (changed && got) note("");
       render();
       if (changed && got) { $("hero").classList.add("upd"); setTimeout(function () { $("hero").classList.remove("upd"); }, 1500); }
@@ -227,9 +230,10 @@
   function render() {
     setLive();
     var names = Object.keys(owners).sort(function (a, b) { return a === "Senza proprietario" ? 1 : b === "Senza proprietario" ? -1 : a.localeCompare(b, "it"); });
-    $("empty").classList.toggle("hidden", S.links.length > 0);
-    $("main").classList.toggle("hidden", !S.links.length);
-    renderAddForms(); renderLinks();
+    var none = !names.length;
+    $("empty").classList.toggle("hidden", !none);
+    $("main").classList.toggle("hidden", none);
+    renderLinks(); renderEmpty(none); renderAddForms();
     document.querySelectorAll("#tabs button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-v") === S.view); });
     document.querySelectorAll("[data-view]").forEach(function (v) { v.classList.toggle("hidden", v.getAttribute("data-view") !== S.view); });
     var os = $("owner");
@@ -332,21 +336,34 @@
     h.appendChild(tog("Gestore con IVA", "La fattura del gestore ha l'IVA al 22%", cfg.mgmtVat, upd(function (v) { cfg.mgmtVat = v; })));
     h.appendChild(tog("Costi per notte di bbb", "Pulizie e simili indicati in bbb", cfg.costs, upd(function (v) { cfg.costs = v; })));
   }
-  function renderLinks() {
-    var h = card("links", "Collegamenti a bbb", "I file si aggiornano da soli ogni 5 minuti"), box = el("div", {});
+  function linkRows() {
+    var box = el("div", {});
     S.links.forEach(function (l, i) {
       box.appendChild(el("div", { class: "link" }, [
-        el("div", { class: "k" }, [el("div", { text: (l.tipo === "gestore" ? "Gestore, tutti i proprietari" : l.nome || "Proprietario") + (l.errore ? " · non letto" : "") }),
-          el("code", { text: l.codice.slice(0, 4) + " ···· " + l.codice.slice(-4) + " · " + l.utente + "/" + l.repository })]),
-        el("button", { class: "btn ghost", text: "Rimuovi", onclick: function () { S.links.splice(i, 1); save(); lastSig = ""; owners = {}; refresh(); } })]));
+        el("div", { class: "k" }, [el("div", { text: l.tipo === "gestore" ? "Gestore, tutti i proprietari" : l.nome || "Codice " + l.codice.slice(0, 4) }),
+          el("code", { text: l.codice.slice(0, 4) + " ···· " + l.codice.slice(-4) + " · " + l.utente + "/" + l.repository + (l.ramo !== "main" ? "/" + l.ramo : "") }),
+          l.errore ? el("div", { class: "muted", style: "color:var(--bad);margin-top:4px", text: l.errore }) : null]),
+        el("button", { class: "btn ghost", text: "Rimuovi", onclick: function () { S.links.splice(i, 1); save(); lastSig = ""; owners = {}; note(""); refresh(); } })]));
     });
+    return box;
+  }
+  function renderEmpty(none) {
+    var box = $("emptyLinks"), loading = status.state === "loading";
+    box.classList.toggle("hidden", !S.links.length); box.innerHTML = "";
+    $("emptyTitle").textContent = S.links.length ? (loading ? "Leggo i dati da GitHub…" : "Non riesco ad aprire il codice") : "Collega i dati di bbb";
+    if (!S.links.length) return;
+    box.appendChild(linkRows());
+    box.appendChild(el("div", { style: "margin-top:12px" }, [el("button", { class: "btn", text: loading ? "Attendi…" : "Riprova", onclick: function () { refresh(); } })]));
+  }
+  function renderLinks() {
+    var h = card("links", "Collegamenti a bbb", "I file si aggiornano da soli ogni 5 minuti"), box = linkRows();
     h.appendChild(box);
     h.appendChild(el("details", {}, [el("summary", { text: "Aggiungi un codice" }), el("div", { class: "addform", style: "padding-top:10px" })]));
   }
   function renderAddForms() {
     document.querySelectorAll(".addform").forEach(function (box) {
       if (box.firstChild) return;
-      var ta = el("textarea", { placeholder: "bbb1:wkisai95/bbb/main/XXXX-XXXX-…", autocapitalize: "characters", spellcheck: "false" });
+      var ta = el("textarea", { placeholder: "bbb1:wkisai95/bbb/main/XXXX-XXXX-…", autocapitalize: "off", autocomplete: "off", spellcheck: "false" });
       box.appendChild(field("Invito o codice di 24 caratteri", ta));
       box.appendChild(el("button", { class: "btn", text: "Collega", onclick: function () { if (addLink(ta.value)) ta.value = ""; } }));
     });
