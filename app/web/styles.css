@@ -284,7 +284,12 @@ details ol, details ul { margin: 4px 0 12px; padding-left: 20px; font-size: 14px
 code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 0.92em; background: var(--accent-wash); padding: 1px 5px; border-radius: 4px; }
 
 /* più appartamenti */
-.pickbtn { margin: -8px 0 8px -6px; }
+.links { display: flex; flex-wrap: wrap; gap: 0 14px; margin: -8px 0 8px -6px; }
+.table.strat tr.cur td { font-weight: 660; }
+.table tr.tot td { font-weight: 660; border-bottom: 0; border-top: 1px solid var(--line-2); }
+.steprow { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+.steprow .field { margin: 8px 0; }
+.steprow .btn.quiet { margin-bottom: 10px; }
 .grp-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 16px; }
 .grp-h h3 { margin: 0; }
 .row.pick { align-items: center; justify-content: flex-start; cursor: pointer; }

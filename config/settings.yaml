@@ -64,6 +64,9 @@ model:
   band: [10, 90]             # i prezzi consigliati restano tra questi percentili dei comparabili...
   max_discount: 0.25         # ...e comunque non oltre il 25% sotto
   max_premium: 0.40          # e il 40% sopra il prezzo mediano dei comparabili per quella notte
+  # strategia "aggressiva": prezzo di mercato, poi questi sconti se la notte è ancora libera
+  # [giorni prima della notte, sconto % sul prezzo di mercato]; dall'app si cambiano per conto proprio
+  aggressive_steps: [[14, 10], [7, 20], [3, 30]]
   # Moltiplicatori di partenza per peso dell'evento, usati solo per le notti non ancora misurate
   event_prior: {1: 1.03, 2: 1.10, 3: 1.25, 4: 1.50, 5: 1.90}
 

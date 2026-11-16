@@ -61,7 +61,7 @@
   function defaults() {
     return { repo: { owner: DEFAULT_REPO.owner, name: DEFAULT_REPO.name, branch: DEFAULT_REPO.branch, token: "" },
       apartments: [{ id: "a1", name: "Il mio appartamento", zone: "c_maggiore", bedrooms: 1, baths: 1, guests: 3, quality: "media", minPrice: 0, cost: null, channel: "airbnb", fee: null, vat: null, payers: 2 }],
-      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", selection: [], customEvents: [] };
+      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", selection: [], aggressive: null, customEvents: [] };
   }
   function loadState() {
     var d = defaults();
@@ -180,12 +180,33 @@
     return { ch: ch, share: P.feeShare(m, ch.id, a.fee, a.vat), pct: blank(a.fee) ? ch.fee : +a.fee,
       vat: blank(a.vat) ? !!ch.vat : !!a.vat, payers: blank(a.payers) ? Math.min(2, a.guests || 2) : +a.payers };
   }
+  var STRATS = [["resa", "Massima resa"], ["occupazione", "Massima occupazione"], ["aggressiva", "Aggressiva"]];
+  var STRAT_NAME = { resa: "massima resa", occupazione: "massima occupazione", aggressiva: "la strategia aggressiva" };
+  var PERIODS = [[30, "30 notti"], [60, "60 notti"], [90, "90 notti"], [365, "1 anno"]];
+  function periodLabel(d) { return d === 365 ? "il prossimo anno" : "le prossime " + d + " notti"; }
+  /* gradini della strategia aggressiva: quelli scelti nell'app, altrimenti quelli del modello */
+  function aggSteps() {
+    var m = model();
+    var own = Array.isArray(state.aggressive) ? P.cleanSteps(state.aggressive) : null;
+    return own || P.cleanSteps((m && m.aggressive && m.aggressive.steps) || P.DEFAULT_STEPS);
+  }
+  function stepsText(steps) {
+    if (!steps.length) return "Nessuno sconto: sempre il prezzo di mercato.";
+    var parts = steps.map(function (x, i) { return "−" + String(x[1]).replace(".", ",") + "% da " + x[0] + (i === 0 ? (x[0] === 1 ? " giorno prima" : " giorni prima") : ""); });
+    var list = parts.length === 1 ? parts[0] : parts.slice(0, -1).join(", ") + " e " + parts[parts.length - 1];
+    return "Prezzo di mercato finché mancano più di " + steps[0][0] + (steps[0][0] === 1 ? " giorno" : " giorni") + "; poi, se la notte è ancora libera, " + list + ". Mai sotto il prezzo minimo dell'appartamento.";
+  }
+  var recCache = { m: null, map: {}, n: 0 };
   function recommend(strategy, days, from, which) {
     var m = model(), a = which || apt(), f = aptFees(a);
     var start = from === undefined ? Math.max(todayMs(), P.parseDate(m.start)) : from;
-    return P.recommend(m, { zone: a.zone, bedrooms: a.bedrooms, baths: a.baths, guests: a.guests, quality: a.quality,
+    var p = { zone: a.zone, bedrooms: a.bedrooms, baths: a.baths, guests: a.guests, quality: a.quality,
       minPrice: a.minPrice || 0, cost: blank(a.cost) ? null : +a.cost, fee: f.share, payers: f.payers, taxMode: f.ch.tax,
-      strategy: strategy, start: P.isoDate(start), end: P.isoDate(start + (days - 1) * DAY) });
+      steps: aggSteps(), strategy: strategy, start: P.isoDate(start), end: P.isoDate(start + (days - 1) * DAY) };
+    if (recCache.m !== m || recCache.n > 400) recCache = { m: m, map: {}, n: 0 };
+    var key = JSON.stringify(p);
+    if (!recCache.map[key]) { recCache.map[key] = P.recommend(m, p); recCache.n++; }
+    return recCache.map[key];
   }
   function shortDay(iso) { return fmtDate(P.parseDate(iso), { day: "numeric", month: "short" }); }
   /* ultima lettura completa che copre quella notte: quanti erano liberi e quanti sono stati prenotati dalla lettura prima */
@@ -227,10 +248,90 @@
     return list.length >= 2 ? list : [];
   }
   function controls(root) {
-    root.appendChild(seg([["resa", "Massima resa"], ["occupazione", "Massima occupazione"]], state.strategy, function (v) { state.strategy = v; saveState(); render(); }));
-    root.appendChild(chips([[30, "30 notti"], [60, "60 notti"], [90, "90 notti"]], state.period, function (v) { state.period = v; saveState(); render(); }));
+    root.appendChild(seg(STRATS, state.strategy, function (v) { state.strategy = v; saveState(); render(); }));
+    if (state.strategy === "aggressiva") {
+      root.appendChild(h("p", { class: "alt", style: "margin:8px 0 0" }, stepsText(aggSteps()) + " ",
+        h("button", { onclick: editSteps, text: "Cambia gli sconti" })));
+    }
+    root.appendChild(chips(PERIODS, state.period, function (v) { state.period = v; saveState(); render(); }));
     root.appendChild(seg([["lordo", "Prezzi lordi"], ["netto", "Netti, tolta la commissione"]], netView() ? "netto" : "lordo", function (v) { state.priceView = v; saveState(); render(); }));
     root.lastChild.classList.add("sm");
+  }
+  /* le tre strategie a confronto; un tocco sceglie quella */
+  function strategyTable(root, list, net) {
+    var tb = h("tbody", {});
+    list.forEach(function (r) {
+      var cur = r.s === state.strategy;
+      tb.appendChild(h("tr", { class: "tap" + (cur ? " cur" : ""), "aria-current": cur ? "true" : null,
+        onclick: function () { if (!cur) { state.strategy = r.s; saveState(); render(); } } },
+        h("td", {}, STRATS.filter(function (x) { return x[0] === r.s; })[0][1], h("small", { text: cur ? "quella scelta" : "tocca per sceglierla" })),
+        h("td", {}, euro(r.price)), h("td", {}, pct(r.occ)), h("td", {}, euro(r.net))));
+    });
+    root.appendChild(h("table", { class: "table strat" }, h("thead", {}, h("tr", {}, h("th", { text: "Strategia" }),
+      h("th", { text: net ? "Netto medio" : "Prezzo medio" }), h("th", { text: "Notti vendute" }), h("th", { text: "Guadagno" }))), tb));
+  }
+  function editSteps() {
+    var rows = aggSteps().map(function (x) { return [x[0], x[1]]; });
+    openSheet("Sconti della strategia aggressiva", function (body) {
+      body.appendChild(h("p", { class: "note", text: "Finché la notte è lontana resta al prezzo di mercato. Se a questi giorni dalla data è ancora libera, scende di questa percentuale sotto il mercato." }));
+      var list = h("div", {});
+      rows.forEach(function (r, i) {
+        var pctIn = h("input", { type: "number", inputmode: "decimal", min: 0, max: 80, step: 1, value: r[1], id: "st-p" + i });
+        var dayIn = h("input", { type: "number", inputmode: "numeric", min: 0, max: 120, step: 1, value: r[0], id: "st-d" + i });
+        pctIn.addEventListener("change", function () { r[1] = +String(pctIn.value).replace(",", "."); });
+        dayIn.addEventListener("change", function () { r[0] = parseInt(dayIn.value, 10); });
+        list.appendChild(h("div", { class: "steprow" },
+          h("div", { class: "field" }, h("label", { for: "st-p" + i, text: "Sconto (%)" }), pctIn),
+          h("div", { class: "field" }, h("label", { for: "st-d" + i, text: "Da giorni prima" }), dayIn),
+          h("button", { class: "btn quiet", "aria-label": "Togli questo gradino", onclick: function () { rows.splice(i, 1); refreshSheet(); }, text: "Togli" })));
+      });
+      body.appendChild(list);
+      body.appendChild(h("div", { class: "stack" },
+        rows.length < 5 ? h("button", { class: "btn block", onclick: function () { var last = rows[rows.length - 1]; rows.push(last ? [Math.max(0, last[0] - 2), Math.min(80, last[1] + 10)] : [14, 10]); refreshSheet(); }, text: "Aggiungi un gradino" }) : null,
+        h("button", { class: "btn quiet", onclick: function () { rows = P.DEFAULT_STEPS.map(function (x) { return [x[0], x[1]]; }); refreshSheet(); }, text: "Torna a −10%, −20%, −30% da 14, 7 e 3 giorni" }),
+        h("button", { class: "btn primary block", onclick: function () {
+          var ok = P.cleanSteps(rows);
+          if (ok.length !== rows.length) { toast("Sconti tra 0 e 80%, giorni tra 0 e 120"); return; }
+          state.aggressive = ok; saveState(); closeSheet(); render(); toast("Sconti salvati");
+        }, text: "Salva" })));
+    });
+  }
+  function ownersSheet() {
+    openSheet("Resa per proprietario", function (body) {
+      var net = netView(), out = [], T = { inc: 0, fees: 0, net: 0, sold: 0, nights: 0, tax: 0, n: 0 };
+      body.appendChild(h("p", { class: "note", text: "Con " + STRAT_NAME[state.strategy] + ", per " + periodLabel(state.period) + (net ? ", incassi al netto delle commissioni." : ", incassi lordi.") + " Tocca un proprietario per vedere i suoi appartamenti." }));
+      body.appendChild(chips(PERIODS, state.period, function (v) { state.period = v; saveState(); render(); refreshSheet(); }));
+      var tb = h("tbody", {});
+      ownerGroups().forEach(function (g) {
+        var G = { inc: 0, fees: 0, net: 0, sold: 0, nights: 0, tax: 0 };
+        g.list.forEach(function (a) {
+          var r = recommend(state.strategy, state.period, undefined, a), f = aptFees(a);
+          G.inc += r.revenue; G.fees += r.fees; G.net += r.net; G.nights += r.nights.length;
+          G.sold += r.nights.reduce(function (t, x) { return t + x.sell; }, 0);
+          if (f.ch.tax !== "portal") G.tax += r.tax;
+        });
+        var costs = G.inc - G.fees - G.net;
+        out.push([g.name, g.list.length, G.nights, Math.round(G.sold), Math.round(G.inc), Math.round(G.fees), Math.round(G.inc - G.fees), Math.round(costs), Math.round(G.net), Math.round(G.tax)]);
+        ["inc", "fees", "net", "sold", "nights", "tax"].forEach(function (k) { T[k] += G[k]; });
+        T.n += g.list.length;
+        tb.appendChild(h("tr", { class: "tap", onclick: function () {
+          var ids = g.list.map(function (a) { return a.id; });
+          state.selection = ids.length >= 2 ? ids : []; state.current = ids[0]; saveState(); closeSheet(); render();
+        } },
+          h("td", {}, g.name, h("small", { text: g.list.length + (g.list.length === 1 ? " appartamento" : " appartamenti") + " · commissioni " + euro(G.fees) + ", costi " + euro(costs) })),
+          h("td", {}, euro(net ? G.inc - G.fees : G.inc)), h("td", {}, nf.format(Math.round(G.sold)), h("small", { text: "su " + nf.format(G.nights) })), h("td", {}, euro(G.net))));
+      });
+      tb.appendChild(h("tr", { class: "tot" }, h("td", {}, "In tutto", h("small", { text: T.n + " appartamenti" })),
+        h("td", {}, euro(net ? T.inc - T.fees : T.inc)), h("td", {}, nf.format(Math.round(T.sold)), h("small", { text: "su " + nf.format(T.nights) })), h("td", {}, euro(T.net))));
+      body.appendChild(h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", { text: "Proprietario" }), h("th", { text: net ? "Incasso netto" : "Incasso" }), h("th", { text: "Notti vendute" }), h("th", { text: "Guadagno" }))), tb));
+      body.appendChild(h("p", { class: "note", style: "margin-top:10px", text: "Notti vendute: quante ci si aspetta di venderne tra quelle ancora libere oggi. Guadagno: incasso meno commissioni dei portali e costi per notte venduta." + (T.tax > 0 ? " La tassa di soggiorno da incassare e versare per i portali che non la riscuotono (circa " + euro(T.tax) + ") non è inclusa." : "") }));
+      body.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () {
+        var rows = [["proprietario", "appartamenti", "notti_nel_periodo", "notti_vendute_previste", "incasso_lordo", "commissioni", "incasso_netto", "costi", "guadagno", "tassa_soggiorno_da_versare"]].concat(out);
+        rows.push(["In tutto", T.n, T.nights, Math.round(T.sold), Math.round(T.inc), Math.round(T.fees), Math.round(T.inc - T.fees), Math.round(T.inc - T.fees - T.net), Math.round(T.net), Math.round(T.tax)]);
+        saveFile("resa-per-proprietario-" + state.strategy + "-" + state.period + "notti.csv", "text/csv",
+          "\ufeff# Resa prevista per proprietario · " + STRAT_NAME[state.strategy] + " · " + periodLabel(state.period) + "\r\n" + csvText(rows));
+      }, text: "Esporta la tabella (CSV)" })));
+    });
   }
   function pickApartments() {
     var chosen = selection().map(function (a) { return a.id; });
@@ -272,21 +373,21 @@
 
   function viewGroup(root, list) {
     var m = model(), net = netView(), owner = ownerName(list[0]);
-    var otherS = state.strategy === "resa" ? "occupazione" : "resa";
     var t0 = P.parseDate(m.start), stale = Math.round((todayMs() - t0) / DAY);
     var rows = list.map(function (a) {
-      return { a: a, f: aptFees(a), rec: recommend(state.strategy, state.period, undefined, a), other: recommend(otherS, state.period, undefined, a) };
+      return { a: a, f: aptFees(a), rec: recommend(state.strategy, state.period, undefined, a) };
     });
     root.appendChild(h("div", { class: "apt" },
       h("div", {}, h("div", { class: "apt-name", text: owner }), h("div", { class: "apt-spec", text: list.length + " appartamenti insieme: " + list.map(function (a) { return a.name; }).join(", ") })),
       h("button", { class: "btn", onclick: pickApartments, text: "Cambia" })));
     if (stale >= 2) root.appendChild(banner("warn", "I dati sono del " + fmtDate(t0, { day: "numeric", month: "long" }) + ": la scansione non gira da " + stale + " giorni.", h("button", { class: "btn quiet", onclick: function () { go("dati"); }, text: "Controlla" })));
+    root.appendChild(h("div", { class: "links" }, h("button", { class: "btn quiet", onclick: ownersSheet, text: "Resa per proprietario" })));
     controls(root);
 
-    var T = { revenue: 0, fees: 0, net: 0, occ: 0, price: 0, otherNet: 0, hostTax: 0 }, hostNames = [];
+    var T = { revenue: 0, fees: 0, net: 0, occ: 0, price: 0, hostTax: 0 }, hostNames = [];
     rows.forEach(function (r) {
       T.revenue += r.rec.revenue; T.fees += r.rec.fees; T.net += r.rec.net; T.occ += r.rec.occupancy;
-      T.price += pv(r.rec.avgPrice, r.a); T.otherNet += r.other.net;
+      T.price += pv(r.rec.avgPrice, r.a);
       if (r.f.ch.tax !== "portal" && r.rec.tax > 0) { T.hostTax += r.rec.tax; hostNames.push(r.a.name); }
     });
     var n = rows.length, costs = T.revenue - T.fees - T.net;
@@ -297,8 +398,15 @@
     var income = net
       ? "Incasso atteso " + euro(T.revenue - T.fees) + " al netto delle commissioni (" + euro(T.revenue) + " lordi, " + euro(T.fees) + " di commissioni)"
       : "Incasso atteso " + euro(T.revenue) + ", commissioni " + euro(T.fees);
-    root.appendChild(h("p", { class: "alt" }, income + ", costi " + euro(costs) + ". Con " + (otherS === "resa" ? "massima resa" : "massima occupazione") + " il guadagno sarebbe " + euro(T.otherNet) + ". ",
-      h("button", { onclick: function () { state.strategy = otherS; saveState(); render(); }, text: "Passa a questa" })));
+    root.appendChild(h("p", { class: "alt", text: income + ", costi " + euro(costs) + "." }));
+    strategyTable(root, STRATS.map(function (x) {
+      var price = 0, occ = 0, gain = 0;
+      rows.forEach(function (r) {
+        var rr = x[0] === state.strategy ? r.rec : recommend(x[0], state.period, undefined, r.a);
+        price += pv(rr.avgPrice, r.a); occ += rr.occupancy; gain += rr.net;
+      });
+      return { s: x[0], price: price / n, occ: occ / n, net: gain };
+    }), net);
     if (T.hostTax > 0) root.appendChild(h("p", { class: "alt", text: "Tassa di soggiorno che incassi e versi tu (" + hostNames.join(", ") + "): circa " + euro(T.hostTax) + " nel periodo. Non è un tuo guadagno." }));
 
     root.appendChild(h("h2", { text: "Appartamento per appartamento" }));
@@ -427,7 +535,7 @@
     var group = selection();
     if (group.length >= 2) return viewGroup(root, group);
     var a = apt();
-    var rec = recommend(state.strategy, state.period), other = recommend(state.strategy === "resa" ? "occupazione" : "resa", state.period);
+    var rec = recommend(state.strategy, state.period);
     var t0 = P.parseDate(m.start), stale = Math.round((todayMs() - t0) / DAY);
 
     root.appendChild(h("div", { class: "apt" },
@@ -435,7 +543,9 @@
       h("button", { class: "btn", onclick: function () { editApartment(a.id); }, text: "Modifica" })));
     if (!state.configured) root.appendChild(banner("warn", "Questi prezzi valgono per un appartamento di esempio.", h("button", { class: "btn quiet", onclick: function () { editApartment(a.id); }, text: "Imposta il tuo" })));
     if (stale >= 2) root.appendChild(banner("warn", "I dati sono del " + fmtDate(t0, { day: "numeric", month: "long" }) + ": la scansione non gira da " + stale + " giorni.", h("button", { class: "btn quiet", onclick: function () { go("dati"); }, text: "Controlla" })));
-    if (state.apartments.length >= 2) root.appendChild(h("button", { class: "btn quiet pickbtn", onclick: pickApartments, text: "Scegli uno o più appartamenti (" + state.apartments.length + ")" }));
+    if (state.apartments.length >= 2) root.appendChild(h("div", { class: "links" },
+      h("button", { class: "btn quiet", onclick: pickApartments, text: "Scegli appartamenti (" + state.apartments.length + ")" }),
+      h("button", { class: "btn quiet", onclick: ownersSheet, text: "Resa per proprietario" })));
 
     controls(root);
     var f = aptFees(a), net = netView();
@@ -447,9 +557,11 @@
     var income = net
       ? "Incasso atteso " + euro(rec.revenue - rec.fees) + " al netto delle commissioni (" + euro(rec.revenue) + " lordi" + (rec.fee > 0 ? ", " + euro(rec.fees) + " a " + f.ch.name : "") + ")"
       : "Incasso atteso " + euro(rec.revenue) + (rec.fee > 0 ? ", commissioni " + f.ch.name + " " + euro(rec.fees) + " (" + pct1(rec.fee) + ")" : ", nessuna commissione");
-    root.appendChild(h("p", { class: "alt" }, income +
-      ", costi " + euro(rec.cost) + " per notte venduta" + (blank(a.cost) ? " (stima)" : "") + ". Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(pv(other.avgPrice)) + " a notte" + (net ? " netti" : "") + ", " + pct(other.occupancy) + " di notti vendute, guadagno " + euro(other.net) + ". ",
-      h("button", { onclick: function () { state.strategy = other.strategy; saveState(); render(); }, text: "Passa a questa" })));
+    root.appendChild(h("p", { class: "alt", text: income + ", costi " + euro(rec.cost) + " per notte venduta" + (blank(a.cost) ? " (stima)" : "") + "." }));
+    strategyTable(root, STRATS.map(function (x) {
+      var r = x[0] === state.strategy ? rec : recommend(x[0], state.period);
+      return { s: x[0], price: pv(r.avgPrice), occ: r.occupancy, net: r.net };
+    }), net);
     var taxAvg = rec.nights.length ? rec.nights.reduce(function (t, n) { return t + n.tax; }, 0) / rec.nights.length : 0;
     if (taxAvg > 0) {
       root.appendChild(h("p", { class: "alt" }, f.ch.tax === "portal"
@@ -520,7 +632,7 @@
     var m = model(), ms = P.parseDate(n.date), aa = which || apt();
     openSheet(longDate(ms), function (body) {
       if (which) body.appendChild(h("p", { class: "apt-spec", style: "margin:-6px 0 10px", text: aa.name + " · " + aptSpec(aa) }));
-      var alt = recommend(state.strategy === "resa" ? "occupazione" : "resa", 1, ms, aa).nights[0];
+
       if (n.eventList.length) {
         body.appendChild(h("p", { class: "note" }, n.eventList.slice(0, 4).map(function (e) {
           return h("span", { class: "tag" }, h("i", { style: "background:var(--" + (CAT[e.category] || CAT.altro)[1] + ")" }), e.name + (e.venue ? " (" + e.venue + ")" : ""));
@@ -548,7 +660,9 @@
       kv("Prezzi rispetto a una notte normale", signedPct(n.uplift) + (n.measured ? "" : " (stima)"));
       kv("Mercato già occupato oggi", pct(n.occNow));
       kv("Mercato occupato alla data (previsione)", pct(n.occFin));
-      kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(pv(alt.price, aa)));
+      STRATS.forEach(function (x) {
+        if (x[0] !== state.strategy) kv("Con " + STRAT_NAME[x[0]], euro(pv(recommend(x[0], 1, ms, aa).nights[0].price, aa)));
+      });
       body.appendChild(dl);
 
       // quanto resta, e la tassa di soggiorno
@@ -567,12 +681,12 @@
       }
       var bk = bookedFor(n.date);
       if (bk) body.appendChild(h("p", { class: "note", text: "Tra il " + shortDay(bk.prev) + " e il " + shortDay(bk.scan) + " sono stati prenotati circa " + nf.format(Math.round(bk.booked)) + " alloggi su " + nf.format(bk.risk) + " liberi per queste date (" + pct1(bk.booked / bk.risk) + ")." }));
-      if (n.plan.length >= 2) {
+      if (n.plan.length >= 2 || (state.strategy === "aggressiva" && n.plan.length)) {
         body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la notte resta libera" }));
         body.appendChild(h("div", { class: "plan" }, n.plan.map(function (p) {
           return h("div", {}, h("b", { text: euro(pv(p.price, aa)) }), h("span", { text: "a " + p.lead + (p.lead === 1 ? " giorno" : " giorni") }));
         })));
-        body.appendChild(h("p", { class: "note", text: "Il prezzo scende avvicinandosi alla data: più passa il tempo, meno occasioni restano per venderla." }));
+        body.appendChild(h("p", { class: "note", text: state.strategy === "aggressiva" ? "Sconti della strategia aggressiva sul prezzo di mercato di questa notte." : "Il prezzo scende avvicinandosi alla data: più passa il tempo, meno occasioni restano per venderla." }));
       }
       if (!n.measured) body.appendChild(h("p", { class: "note", text: "Per questa data lo scanner non ha ancora letto abbastanza prezzi: il valore viene dal livello normale del periodo e dall'effetto tipico degli eventi." }));
     });
@@ -973,7 +1087,7 @@
       h("button", { class: "btn primary block", disabled: data.loading, onclick: function () { loadData(true); loadRun(); }, text: data.loading ? "Aggiorno…" : "Aggiorna i dati" }),
       h("button", { class: "btn block", onclick: startScan, text: "Avvia una scansione adesso" }),
       h("button", { class: "btn block", onclick: function () { downloadUrl(base + "/releases/download/backup/bbb-backup.zip", "bbb-backup.zip"); }, text: "Scarica il backup completo (ZIP)" }),
-      h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period, priceView: state.priceView }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
+      h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period, priceView: state.priceView, aggressive: state.aggressive }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
       h("button", { class: "btn block", onclick: importSettings, text: "Importa appartamenti ed eventi" }),
       h("button", { class: "btn block", onclick: function () { openExternal(base + "/actions"); }, text: "Apri le esecuzioni su GitHub" })));
     root.appendChild(h("p", { class: "note", text: "Il backup contiene tutto lo storico: prezzi giorno per giorno, catalogo, conteggi, modello. Finisce nella cartella Download del telefono." }));

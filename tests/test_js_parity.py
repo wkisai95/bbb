@@ -26,8 +26,11 @@ def test_app_and_program_agree(world, tmp_path):
              channel="direct", payers=6),
         dict(zone="colli", bedrooms=0, baths=1.5, guests=2, strategy="occupazione", quality="media", cost=0,
              channel="airbnb", feePct=12, vat=False, payers=2),
+        dict(zone="c_maggiore", bedrooms=1, baths=1, guests=3, strategy="aggressiva", quality="media", channel="airbnb", payers=2),
+        dict(zone="bolognina", bedrooms=2, baths=1, guests=4, strategy="aggressiva", quality="base", channel="booking", payers=3,
+             minPrice=90, steps=[[21, 5], [10, 15], [2, 40]]),
     ]
-    spans = [(1, 90), (1, 90), (100, 140), (0, 40), (200, 360)]
+    spans = [(1, 90), (1, 90), (100, 140), (0, 40), (200, 360), (0, 60), (1, 45)]
     for c, (a, b) in zip(cases, spans):
         c["start"], c["end"] = (t + timedelta(days=a)).isoformat(), (t + timedelta(days=b)).isoformat()
     out = subprocess.run(["node", os.path.join(HERE, "js_recommend.js"), str(path), json.dumps(cases)],
@@ -38,7 +41,7 @@ def test_app_and_program_agree(world, tmp_path):
         assert abs(fee - j["feeShare"]) < 1e-9
         py = pricing.recommend(model, c["zone"], c["bedrooms"], c["baths"], c["guests"], date.fromisoformat(c["start"]),
                                date.fromisoformat(c["end"]), c["strategy"], c["quality"], c.get("minPrice", 0.0), c.get("cost"),
-                               fee=fee, payers=c["payers"], tax_mode=pricing.channel(model, c["channel"])["tax"])
+                               fee=fee, payers=c["payers"], tax_mode=pricing.channel(model, c["channel"])["tax"], steps=c.get("steps"))
         assert abs(py["net"] - j["net"]) <= max(3, 0.002 * abs(py["net"]))
         assert abs(py["fees"] - j["fees"]) <= max(2, 0.002 * py["fees"]) and abs(py["tax"] - j["tax"]) <= max(2, 0.004 * py["tax"])
         assert len(py["nights"]) == len(j["nights"]) > 0

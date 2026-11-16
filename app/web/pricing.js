@@ -131,6 +131,41 @@
     return { rel: policy[0], sell: Q, gross: G, net: V, sellMarket: sellMarket, plan: plan };
   }
 
+  var DEFAULT_STEPS = [[14, 10], [7, 20], [3, 30]];      // [giorni prima della notte, sconto % sul prezzo di mercato]
+  /* gradini validi, dal più lontano al più vicino alla data */
+  function cleanSteps(steps) {
+    var out = [];
+    (steps || []).forEach(function (x) {
+      var days = parseInt(x && x[0], 10), pct = parseFloat(x && x[1]);
+      if (isFinite(days) && isFinite(pct) && days >= 0 && days <= 120 && pct >= 0 && pct <= 80) out.push([days, pct]);
+    });
+    return out.sort(function (a, b) { return b[0] - a[0]; });
+  }
+  /* prezzo rispetto al mercato a `lead` giorni dalla notte: lo sconto più forte tra i gradini raggiunti */
+  function ladderRel(lead, steps) {
+    var d = 0;
+    for (var i = 0; i < steps.length; i++) if (lead <= steps[i][0]) d = Math.max(d, steps[i][1]);
+    return Math.max(0.05, 1 - d / 100);
+  }
+  /* strategia aggressiva: prezzo di mercato, poi sconti a gradini se la notte è ancora libera (regola fissa) */
+  function solveAggressive(h, beta, m, steps, cost, floorPrice, keepShare) {
+    var ks = keepShare === undefined ? 1 : keepShare, n = h.length, floorRel = Math.max(floorPrice || 0, 0) / m;
+    function relAt(L) { return Math.max(ladderRel(L, steps), floorRel); }
+    var today = relAt(n), plan = [], last = today, i;
+    for (i = 0; i < steps.length; i++) {
+      var dd = steps[i][0];
+      if (dd < n && Math.abs(relAt(dd) - last) > 1e-12) { last = relAt(dd); plan.push({ lead: dd, rel: last }); }
+    }
+    if (n === 0) return { rel: today, sell: 0, gross: 0, net: 0, sellMarket: 0, plan: plan };
+    var surv = 1, gross = 0, net = 0, sold = 0, keep = 1;
+    for (i = 0; i < n; i++) {
+      var r = relAt(n - i), hr = expit(logit(h[i]) + beta * Math.log(r));
+      gross += surv * hr * r * m; net += surv * hr * (r * m * ks - cost); sold += surv * hr;
+      surv *= 1 - hr; keep *= 1 - h[i];
+    }
+    return { rel: today, sell: sold, gross: gross, net: net, sellMarket: 1 - keep, plan: plan };
+  }
+
   function eventsByNight(model) {
     var map = {};
     (model.events || []).forEach(function (e) {
@@ -169,13 +204,16 @@
     var thetas = model.theta[segClass(Math.round(p.bedrooms))][grp];
     var cost = (p.cost === undefined || p.cost === null) ? defaultCost(model, attr) : p.cost;
     var fee = p.fee || 0, keepShare = 1 - fee, payers = p.payers === undefined ? 2 : p.payers, taxMode = p.taxMode || "portal";
+    var strategy = p.strategy || "resa", steps = cleanSteps(p.steps || (model.aggressive && model.aggressive.steps) || DEFAULT_STEPS);
     var evs = eventsByNight(model), nights = [];
     var sums = { price: 0, sell: 0, gross: 0, net: 0, market: 0, sellMarket: 0, marketRev: 0, tax: 0 };
     for (var t = parseDate(p.start); t <= parseDate(p.end); t += DAY) {
       var k = Math.round((t - t0) / DAY);
       if (k < 0 || k >= model.idx.length) continue;
       var m = Math.exp(attr + model.idx[k]);
-      var s = solveNight(nightHazards(model, thetas[k], k), beta, m, lo, hi, p.strategy || "resa", target, cost, p.minPrice || 0, keepShare);
+      var hz = nightHazards(model, thetas[k], k);
+      var s = strategy === "aggressiva" ? solveAggressive(hz, beta, m, steps, cost, p.minPrice || 0, keepShare)
+        : solveNight(hz, beta, m, lo, hi, strategy, target, cost, p.minPrice || 0, keepShare);
       var price = Math.max(1, Math.round(s.rel * m)), date = isoDate(t), list = evs[date] || [];
       var tax = touristTax(model, price, payers, taxMode);
       var night = {
@@ -198,7 +236,7 @@
     }
     var n = nights.length || 1;
     return {
-      strategy: p.strategy || "resa", cost: cost, nights: nights, fee: fee, taxMode: taxMode, payers: payers,
+      strategy: strategy, cost: cost, nights: nights, fee: fee, taxMode: taxMode, payers: payers, steps: steps,
       fees: Math.round(sums.gross * fee), tax: Math.round(sums.tax),
       avgPrice: Math.round(sums.price / n), occupancy: sums.sell / n,
       revenue: Math.round(sums.gross), net: Math.round(sums.net),
@@ -210,6 +248,7 @@
   return {
     recommend: recommend, attrLevel: attrLevel, defaultCost: defaultCost, priceBand: priceBand,
     feesOf: feesOf, channel: channel, feeShare: feeShare, touristTax: touristTax,
+    DEFAULT_STEPS: DEFAULT_STEPS, cleanSteps: cleanSteps, ladderRel: ladderRel,
     nightHazards: nightHazards, solveNight: solveNight, reliability: reliability, eventsByNight: eventsByNight,
     parseDate: parseDate, isoDate: isoDate, DAY: DAY
   };

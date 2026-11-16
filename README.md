@@ -12,12 +12,12 @@ Le versioni sono anche nelle [release](https://github.com/wkisai95/bbb/releases/
 
 | Sezione | Cosa fa |
 |---|---|
-| **Prezzi** | Imposti il tuo appartamento (zona, camere, bagni, ospiti, qualità, prezzo minimo, costi, **portale e commissione**, ospiti che pagano la tassa di soggiorno) e scegli **Massima resa** o **Massima occupazione**. Calendario dei prossimi 30, 60 o 90 giorni con il prezzo da impostare oggi per ogni notte; toccando una notte vedi dove cade rispetto ai comparabili, la probabilità di venderla, **quanto ti resta tolta la commissione, la tassa di soggiorno e chi la riscuote**, il prezzo da mettere sugli altri portali per avere lo stesso netto. I prezzi si possono vedere **al lordo** (quelli da mettere sul portale) o **al netto della commissione**. Esporta in CSV. Con più appartamenti si indica il **proprietario** di ciascuno, e quelli dello stesso proprietario si possono vedere insieme: incasso, commissioni e guadagno sommati, il confronto appartamento per appartamento, i prezzi notte per notte affiancati e un unico CSV. |
+| **Prezzi** | Imposti il tuo appartamento (zona, camere, bagni, ospiti, qualità, prezzo minimo, costi, **portale e commissione**, ospiti che pagano la tassa di soggiorno) e scegli **Massima resa**, **Massima occupazione** o **Aggressiva**, con una tabella che le mette a confronto. Calendario dei prossimi 30, 60, 90 giorni o di un anno con il prezzo da impostare oggi per ogni notte; toccando una notte vedi dove cade rispetto ai comparabili, la probabilità di venderla, **quanto ti resta tolta la commissione, la tassa di soggiorno e chi la riscuote**, il prezzo da mettere sugli altri portali per avere lo stesso netto. I prezzi si possono vedere **al lordo** (quelli da mettere sul portale) o **al netto della commissione**. Esporta in CSV. Con più appartamenti si indica il **proprietario** di ciascuno, e quelli dello stesso proprietario si possono vedere insieme: incasso, commissioni e guadagno sommati, il confronto appartamento per appartamento, i prezzi notte per notte affiancati e un unico CSV. **Resa per proprietario** mostra in una tabella incasso, notti vendute e guadagno previsti di ogni proprietario e il totale, anche sull'anno intero, esportabile in CSV. |
 | **Mercato** | Il catalogo: fascia di prezzo e mediana per zona, camere, bagni, ospiti, quartiere. Toccando una riga, l'elenco degli annunci con il link ad Airbnb. In fondo, **chi viene prenotato**: quante prenotazioni sono state rilevate e a che prezzo, rispetto a chi è rimasto libero. |
 | **Eventi** | Livello dei prezzi nei prossimi 12 mesi e calendario di fiere, concerti, ponti, con l'aumento dei prezzi misurato o stimato. Puoi aggiungere i tuoi eventi. |
 | **Dati** | Stato dell'ultima scansione, precisione del modello, avvio di una scansione, **backup completo in ZIP**, esportazione e importazione delle impostazioni. |
 
-## Le due strategie
+## Le strategie
 
 - **Massima resa.** Per ogni notte sceglie il prezzo che rende massimo il guadagno atteso (prezzo, meno la
   commissione del portale, meno i costi variabili, per la probabilità di vendere), sapendo che nei giorni
@@ -25,9 +25,14 @@ Le versioni sono anche nelle [release](https://github.com/wkisai95/bbb/releases/
   ancora libera.
 - **Massima occupazione.** Il prezzo più alto che lascia almeno il 90% di probabilità di vendere la notte;
   quando non basta, il minimo della fascia.
+- **Aggressiva.** Una regola fissa: prezzo di mercato (la mediana degli appartamenti simili per quella notte)
+  finché la notte è lontana; se è ancora libera, −10% da 14 giorni prima, −20% da 7 e −30% da 3. Gradini e
+  percentuali si cambiano dall'app (Cambia gli sconti) o in `config/settings.yaml` (`aggressive_steps`). Il
+  modello ne calcola l'esito atteso come per le altre due, così si possono confrontare.
 
-In entrambi i casi il prezzo resta attorno al mercato: tra il 10° e il 90° percentile degli appartamenti
-simili per quella notte, e comunque non oltre il 25% sotto o il 40% sopra la loro mediana.
+Nelle prime due il prezzo resta attorno al mercato: tra il 10° e il 90° percentile degli appartamenti simili
+per quella notte, e comunque non oltre il 25% sotto o il 40% sopra la loro mediana. L'aggressiva scende sotto
+quella fascia di proposito. Nessuna va sotto il prezzo minimo impostato per l'appartamento.
 
 ## Come funziona
 
@@ -184,7 +189,7 @@ tests/          test, compresa una prova d'insieme su un mercato simulato di cui
 
 ```
 pip install -r requirements.txt pytest
-python -m pytest tests -q            # 44 test, mezzo minuto
+python -m pytest tests -q            # 45 test, mezzo minuto
 python -m bnb all --out out          # scansione + modello + file per l'app + backup
 python -m bnb model --out out        # solo ricalcolo dai dati già raccolti
 ```

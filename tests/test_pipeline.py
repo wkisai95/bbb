@@ -211,3 +211,29 @@ def test_fees_and_tourist_tax(world):
     # il guadagno è l'incasso, meno commissioni, meno costi delle notti vendute
     sold = sum(x["sell"] for x in air["nights"])
     assert abs(air["net"] - (air["revenue"] * (1 - fee) - air["cost"] * sold)) < 0.02 * air["revenue"] + 5
+
+
+def test_aggressive_pricing(world):
+    """Strategia aggressiva: prezzo di mercato, poi -10%, -20%, -30% se la notte è ancora libera."""
+    m, t = world["model"], world["today"]
+    t0 = date.fromisoformat(m["start"])
+    args = ("c_maggiore", 1, 1, 3, t0, t0 + timedelta(days=40))
+    r = pricing.recommend(m, *args, "aggressiva")
+    assert r["steps"] == [[14, 10.0], [7, 20.0], [3, 30.0]]
+    for n in r["nights"]:
+        L, mk = n["lead"], n["market"]
+        want = 1.0 if L > 14 else 0.9 if L > 7 else 0.8 if L > 3 else 0.7
+        assert abs(n["price"] - want * mk) <= 1, (L, n["price"], mk)
+        assert n["sell"] >= n["sell_market"] - 1e-9                  # mai sopra il mercato: si vende almeno quanto al mercato
+        future = [p["lead"] for p in n["plan"]]
+        assert future == [d for d in (14, 7, 3) if d < L]            # il piano dice quando scatterà ogni sconto
+    far = next(n for n in r["nights"] if n["lead"] == 20)
+    assert all(abs(p["price"] - far["market"] * x) <= 1 for p, x in zip(far["plan"], (0.9, 0.8, 0.7)))
+    # rispetto al mercato tenuto fisso vende di più e incassa di meno a notte
+    assert r["occupancy"] > r["market_occupancy"] and r["avg_price"] < r["market_avg"]
+    # gradini propri e prezzo minimo
+    own = pricing.recommend(m, *args, "aggressiva", min_price=100, steps=[[5, 25], ["x", 3], [400, 10]])
+    assert own["steps"] == [[5, 25.0]]
+    for n in own["nights"]:
+        want = max(100, round(n["market"] * (0.75 if n["lead"] <= 5 else 1.0)))
+        assert abs(n["price"] - want) <= 1 and n["price"] >= 100

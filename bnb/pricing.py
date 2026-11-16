@@ -161,16 +161,73 @@ def solve_night(h: np.ndarray, beta: float, m: float, lo: float, hi: float, stra
     return {"rel": policy[0], "sell": float(Q), "gross": float(G), "net": float(V), "sell_market": sell_market, "plan": plan}
 
 
+DEFAULT_STEPS = [[14, 10.0], [7, 20.0], [3, 30.0]]     # [giorni prima della notte, sconto % sul prezzo di mercato]
+
+
+def clean_steps(steps) -> list:
+    """Gradini validi, dal più lontano al più vicino alla data."""
+    out = []
+    for x in steps or []:
+        try:
+            days, pct = int(x[0]), float(x[1])
+        except (TypeError, ValueError, IndexError):
+            continue
+        if 0 <= days <= 120 and 0 <= pct <= 80:
+            out.append([days, pct])
+    return sorted(out, key=lambda x: -x[0])
+
+
+def ladder_rel(lead: int, steps: list) -> float:
+    """Prezzo rispetto al mercato a `lead` giorni dalla notte: vale lo sconto più forte tra i gradini raggiunti."""
+    d = 0.0
+    for days, pct in steps:
+        if lead <= days:
+            d = max(d, pct)
+    return max(0.05, 1.0 - d / 100.0)
+
+
+def solve_aggressive(h: np.ndarray, beta: float, m: float, steps: list, cost: float = 0.0,
+                     floor_price: float = 0.0, keep: float = 1.0) -> dict:
+    """Strategia aggressiva: prezzo di mercato, poi sconti a gradini se la notte è ancora libera.
+
+    È una regola fissa, non un'ottimizzazione: qui se ne calcola l'esito atteso (probabilità di vendere,
+    incasso, guadagno) con lo stesso modello della domanda delle altre strategie.
+    """
+    k = len(h)
+    floor_rel = max(floor_price, 0.0) / m
+    rel_at = lambda L: max(ladder_rel(L, steps), floor_rel)          # mai sotto il prezzo minimo dell'utente
+    today = rel_at(k)
+    plan, last = [], today
+    for days, _ in steps:
+        if days < k and abs(rel_at(days) - last) > 1e-12:
+            last = rel_at(days)
+            plan.append({"lead": int(days), "rel": float(last)})
+    if k == 0:
+        return {"rel": float(today), "sell": 0.0, "gross": 0.0, "net": 0.0, "sell_market": 0.0, "plan": plan}
+    rel = np.array([rel_at(L) for L in range(k, 0, -1)])              # h[i] è il giorno in cui mancano k-i giorni
+    hr = _expit(_logit(h) + beta * np.log(rel))
+    surv, gross, net, sold = 1.0, 0.0, 0.0, 0.0
+    for i in range(k):
+        gross += surv * hr[i] * rel[i] * m
+        net += surv * hr[i] * (rel[i] * m * keep - cost)
+        sold += surv * hr[i]
+        surv *= 1 - hr[i]
+    return {"rel": float(today), "sell": float(sold), "gross": float(gross), "net": float(net),
+            "sell_market": float(1 - np.prod(1 - h)), "plan": plan}
+
+
 def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, start: date, end: date,
               strategy: str = "resa", quality: str = "media", min_price: float = 0.0, cost: float | None = None,
-              fee: float = 0.0, payers: float = 2.0, tax_mode: str = "portal") -> dict:
-    """Notti da `start` a `end` comprese.
+              fee: float = 0.0, payers: float = 2.0, tax_mode: str = "portal", steps: list | None = None) -> dict:
+    """Notti da `start` a `end` comprese. strategy: resa | occupazione | aggressiva.
 
     cost      costo variabile per notte prenotata (None = valore di partenza)
     fee       quota del prezzo trattenuta dal portale (vedi fee_share); 0 = nessuna commissione
     payers    ospiti che pagano l'imposta di soggiorno; tax_mode dice chi la riscuote (vedi tourist_tax)
+    steps     gradini della strategia aggressiva, [[giorni, sconto %], ...] (None = quelli del modello)
     """
     keep = 1.0 - fee
+    steps = clean_steps(steps if steps is not None else (model.get("aggressive") or {}).get("steps") or DEFAULT_STEPS)
     t0 = date.fromisoformat(model["start"])
     lo, hi = price_band(model)
     q = dict(zip(model["q_levels"], model["q_values"]))
@@ -192,7 +249,11 @@ def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, 
         k = (d - t0).days
         if 0 <= k < len(model["idx"]):
             m = math.exp(attr + model["idx"][k])
-            s = solve_night(night_hazards(model, thetas[k], k), beta, m, lo, hi, strategy, target, cost, min_price, keep)
+            hz = night_hazards(model, thetas[k], k)
+            if strategy == "aggressiva":
+                s = solve_aggressive(hz, beta, m, steps, cost, min_price, keep)
+            else:
+                s = solve_night(hz, beta, m, lo, hi, strategy, target, cost, min_price, keep)
             price = max(1, round(s["rel"] * m))
             tax = tourist_tax(model, price, payers, tax_mode)
             evs = sorted(ev_by_night.get(d.isoformat(), []), key=lambda e: -e["weight"])
@@ -212,7 +273,7 @@ def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, 
         d += timedelta(days=1)
     n = len(nights)
     return {
-        "strategy": strategy, "cost": cost, "nights": nights, "fee": fee, "tax_mode": tax_mode, "payers": payers,
+        "strategy": strategy, "cost": cost, "nights": nights, "fee": fee, "tax_mode": tax_mode, "payers": payers, "steps": steps,
         "fees": round(sum(x["gross"] for x in nights) * fee),
         "tax": round(sum(x["tax"] * x["sell"] for x in nights)),
         "avg_price": round(sum(x["price"] for x in nights) / n) if n else 0,

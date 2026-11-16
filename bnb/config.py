@@ -46,6 +46,7 @@ DEFAULTS: dict = {
         "target_occupancy": 0.90,
         "band": [10, 90],
         "max_discount": 0.25,
+        "aggressive_steps": [[14, 10], [7, 20], [3, 30]],
         "max_premium": 0.40,
         "nu": None,
         "cost_share": 0.30,
