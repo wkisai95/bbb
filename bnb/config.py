@@ -52,6 +52,17 @@ DEFAULTS: dict = {
         "event_prior": {1: 1.03, 2: 1.10, 3: 1.25, 4: 1.50, 5: 1.90},
     },
     "sources": {"inside_airbnb": True, "inside_airbnb_every_days": 7, "events_auto": True},
+    "fees": {
+        "vat": 0.22,
+        "channels": [
+            {"id": "airbnb", "name": "Airbnb", "fee": 15.5, "vat": True, "tax": "portal"},
+            {"id": "booking", "name": "Booking.com", "fee": 16.5, "vat": True, "tax": "host"},
+            {"id": "vrbo", "name": "Vrbo", "fee": 8.0, "vat": True, "tax": "host"},
+            {"id": "direct", "name": "Prenotazione diretta", "fee": 0.0, "vat": False, "tax": "host"},
+        ],
+        "tourist_tax": {"year": 2026, "portal_rate": 0.105, "cap": 7.0,
+                        "bands": [[31, 4.0], [71, 5.8], [121, 6.5], [None, 7.0]], "max_nights": 5},
+    },
 }
 
 

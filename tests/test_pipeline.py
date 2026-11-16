@@ -180,3 +180,34 @@ def test_first_day_is_already_usable(tmp_path):
     assert r["avg_price"] > o["avg_price"] and 0.1 < r["occupancy"] < 0.95
     assert r["reliability"]["label"] in ("bassa", "media")
     publish.publish(store, m, START, run, cfg)
+
+
+def test_fees_and_tourist_tax(world):
+    """Commissioni dei portali e imposta di soggiorno: Airbnb la trattiene, gli altri no."""
+    m = world["model"]
+    # commissione: percentuale del portale, con l'IVA sopra
+    assert abs(pricing.fee_share(m, "airbnb") - 0.155 * 1.22) < 1e-9
+    assert abs(pricing.fee_share(m, "booking") - 0.165 * 1.22) < 1e-9
+    assert pricing.fee_share(m, "direct") == 0.0 and abs(pricing.fee_share(m, "airbnb", fee=3, vat=False) - 0.03) < 1e-9
+    # imposta riscossa dal portale: 10,5% del prezzo, al massimo 7 € a persona a notte
+    assert abs(pricing.tourist_tax(m, 100, 2, "portal") - 10.5) < 1e-9
+    assert pricing.tourist_tax(m, 200, 2, "portal") == 14.0
+    # imposta riscossa da chi ospita: scaglioni sul prezzo a persona a notte
+    assert pricing.tourist_tax(m, 60, 2, "host") == 8.0            # 30 € a testa → 4 €
+    assert pricing.tourist_tax(m, 100, 2, "host") == 11.6          # 50 € a testa → 5,80 €
+    assert pricing.tourist_tax(m, 200, 2, "host") == 13.0          # 100 € a testa → 6,50 €
+    assert pricing.tourist_tax(m, 300, 2, "host") == 14.0          # 150 € a testa → 7 €
+    assert pricing.tourist_tax(m, 100, 0, "host") == 0.0
+    t = world["today"]
+    args = ("c_maggiore", 1, 1, 3, t + timedelta(days=1), t + timedelta(days=30), "resa")
+    free = pricing.recommend(m, *args)
+    fee = pricing.fee_share(m, "airbnb")
+    air = pricing.recommend(m, *args, fee=fee, payers=2, tax_mode="portal")
+    # la commissione riduce il guadagno e spinge un po' in su il prezzo che conviene chiedere
+    assert air["net"] < free["net"] and air["avg_price"] >= free["avg_price"]
+    assert abs(air["fees"] - air["revenue"] * fee) <= 2 and air["tax"] > 0
+    n = air["nights"][3]
+    assert abs(n["fee"] + n["payout"] - n["price"]) < 0.02 and abs(n["tax"] - min(0.105 * n["price"], 14)) < 0.01
+    # il guadagno è l'incasso, meno commissioni, meno costi delle notti vendute
+    sold = sum(x["sell"] for x in air["nights"])
+    assert abs(air["net"] - (air["revenue"] * (1 - fee) - air["cost"] * sold)) < 0.02 * air["revenue"] + 5

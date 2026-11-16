@@ -60,7 +60,7 @@
   // ------------------------------------------------------------------ stato salvato sul telefono
   function defaults() {
     return { repo: { owner: DEFAULT_REPO.owner, name: DEFAULT_REPO.name, branch: DEFAULT_REPO.branch, token: "" },
-      apartments: [{ id: "a1", name: "Il mio appartamento", zone: "c_maggiore", bedrooms: 1, baths: 1, guests: 3, quality: "media", minPrice: 0, cost: null }],
+      apartments: [{ id: "a1", name: "Il mio appartamento", zone: "c_maggiore", bedrooms: 1, baths: 1, guests: 3, quality: "media", minPrice: 0, cost: null, channel: "airbnb", fee: null, vat: null, payers: 2 }],
       current: "a1", configured: false, strategy: "resa", period: 30, customEvents: [] };
   }
   function loadState() {
@@ -173,13 +173,33 @@
     eff = out; return out;
   }
 
+  function blank(v) { return v === null || v === undefined || v === ""; }
+  /* portale, commissione e ospiti paganti dell'appartamento, con i valori tipici dove non sono stati cambiati */
+  function aptFees(a) {
+    var m = model(), ch = P.channel(m, a.channel || "airbnb");
+    return { ch: ch, share: P.feeShare(m, ch.id, a.fee, a.vat), pct: blank(a.fee) ? ch.fee : +a.fee,
+      vat: blank(a.vat) ? !!ch.vat : !!a.vat, payers: blank(a.payers) ? Math.min(2, a.guests || 2) : +a.payers };
+  }
   function recommend(strategy, days, from) {
-    var m = model(), a = apt();
+    var m = model(), a = apt(), f = aptFees(a);
     var start = from === undefined ? Math.max(todayMs(), P.parseDate(m.start)) : from;
     return P.recommend(m, { zone: a.zone, bedrooms: a.bedrooms, baths: a.baths, guests: a.guests, quality: a.quality,
-      minPrice: a.minPrice || 0, cost: a.cost === null || a.cost === undefined || a.cost === "" ? null : +a.cost,
+      minPrice: a.minPrice || 0, cost: blank(a.cost) ? null : +a.cost, fee: f.share, payers: f.payers, taxMode: f.ch.tax,
       strategy: strategy, start: P.isoDate(start), end: P.isoDate(start + (days - 1) * DAY) });
   }
+  function shortDay(iso) { return fmtDate(P.parseDate(iso), { day: "numeric", month: "short" }); }
+  /* ultima lettura completa che copre quella notte: quanti erano liberi e quanti sono stati prenotati dalla lettura prima */
+  function bookedFor(date) {
+    var m = model(), t = m.tracking, n = m.nights_per_sample || 2, ms = P.parseDate(date), best = null;
+    ((t && t.windows) || []).forEach(function (w) {
+      var a = P.parseDate(w.checkin);
+      if (ms >= a && ms < a + n * DAY && w.risk > 0 && w.booked > 0) best = w;
+    });
+    return best;
+  }
+  function pct1(x) { return (x * 100).toFixed(1).replace(".", ",").replace(",0", "") + "%"; }
+  function euro2(x) { return (Math.round(x * 100) / 100).toFixed(2).replace(".", ",").replace(",00", "") + " €"; }
+  function guestsWord(n) { return n + (n === 1 ? " ospite" : " ospiti"); }
   function zoneName(id, short) {
     var z = (model() ? model().zones : []).filter(function (x) { return x.id === id; })[0];
     return z ? (short ? z.short : z.name) : id;
@@ -280,9 +300,18 @@
     root.appendChild(h("div", { class: "sum" },
       h("div", {}, h("b", { text: euro(rec.avgPrice) }), h("span", { text: "prezzo medio a notte" })),
       h("div", {}, h("b", { text: pct(rec.occupancy) }), h("span", { text: "notti che ti aspetti di vendere" })),
-      h("div", {}, h("b", { text: euro(rec.net) }), h("span", { text: "guadagno atteso, tolti i costi" }))));
-    root.appendChild(h("p", { class: "alt" }, "Incasso atteso " + euro(rec.revenue) + ", costi " + euro(rec.cost) + " per notte venduta" + (a.cost === null || a.cost === undefined || a.cost === "" ? " (stima)" : "") + ". Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(other.avgPrice) + " a notte, " + pct(other.occupancy) + " di notti vendute, guadagno " + euro(other.net) + ". ",
+      h("div", {}, h("b", { text: euro(rec.net) }), h("span", { text: "guadagno atteso, tolte commissioni e costi" }))));
+    var f = aptFees(a);
+    root.appendChild(h("p", { class: "alt" }, "Incasso atteso " + euro(rec.revenue) +
+      (rec.fee > 0 ? ", commissioni " + f.ch.name + " " + euro(rec.fees) + " (" + pct1(rec.fee) + ")" : ", nessuna commissione") +
+      ", costi " + euro(rec.cost) + " per notte venduta" + (blank(a.cost) ? " (stima)" : "") + ". Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(other.avgPrice) + " a notte, " + pct(other.occupancy) + " di notti vendute, guadagno " + euro(other.net) + ". ",
       h("button", { onclick: function () { state.strategy = other.strategy; saveState(); render(); }, text: "Passa a questa" })));
+    var taxAvg = rec.nights.length ? rec.nights.reduce(function (t, n) { return t + n.tax; }, 0) / rec.nights.length : 0;
+    if (taxAvg > 0) {
+      root.appendChild(h("p", { class: "alt" }, f.ch.tax === "portal"
+        ? "Tassa di soggiorno: la riscuote " + f.ch.name + " dall'ospite e la versa al Comune, circa " + euro2(taxAvg) + " a notte per " + guestsWord(f.payers) + ". Non passa da te."
+        : "Tassa di soggiorno: la incassi tu dall'ospite e la versi al Comune, circa " + euro2(taxAvg) + " a notte per " + guestsWord(f.payers) + " (" + euro(rec.tax) + " attesi nel periodo). Non è un tuo guadagno."));
+    }
 
     var r = rec.reliability, dots = r.label === "alta" ? 3 : r.label === "media" ? 2 : 1;
     root.appendChild(h("button", { class: "rely", onclick: function () { relySheet(rec); } },
@@ -371,6 +400,23 @@
       kv("Mercato occupato alla data (previsione)", pct(n.occFin));
       kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(alt.price));
       body.appendChild(dl);
+
+      // quanto resta, e la tassa di soggiorno
+      var f = aptFees(apt()), d2 = h("dl", { class: "kv" });
+      function kv2(k, v) { d2.appendChild(h("dt", { text: k })); d2.appendChild(h("dd", { text: v })); }
+      body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la vendi a " + euro(n.price) }));
+      if (n.fee > 0) kv2("Commissione " + f.ch.name + " (" + pct1(f.share) + ")", "−" + euro2(n.fee));
+      kv2("Ti resta, prima dei costi", euro2(n.payout));
+      if (n.tax > 0) kv2("Tassa di soggiorno, " + guestsWord(f.payers), euro2(n.tax) + (f.ch.tax === "portal" ? " · la riscuote " + f.ch.name : " · la incassi e la versi tu"));
+      body.appendChild(d2);
+      var others = P.feesOf(m).channels.filter(function (c) { return c.id !== f.ch.id; });
+      if (others.length) {
+        body.appendChild(h("p", { class: "note", style: "margin-top:10px", text: "Per avere lo stesso netto altrove: " + others.map(function (c) {
+          return c.name + " " + euro(Math.round(n.payout / (1 - P.feeShare(m, c.id))));
+        }).join(", ") + "." }));
+      }
+      var bk = bookedFor(n.date);
+      if (bk) body.appendChild(h("p", { class: "note", text: "Tra il " + shortDay(bk.prev) + " e il " + shortDay(bk.scan) + " sono stati prenotati circa " + nf.format(Math.round(bk.booked)) + " alloggi su " + nf.format(bk.risk) + " liberi per queste date (" + pct1(bk.booked / bk.risk) + ")." }));
       if (n.plan.length >= 2) {
         body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la notte resta libera" }));
         body.appendChild(h("div", { class: "plan" }, n.plan.map(function (p) {
@@ -402,12 +448,12 @@
   }
 
   function exportCsv(rec) {
-    var a = apt(), rows = [["data", "prezzo_consigliato", "probabilita_vendita", "prezzo_mediano_comparabili", "comparabili_25", "comparabili_75", "rispetto_al_normale", "misurato", "eventi"]];
+    var a = apt(), f = aptFees(a), rows = [["data", "prezzo_consigliato", "probabilita_vendita", "commissione_portale", "netto_dopo_commissione", "tassa_soggiorno", "tassa_riscossa_da", "prezzo_mediano_comparabili", "comparabili_25", "comparabili_75", "rispetto_al_normale", "misurato", "eventi"]];
     rec.nights.forEach(function (n) {
-      rows.push([n.date, n.price, n.sell.toFixed(3), n.market, n.low, n.high, n.uplift.toFixed(3), n.measured ? "si" : "no", n.events.join(" | ")]);
+      rows.push([n.date, n.price, n.sell.toFixed(3), n.fee.toFixed(2), n.payout.toFixed(2), n.tax.toFixed(2), f.ch.tax === "portal" ? f.ch.name : "host", n.market, n.low, n.high, n.uplift.toFixed(3), n.measured ? "si" : "no", n.events.join(" | ")]);
     });
     var csv = rows.map(function (r) { return r.map(function (c) { c = String(c); return /[",;\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(";"); }).join("\r\n");
-    saveFile("prezzi-" + rec.strategy + "-" + rec.nights[0].date + ".csv", "text/csv", "﻿# " + a.name + " · " + aptSpec(a) + " · strategia: " + rec.strategy + "\r\n" + csv);
+    saveFile("prezzi-" + rec.strategy + "-" + rec.nights[0].date + ".csv", "text/csv", "﻿# " + a.name + " · " + aptSpec(a) + " · strategia: " + rec.strategy + " · portale: " + f.ch.name + " (" + pct1(f.share) + ") · tassa di soggiorno per " + guestsWord(f.payers) + "\r\n" + csv);
   }
 
   function editApartment(id) {
@@ -435,8 +481,31 @@
       body.appendChild(h("div", { class: "two" },
         h("div", { class: "field" }, h("label", { for: "f-min", text: "Prezzo minimo (€)" }), minp, h("span", { class: "hint", text: "Sotto questa cifra non scendi mai." })),
         h("div", { class: "field" }, h("label", { for: "f-cost", text: "Costi per notte venduta (€)" }), cost, h("span", { class: "hint", text: "Pulizie, biancheria, consumi. Conta per la massima resa." }))));
-      function keep() { d.name = name.value.trim() || "Il mio appartamento"; d.zone = zone.value; d.minPrice = Math.max(0, +minp.value || 0); d.cost = cost.value === "" ? null : Math.max(0, +cost.value); }
+      // portale, commissione e tassa di soggiorno
+      var fz = P.feesOf(m), ch = P.channel(m, d.channel || "airbnb"), tt = fz.tourist_tax || {};
+      var chan = h("select", { id: "f-chan" });
+      fz.channels.forEach(function (c) { chan.appendChild(h("option", { value: c.id, selected: c.id === ch.id, text: c.name })); });
+      var feeIn = h("input", { type: "number", inputmode: "decimal", min: 0, max: 60, step: 0.5, value: blank(d.fee) ? "" : d.fee, placeholder: String(ch.fee).replace(".", ",") + " (tipica)", id: "f-fee" });
+      var vatOn = blank(d.vat) ? !!ch.vat : !!d.vat;
+      body.appendChild(h("h3", { style: "margin-top:18px", text: "Portale e tassa di soggiorno" }));
+      body.appendChild(h("div", { class: "two" },
+        h("div", { class: "field" }, h("label", { for: "f-chan", text: "Dove lo vendi" }), chan),
+        h("div", { class: "field" }, h("label", { for: "f-fee", text: "Commissione (%)" }), feeIn)));
+      body.appendChild(h("div", { class: "field" }, h("span", { class: "lab", text: "IVA 22% sulla commissione" }),
+        seg([["si", "Sì"], ["no", "No"]], vatOn ? "si" : "no", function (v) { keep(); d.vat = v === "si"; refreshSheet(); }),
+        h("span", { class: "hint", text: "I portali la aggiungono a chi affitta da privato. Con questi valori il portale trattiene il " + pct1(P.feeShare(m, ch.id, d.fee, d.vat)) + " del prezzo." })));
+      body.appendChild(stepper("Ospiti che pagano la tassa di soggiorno", blank(d.payers) ? Math.min(2, d.guests) : d.payers, 1, 12, 1, String, function (v) { d.payers = v; }));
+      body.appendChild(h("p", { class: "note", style: "margin-top:8px", text: (ch.tax === "portal"
+        ? ch.name + " la riscuote dall'ospite e la versa al Comune: " + String(Math.round(tt.portal_rate * 1000) / 10).replace(".", ",") + "% del prezzo, al massimo " + euro(tt.cap) + " a persona a notte."
+        : "Qui la incassi tu dall'ospite e la versi al Comune: da " + euro2(tt.bands[0][1]) + " a " + euro2(tt.bands[tt.bands.length - 1][1]) + " a persona a notte, secondo il prezzo.")
+        + " Non la pagano i minori di 14 anni e i residenti a Bologna. Tariffe " + tt.year + " del Comune." }));
+      function keep() {
+        d.name = name.value.trim() || "Il mio appartamento"; d.zone = zone.value; d.minPrice = Math.max(0, +minp.value || 0); d.cost = cost.value === "" ? null : Math.max(0, +cost.value);
+        d.fee = feeIn.value === "" ? null : Math.min(60, Math.max(0, +String(feeIn.value).replace(",", ".")));
+      }
       [name, zone, minp, cost].forEach(function (el) { el.addEventListener("change", keep); });
+      feeIn.addEventListener("change", function () { keep(); refreshSheet(); });
+      chan.addEventListener("change", function () { keep(); d.channel = chan.value; d.fee = null; d.vat = null; refreshSheet(); });
       body.appendChild(h("div", { class: "stack" },
         h("button", { class: "btn primary block", onclick: function () { keep(); Object.assign(a, d); state.configured = true; saveState(); closeSheet(); render(); toast("Appartamento salvato"); }, text: "Salva" }),
         state.apartments.length > 1 ? h("button", { class: "btn block danger", onclick: function () {
@@ -487,6 +556,31 @@
     });
     root.appendChild(list);
     root.appendChild(h("p", { class: "note", style: "margin-top:12px", text: "Scala da " + euro(lo) + " a " + euro(hi) + ". Tocca una riga per vedere gli annunci." }));
+    bookingsBlock(root, m);
+  }
+  /* chi era libero a una lettura completa e non c'è più alla successiva: prenotato */
+  function bookingsBlock(root, m) {
+    var t = m.tracking;
+    root.appendChild(h("h2", { text: "Chi viene prenotato" }));
+    if (!t || !t.pairs) {
+      root.appendChild(h("p", { class: "note", text: "Per le date entro 30 giorni lo scanner legge l'elenco completo degli alloggi liberi e due giorni dopo lo rilegge: chi non c'è più è stato prenotato. I primi risultati compaiono dopo il secondo confronto, cioè a due o tre giorni dalla prima scansione completa." }));
+      return;
+    }
+    root.appendChild(h("p", {}, "Negli ultimi " + t.days + " giorni: circa ", h("b", { text: nf.format(Math.round(t.booked)) + " prenotazioni" }), " rilevate in " + nf.format(t.pairs) + " confronti tra letture complete."));
+    var pr = t.price || {}, rows = [];
+    if (pr.all) rows.push(["Tutti", pr.all]);
+    ["0", "1", "2", "3"].forEach(function (k) { if (pr.bedrooms && pr.bedrooms[k]) rows.push([k === "0" ? "Monolocale" : k === "3" ? "3 camere o più" : k + (k === "1" ? " camera" : " camere"), pr.bedrooms[k]]); });
+    Object.keys(m.groups || {}).forEach(function (g) { if (pr.group && pr.group[g]) rows.push([m.groups[g], pr.group[g]]); });
+    if (rows.length) {
+      var tb = h("tbody", {});
+      rows.forEach(function (r) {
+        tb.appendChild(h("tr", {}, h("td", {}, r[0], h("small", { text: nf.format(r[1].n) + " prenotati" })), h("td", { text: euro(r[1].booked) }), h("td", { text: euro(r[1].free) }),
+          h("td", { text: r[1].rel === null || r[1].rel === undefined ? "–" : signedPct(r[1].rel) })));
+      });
+      root.appendChild(h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", { text: "" }), h("th", { text: "Prenotati a" }), h("th", { text: "Rimasti liberi a" }), h("th", { text: "A parità di alloggio" }))), tb));
+      root.appendChild(h("p", { class: "note", style: "margin-top:10px", text: "Prezzo mediano a notte di chi è stato prenotato e di chi è rimasto libero, nelle stesse date. L'ultima colonna toglie le differenze di zona, taglia e qualità: quanto costava in meno (o in più) chi è stato scelto." }));
+    }
+    root.appendChild(h("p", { class: "note", text: "Un alloggio sparito conta come prenotato solo se manca anche alla lettura dopo: " + pct(t.back_rate) + " degli spariti ricompare. Non contano gli annunci tolti dal sito né i calendari chiusi in blocco. Da fuori una prenotazione non si distingue da una data bloccata dal proprietario." }));
   }
   function listingsSheet(dim, key) {
     var m = model();
@@ -513,7 +607,8 @@
         var br = r[ix.bedrooms];
         ul.appendChild(h("li", {}, h("button", { class: "row", onclick: function () { openExternal("https://www.airbnb.it/rooms/" + r[ix.id]); } },
           h("div", { class: "main" }, h("div", { class: "t", text: r[ix.name] || "Annuncio " + r[ix.id] }),
-            h("div", { class: "s", text: zoneName(zoneIds[r[ix.zone]], true) + ", " + (br === 0 ? "monolocale" : br + " cam.") + ", " + String(r[ix.baths]).replace(".", ",") + (r[ix.baths] === 1 ? " bagno, " : " bagni, ") + r[ix.guests] + (r[ix.guests_est] ? " ospiti (stima)" : " ospiti") + (r[ix.rating] ? ", " + String(r[ix.rating]).replace(".", ",") + " su " + r[ix.reviews] + " rec." : "") })),
+            h("div", { class: "s", text: zoneName(zoneIds[r[ix.zone]], true) + ", " + (br === 0 ? "monolocale" : br + " cam.") + ", " + String(r[ix.baths]).replace(".", ",") + (r[ix.baths] === 1 ? " bagno, " : " bagni, ") + r[ix.guests] + (r[ix.guests_est] ? " ospiti (stima)" : " ospiti") + (r[ix.rating] ? ", " + String(r[ix.rating]).replace(".", ",") + " su " + r[ix.reviews] + " rec." : "") +
+              (ix.booked !== undefined && r[ix.booked] > 0 ? ". Prenotato per " + r[ix.booked] + (r[ix.booked] === 1 ? " data" : " date") + (r[ix.booked_price] ? " a " + r[ix.booked_price] + " € a notte" : "") : "") })),
           h("div", { class: "side" }, r[ix.price] + " €", h("small", { text: "apri" })))));
       });
       body.appendChild(ul);
@@ -688,7 +783,7 @@
       var dl = h("dl", { class: "kv" });
       var kv = function (k, v) { dl.appendChild(h("dt", { text: k })); dl.appendChild(h("dd", { text: v })); };
       if (st && st.last_scan) kv("Ultima scansione", fmtDate(P.parseDate(st.last_scan), { day: "numeric", month: "long", year: "numeric" }));
-      if (st && st.run) { kv("Prezzi letti nell'ultima scansione", nf.format(st.run.prices || 0)); kv("Richieste ad Airbnb, errori", nf.format(st.run.requests || 0) + ", " + (st.run.errors || 0)); }
+      if (st && st.run) { kv("Prezzi letti nell'ultima scansione", nf.format(st.run.prices || 0)); kv("Richieste ad Airbnb, errori", nf.format(st.run.requests || 0) + ", " + (st.run.errors || 0)); if (st.run.census) kv("Date lette per intero (elenco completo dei liberi)", String(st.run.census)); }
       if (rel) { kv("Giorni di storico", String(rel.scan_days)); kv("Appartamenti con prezzi", nf.format(rel.n_listings)); kv("Prezzi usati dal modello", nf.format(rel.n_obs)); }
       if (st && st.inside_airbnb) kv("Catalogo di partenza (Inside Airbnb)", st.inside_airbnb.snapshot ? fmtDate(P.parseDate(st.inside_airbnb.snapshot), { day: "numeric", month: "long", year: "numeric" }) : "sì");
       root.appendChild(h("h2", { style: "margin-top:8px", text: "Stato" })); root.appendChild(dl);
@@ -699,7 +794,9 @@
       if (rel.seg_mdape !== null && rel.seg_mdape !== undefined) kq("Errore sul prezzo mediano di zona e taglia", "±" + pct(rel.seg_mdape));
       if (rel.fit_mdape !== null && rel.fit_mdape !== undefined) kq("Errore sul singolo annuncio", "±" + pct(rel.fit_mdape));
       kq("Sensibilità al prezzo", String(m.beta).replace(".", ",") + (rel.beta.weight > 0.05 ? " (appresa al " + pct(rel.beta.weight) + ")" : " (valore di partenza)"));
-      kq("Confronti tra letture complete", nf.format(rel.beta.pairs || 0));
+      kq("Confronti tra letture complete", nf.format(rel.track_pairs === undefined ? (rel.beta.pairs || 0) : rel.track_pairs));
+      if (rel.track_booked) kq("Prenotazioni rilevate dai confronti", nf.format(Math.round(rel.track_booked)));
+      if (m.tracking && m.tracking.checked) kq("Alloggi spariti che poi ricompaiono", pct(m.tracking.back_rate));
       ["7", "14"].forEach(function (k) { var f = rel.forecast && rel.forecast[k]; if (f) kq("Previsioni a " + k + " giorni: errore sui prezzi", "±" + pct(f.price_err)); });
       root.appendChild(q);
       var hist = (rel.history || []).filter(function (x) { return x.seg_mdape !== null; });

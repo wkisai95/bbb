@@ -575,6 +575,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
         "max_discount": mcfg.get("max_discount", 0.25),
         "max_premium": mcfg.get("max_premium", 0.40),
         "cost_share": mcfg.get("cost_share", 0.30),
+        "fees": cfg.get("fees"),
         "events": ev_out,
         "event_effect": {str(w): round(float(math.exp(learned[w]) - 1), 3) for w in learned},
         "zones": zones.public(),

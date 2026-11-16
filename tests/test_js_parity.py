@@ -19,11 +19,13 @@ def test_app_and_program_agree(world, tmp_path):
     path.write_text(json.dumps(model), encoding="utf-8")
     t = world["today"]
     cases = [
-        dict(zone="c_maggiore", bedrooms=2, baths=1, guests=4, strategy="resa", quality="media"),
-        dict(zone="c_maggiore", bedrooms=2, baths=1, guests=4, strategy="occupazione", quality="media"),
-        dict(zone="fiera", bedrooms=1, baths=1, guests=2, strategy="resa", quality="alta", cost=20),
-        dict(zone="borgopanigale", bedrooms=3, baths=2, guests=7, strategy="resa", quality="base", minPrice=150),
-        dict(zone="colli", bedrooms=0, baths=1.5, guests=2, strategy="occupazione", quality="media", cost=0),
+        dict(zone="c_maggiore", bedrooms=2, baths=1, guests=4, strategy="resa", quality="media", channel="airbnb", payers=2),
+        dict(zone="c_maggiore", bedrooms=2, baths=1, guests=4, strategy="occupazione", quality="media", channel="booking", payers=4),
+        dict(zone="fiera", bedrooms=1, baths=1, guests=2, strategy="resa", quality="alta", cost=20, channel="vrbo", payers=1),
+        dict(zone="borgopanigale", bedrooms=3, baths=2, guests=7, strategy="resa", quality="base", minPrice=150,
+             channel="direct", payers=6),
+        dict(zone="colli", bedrooms=0, baths=1.5, guests=2, strategy="occupazione", quality="media", cost=0,
+             channel="airbnb", feePct=12, vat=False, payers=2),
     ]
     spans = [(1, 90), (1, 90), (100, 140), (0, 40), (200, 360)]
     for c, (a, b) in zip(cases, spans):
@@ -32,8 +34,13 @@ def test_app_and_program_agree(world, tmp_path):
                          capture_output=True, text=True, check=True)
     js = json.loads(out.stdout)
     for c, j in zip(cases, js):
+        fee = pricing.fee_share(model, c["channel"], c.get("feePct"), c.get("vat"))
+        assert abs(fee - j["feeShare"]) < 1e-9
         py = pricing.recommend(model, c["zone"], c["bedrooms"], c["baths"], c["guests"], date.fromisoformat(c["start"]),
-                               date.fromisoformat(c["end"]), c["strategy"], c["quality"], c.get("minPrice", 0.0), c.get("cost"))
+                               date.fromisoformat(c["end"]), c["strategy"], c["quality"], c.get("minPrice", 0.0), c.get("cost"),
+                               fee=fee, payers=c["payers"], tax_mode=pricing.channel(model, c["channel"])["tax"])
+        assert abs(py["net"] - j["net"]) <= max(3, 0.002 * abs(py["net"]))
+        assert abs(py["fees"] - j["fees"]) <= max(2, 0.002 * py["fees"]) and abs(py["tax"] - j["tax"]) <= max(2, 0.004 * py["tax"])
         assert len(py["nights"]) == len(j["nights"]) > 0
         assert abs(py["cost"] - j["cost"]) <= 1
         assert abs(py["avg_price"] - j["avgPrice"]) <= 1
@@ -45,5 +52,7 @@ def test_app_and_program_agree(world, tmp_path):
             assert a["date"] == b["date"] and a["events"] == b["events"] and a["measured"] == b["measured"]
             assert abs(a["price"] - b["price"]) <= 1 and abs(a["market"] - b["market"]) <= 1
             assert abs(a["sell"] - b["sell"]) < 2e-3
+            if abs(a["price"] - b["price"]) == 0:
+                assert abs(a["fee"] - b["fee"]) < 0.01 and abs(a["payout"] - b["payout"]) < 0.01 and abs(a["tax"] - b["tax"]) < 0.01
             assert [p["lead"] for p in a["plan"]] == [p["lead"] for p in b["plan"]]
             assert all(abs(x["price"] - y["price"]) <= 1 for x, y in zip(a["plan"], b["plan"]))

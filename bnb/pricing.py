@@ -76,9 +76,60 @@ def default_cost(model: dict, attr: float) -> float:
     return round(model.get("cost_share", 0.30) * math.exp(attr + base[len(base) // 2]))
 
 
+DEFAULT_FEES = {
+    "vat": 0.22,
+    "channels": [
+        {"id": "airbnb", "name": "Airbnb", "fee": 15.5, "vat": True, "tax": "portal"},
+        {"id": "booking", "name": "Booking.com", "fee": 16.5, "vat": True, "tax": "host"},
+        {"id": "vrbo", "name": "Vrbo", "fee": 8.0, "vat": True, "tax": "host"},
+        {"id": "direct", "name": "Prenotazione diretta", "fee": 0.0, "vat": False, "tax": "host"},
+    ],
+    "tourist_tax": {"year": 2026, "portal_rate": 0.105, "cap": 7.0,
+                    "bands": [[31, 4.0], [71, 5.8], [121, 6.5], [None, 7.0]], "max_nights": 5},
+}
+
+
+def fees_of(model: dict) -> dict:
+    return model.get("fees") or DEFAULT_FEES
+
+
+def channel(model: dict, channel_id: str | None) -> dict:
+    chans = fees_of(model)["channels"]
+    return next((c for c in chans if c["id"] == channel_id), chans[0])
+
+
+def fee_share(model: dict, channel_id: str | None = None, fee: float | None = None, vat: bool | None = None) -> float:
+    """Quota del prezzo che il portale trattiene: la commissione (in %), con l'IVA sopra se dovuta."""
+    ch = channel(model, channel_id)
+    pct = ch["fee"] if fee is None else float(fee)
+    with_vat = ch.get("vat", False) if vat is None else bool(vat)
+    return min(0.9, max(0.0, pct / 100.0 * (1 + (fees_of(model).get("vat", 0.22) if with_vat else 0.0))))
+
+
+def tourist_tax(model: dict, price: float, payers: float, mode: str) -> float:
+    """Imposta di soggiorno per una notte, per tutti gli ospiti che la pagano.
+
+    mode "portal": la riscuote il portale che incassa l'affitto (Airbnb) come percentuale del prezzo, con un
+    tetto a persona. mode "host": la riscuote chi ospita, a scaglioni sul prezzo a persona a notte.
+    """
+    tt = fees_of(model).get("tourist_tax")
+    if not tt or payers <= 0 or price <= 0:
+        return 0.0
+    if mode == "portal":
+        return float(min(tt["portal_rate"] * price, tt["cap"] * payers))
+    each = price / payers
+    for limit, amount in tt["bands"]:
+        if limit is None or each < limit:
+            return float(amount * payers)
+    return float(tt["bands"][-1][1] * payers)
+
+
 def solve_night(h: np.ndarray, beta: float, m: float, lo: float, hi: float, strategy: str, target: float,
-                cost: float = 0.0, floor_price: float = 0.0) -> dict:
-    """Prezzo di oggi per una notte, con probabilità di venderla e incasso atteso."""
+                cost: float = 0.0, floor_price: float = 0.0, keep: float = 1.0) -> dict:
+    """Prezzo di oggi per una notte, con probabilità di venderla e incasso atteso.
+
+    keep = quota del prezzo che resta dopo la commissione del portale: la massima resa guarda a quella.
+    """
     lo_eff = max(lo, math.log(max(floor_price, 1e-9) / m))     # mai sotto il prezzo minimo dell'utente
     hi_eff = max(hi, lo_eff)
     lnr = np.linspace(lo_eff, hi_eff, GRID)
@@ -93,12 +144,12 @@ def solve_night(h: np.ndarray, beta: float, m: float, lo: float, hi: float, stra
         ok = np.flatnonzero(sell >= target)
         j = int(ok[-1]) if len(ok) else 0
         return {"rel": float(r[j]), "sell": float(sell[j]), "gross": float(r[j] * m * sell[j]),
-                "net": float((r[j] * m - cost) * sell[j]), "sell_market": sell_market, "plan": []}
+                "net": float((r[j] * m * keep - cost) * sell[j]), "sell_market": sell_market, "plan": []}
     V = G = Q = 0.0
     policy = []
     for k in range(len(h) - 1, -1, -1):                          # dall'ultimo giorno utile a oggi
         hr = _expit(lg[k] + beta * lnr)
-        val = hr * (r * m - cost) + (1 - hr) * V
+        val = hr * (r * m * keep - cost) + (1 - hr) * V
         j = int(np.argmax(val))
         G = hr[j] * r[j] * m + (1 - hr[j]) * G
         Q = hr[j] + (1 - hr[j]) * Q
@@ -111,8 +162,15 @@ def solve_night(h: np.ndarray, beta: float, m: float, lo: float, hi: float, stra
 
 
 def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, start: date, end: date,
-              strategy: str = "resa", quality: str = "media", min_price: float = 0.0, cost: float | None = None) -> dict:
-    """Notti da `start` a `end` comprese. `cost` = costo variabile per notte prenotata (None = valore di partenza)."""
+              strategy: str = "resa", quality: str = "media", min_price: float = 0.0, cost: float | None = None,
+              fee: float = 0.0, payers: float = 2.0, tax_mode: str = "portal") -> dict:
+    """Notti da `start` a `end` comprese.
+
+    cost      costo variabile per notte prenotata (None = valore di partenza)
+    fee       quota del prezzo trattenuta dal portale (vedi fee_share); 0 = nessuna commissione
+    payers    ospiti che pagano l'imposta di soggiorno; tax_mode dice chi la riscuote (vedi tourist_tax)
+    """
+    keep = 1.0 - fee
     t0 = date.fromisoformat(model["start"])
     lo, hi = price_band(model)
     q = dict(zip(model["q_levels"], model["q_values"]))
@@ -134,12 +192,14 @@ def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, 
         k = (d - t0).days
         if 0 <= k < len(model["idx"]):
             m = math.exp(attr + model["idx"][k])
-            s = solve_night(night_hazards(model, thetas[k], k), beta, m, lo, hi, strategy, target, cost, min_price)
+            s = solve_night(night_hazards(model, thetas[k], k), beta, m, lo, hi, strategy, target, cost, min_price, keep)
             price = max(1, round(s["rel"] * m))
+            tax = tourist_tax(model, price, payers, tax_mode)
             evs = sorted(ev_by_night.get(d.isoformat(), []), key=lambda e: -e["weight"])
             nights.append({
                 "date": d.isoformat(), "lead": k, "price": int(price), "sell": round(s["sell"], 3),
                 "gross": round(s["gross"], 1), "net": round(s["net"], 1),
+                "fee": round(price * fee, 2), "payout": round(price * keep, 2), "tax": round(tax, 2),
                 "market": round(m), "sell_market": round(s["sell_market"], 3),
                 "low": round(m * math.exp(q[25])), "high": round(m * math.exp(q[75])),
                 "floor": round(m * math.exp(lo)), "cap": round(m * math.exp(hi)),
@@ -152,7 +212,9 @@ def recommend(model: dict, zone: str, bedrooms: int, baths: float, guests: int, 
         d += timedelta(days=1)
     n = len(nights)
     return {
-        "strategy": strategy, "cost": cost, "nights": nights,
+        "strategy": strategy, "cost": cost, "nights": nights, "fee": fee, "tax_mode": tax_mode, "payers": payers,
+        "fees": round(sum(x["gross"] for x in nights) * fee),
+        "tax": round(sum(x["tax"] * x["sell"] for x in nights)),
         "avg_price": round(sum(x["price"] for x in nights) / n) if n else 0,
         "occupancy": round(sum(x["sell"] for x in nights) / n, 3) if n else 0.0,
         "revenue": round(sum(x["gross"] for x in nights)),

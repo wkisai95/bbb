@@ -71,3 +71,22 @@ sources:
   inside_airbnb: true        # dati aperti trimestrali (CC BY 4.0): catalogo iniziale e capienze
   inside_airbnb_every_days: 7
   events_auto: true          # rilegge i calendari pubblici di BolognaFiere e Bologna Welcome
+
+# Commissioni dei portali e imposta di soggiorno: entrano nel calcolo del guadagno. Sono i valori di partenza;
+# dall'app si scelgono portale, commissione e numero di ospiti appartamento per appartamento.
+fees:
+  vat: 0.22                  # IVA che i portali applicano sulla loro commissione a chi affitta da privato
+  channels:
+    # fee = commissione in % del prezzo pagato dall'ospite · tax = chi riscuote l'imposta di soggiorno
+    - {id: airbnb, name: Airbnb, fee: 15.5, vat: true, tax: portal}                  # commissione unica, trattenuta dal compenso
+    - {id: booking, name: Booking.com, fee: 16.5, vat: true, tax: host}              # 15% più 1,5% per i pagamenti
+    - {id: vrbo, name: Vrbo, fee: 8.0, vat: true, tax: host}                         # indicativa: verificare sul proprio contratto
+    - {id: direct, name: Prenotazione diretta, fee: 0.0, vat: false, tax: host}
+  # Comune di Bologna, tariffe in vigore dal 1° gennaio al 31 dicembre 2026 (delibera DG/PRO/2025/283).
+  tourist_tax:
+    year: 2026
+    portal_rate: 0.105       # quando l'affitto lo incassa un portale che riscuote l'imposta (Airbnb): 10,5% del prezzo...
+    cap: 7.0                 # ...fino a 7 € a persona a notte
+    # negli altri casi la riscuote chi ospita: [prezzo a persona a notte sotto questa soglia, € a persona a notte]
+    bands: [[31, 4.0], [71, 5.8], [121, 6.5], [null, 7.0]]
+    max_nights: 5            # notti consecutive tassate al massimo; esenti i residenti e i minori di 14 anni

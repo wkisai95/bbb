@@ -57,7 +57,42 @@
     return Math.round(share * Math.exp(attr + base[Math.floor(base.length / 2)]));
   }
 
-  function solveNight(h, beta, m, lo, hi, strategy, target, cost, floorPrice) {
+  var DEFAULT_FEES = {
+    vat: 0.22,
+    channels: [
+      { id: "airbnb", name: "Airbnb", fee: 15.5, vat: true, tax: "portal" },
+      { id: "booking", name: "Booking.com", fee: 16.5, vat: true, tax: "host" },
+      { id: "vrbo", name: "Vrbo", fee: 8.0, vat: true, tax: "host" },
+      { id: "direct", name: "Prenotazione diretta", fee: 0.0, vat: false, tax: "host" }
+    ],
+    tourist_tax: { year: 2026, portal_rate: 0.105, cap: 7.0, bands: [[31, 4.0], [71, 5.8], [121, 6.5], [null, 7.0]], max_nights: 5 }
+  };
+  function feesOf(model) { return (model && model.fees) || DEFAULT_FEES; }
+  function channel(model, id) {
+    var list = feesOf(model).channels;
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return list[0];
+  }
+  /* quota del prezzo trattenuta dal portale: commissione in %, con l'IVA sopra se dovuta */
+  function feeShare(model, id, fee, vat) {
+    var ch = channel(model, id), f = feesOf(model);
+    var pct = (fee === undefined || fee === null || fee === "") ? ch.fee : +fee;
+    var withVat = (vat === undefined || vat === null) ? !!ch.vat : !!vat;
+    return clamp(pct / 100 * (1 + (withVat ? (f.vat === undefined ? 0.22 : f.vat) : 0)), 0, 0.9);
+  }
+  /* imposta di soggiorno per una notte, per tutti gli ospiti paganti: "portal" = percentuale con tetto a persona
+     (la riscuote il portale), "host" = scaglioni sul prezzo a persona (la riscuote chi ospita) */
+  function touristTax(model, price, payers, mode) {
+    var tt = feesOf(model).tourist_tax;
+    if (!tt || !(payers > 0) || !(price > 0)) return 0;
+    if (mode === "portal") return Math.min(tt.portal_rate * price, tt.cap * payers);
+    var each = price / payers;
+    for (var i = 0; i < tt.bands.length; i++) if (tt.bands[i][0] === null || each < tt.bands[i][0]) return tt.bands[i][1] * payers;
+    return tt.bands[tt.bands.length - 1][1] * payers;
+  }
+
+  function solveNight(h, beta, m, lo, hi, strategy, target, cost, floorPrice, keepShare) {
+    var ks = keepShare === undefined ? 1 : keepShare;
     var loEff = Math.max(lo, Math.log(Math.max(floorPrice || 0, 1e-9) / m));
     var hiEff = Math.max(hi, loEff);
     var lnr = new Float64Array(GRID), r = new Float64Array(GRID), i, k;
@@ -76,14 +111,14 @@
         if (first) { bestSell = s; first = false; }
         if (s >= target) { best = i; bestSell = s; }
       }
-      return { rel: r[best], sell: bestSell, gross: r[best] * m * bestSell, net: (r[best] * m - cost) * bestSell, sellMarket: sellMarket, plan: [] };
+      return { rel: r[best], sell: bestSell, gross: r[best] * m * bestSell, net: (r[best] * m * ks - cost) * bestSell, sellMarket: sellMarket, plan: [] };
     }
     var V = 0, G = 0, Q = 0, policy = new Float64Array(n);
     for (k = n - 1; k >= 0; k--) {
       var bj = 0, bv = -Infinity, bh = 0;
       for (i = 0; i < GRID; i++) {
         var hr = expit(lg[k] + beta * lnr[i]);
-        var val = hr * (r[i] * m - cost) + (1 - hr) * V;
+        var val = hr * (r[i] * m * ks - cost) + (1 - hr) * V;
         if (val > bv) { bv = val; bj = i; bh = hr; }
       }
       G = bh * r[bj] * m + (1 - bh) * G;
@@ -123,7 +158,8 @@
     return { score: score, label: score >= 0.7 ? "alta" : score >= 0.4 ? "media" : "bassa", parts: parts, comparables: comp };
   }
 
-  /* p = {zone, bedrooms, baths, guests, start, end, strategy, quality, minPrice, cost} — notti da start a end comprese */
+  /* p = {zone, bedrooms, baths, guests, start, end, strategy, quality, minPrice, cost, fee, payers, taxMode}
+     notti da start a end comprese; fee = quota trattenuta dal portale (0..1), payers = ospiti che pagano l'imposta */
   function recommend(model, p) {
     var t0 = parseDate(model.start), band = priceBand(model), q = quantiles(model);
     var lo = band[0], hi = band[1], beta = model.beta, target = model.target_occupancy;
@@ -132,16 +168,19 @@
     model.zones.forEach(function (z) { if (z.id === p.zone) grp = z.group; });
     var thetas = model.theta[segClass(Math.round(p.bedrooms))][grp];
     var cost = (p.cost === undefined || p.cost === null) ? defaultCost(model, attr) : p.cost;
+    var fee = p.fee || 0, keepShare = 1 - fee, payers = p.payers === undefined ? 2 : p.payers, taxMode = p.taxMode || "portal";
     var evs = eventsByNight(model), nights = [];
-    var sums = { price: 0, sell: 0, gross: 0, net: 0, market: 0, sellMarket: 0, marketRev: 0 };
+    var sums = { price: 0, sell: 0, gross: 0, net: 0, market: 0, sellMarket: 0, marketRev: 0, tax: 0 };
     for (var t = parseDate(p.start); t <= parseDate(p.end); t += DAY) {
       var k = Math.round((t - t0) / DAY);
       if (k < 0 || k >= model.idx.length) continue;
       var m = Math.exp(attr + model.idx[k]);
-      var s = solveNight(nightHazards(model, thetas[k], k), beta, m, lo, hi, p.strategy || "resa", target, cost, p.minPrice || 0);
+      var s = solveNight(nightHazards(model, thetas[k], k), beta, m, lo, hi, p.strategy || "resa", target, cost, p.minPrice || 0, keepShare);
       var price = Math.max(1, Math.round(s.rel * m)), date = isoDate(t), list = evs[date] || [];
+      var tax = touristTax(model, price, payers, taxMode);
       var night = {
         date: date, lead: k, price: price, sell: s.sell, gross: s.gross, net: s.net,
+        fee: price * fee, payout: price * keepShare, tax: tax,
         market: Math.round(m), sellMarket: s.sellMarket,
         low: Math.round(m * Math.exp(q[25])), high: Math.round(m * Math.exp(q[75])),
         floor: Math.round(m * Math.exp(lo)), cap: Math.round(m * Math.exp(hi)),
@@ -155,10 +194,12 @@
       nights.push(night);
       sums.price += price; sums.sell += s.sell; sums.gross += s.gross; sums.net += s.net;
       sums.market += night.market; sums.sellMarket += s.sellMarket; sums.marketRev += night.market * s.sellMarket;
+      sums.tax += tax * s.sell;
     }
     var n = nights.length || 1;
     return {
-      strategy: p.strategy || "resa", cost: cost, nights: nights,
+      strategy: p.strategy || "resa", cost: cost, nights: nights, fee: fee, taxMode: taxMode, payers: payers,
+      fees: Math.round(sums.gross * fee), tax: Math.round(sums.tax),
       avgPrice: Math.round(sums.price / n), occupancy: sums.sell / n,
       revenue: Math.round(sums.gross), net: Math.round(sums.net),
       marketAvg: Math.round(sums.market / n), marketOccupancy: sums.sellMarket / n, marketRevenue: Math.round(sums.marketRev),
@@ -168,6 +209,7 @@
 
   return {
     recommend: recommend, attrLevel: attrLevel, defaultCost: defaultCost, priceBand: priceBand,
+    feesOf: feesOf, channel: channel, feeShare: feeShare, touristTax: touristTax,
     nightHazards: nightHazards, solveNight: solveNight, reliability: reliability, eventsByNight: eventsByNight,
     parseDate: parseDate, isoDate: isoDate, DAY: DAY
   };
