@@ -12,7 +12,7 @@ Le versioni sono anche nelle [release](https://github.com/wkisai95/bbb/releases/
 
 | Sezione | Cosa fa |
 |---|---|
-| **Prezzi** | Imposti il tuo appartamento (zona, camere, bagni, ospiti, qualità, prezzo minimo, costi, **portale e commissione**, ospiti che pagano la tassa di soggiorno) e scegli **Massima resa** o **Massima occupazione**. Calendario dei prossimi 30, 60 o 90 giorni con il prezzo da impostare oggi per ogni notte; toccando una notte vedi dove cade rispetto ai comparabili, la probabilità di venderla, **quanto ti resta tolta la commissione, la tassa di soggiorno e chi la riscuote**, il prezzo da mettere sugli altri portali per avere lo stesso netto. Esporta in CSV. |
+| **Prezzi** | Imposti il tuo appartamento (zona, camere, bagni, ospiti, qualità, prezzo minimo, costi, **portale e commissione**, ospiti che pagano la tassa di soggiorno) e scegli **Massima resa** o **Massima occupazione**. Calendario dei prossimi 30, 60 o 90 giorni con il prezzo da impostare oggi per ogni notte; toccando una notte vedi dove cade rispetto ai comparabili, la probabilità di venderla, **quanto ti resta tolta la commissione, la tassa di soggiorno e chi la riscuote**, il prezzo da mettere sugli altri portali per avere lo stesso netto. I prezzi si possono vedere **al lordo** (quelli da mettere sul portale) o **al netto della commissione**. Esporta in CSV. |
 | **Mercato** | Il catalogo: fascia di prezzo e mediana per zona, camere, bagni, ospiti, quartiere. Toccando una riga, l'elenco degli annunci con il link ad Airbnb. In fondo, **chi viene prenotato**: quante prenotazioni sono state rilevate e a che prezzo, rispetto a chi è rimasto libero. |
 | **Eventi** | Livello dei prezzi nei prossimi 12 mesi e calendario di fiere, concerti, ponti, con l'aumento dei prezzi misurato o stimato. Puoi aggiungere i tuoi eventi. |
 | **Dati** | Stato dell'ultima scansione, precisione del modello, avvio di una scansione, **backup completo in ZIP**, esportazione e importazione delle impostazioni. |
@@ -53,7 +53,10 @@ simili per quella notte, e comunque non oltre il 25% sotto o il 40% sopra la lor
 6. **Domanda.** Per ogni notte, la probabilità giornaliera che venga prenotata. Entro 30 giorni il ritmo è
    quello misurato seguendo gli alloggi uno per uno; più lontano viene dai conteggi dei liberi, contando come
    prenotazione solo il calo delle ultime settimane (molto prima gli alloggi liberi sono meno perché tanti
-   calendari non sono ancora aperti, e quello non viene scambiato per domanda).
+   calendari non sono ancora aperti, e quello non viene scambiato per domanda). Il ritmo "tipico" si stima
+   sulle notti feriali senza eventi; fine settimana, eventi e feste corrono di più, e di quanto lo dice la
+   loro disponibilità rispetto al tipico. Nei primi giorni, prima che ci siano confronti tra letture della
+   stessa data, questa stima è la parte più incerta del modello.
 7. **Sensibilità al prezzo.** Tra gli alloggi liberi a una lettura, guarda chi è stato prenotato prima della
    successiva rispetto al proprio prezzo, a parità di zona, taglia e qualità.
 8. **App.** Scarica `public/model.json` dal ramo `data` e fa i conti sul telefono (`app/web/pricing.js`,
@@ -181,7 +184,7 @@ tests/          test, compresa una prova d'insieme su un mercato simulato di cui
 
 ```
 pip install -r requirements.txt pytest
-python -m pytest tests -q            # 42 test, mezzo minuto
+python -m pytest tests -q            # 44 test, mezzo minuto
 python -m bnb all --out out          # scansione + modello + file per l'app + backup
 python -m bnb model --out out        # solo ricalcolo dai dati già raccolti
 ```

@@ -35,7 +35,7 @@
     return el;
   }
   var nf = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 0, useGrouping: "always" });
-  function euro(n) { return nf.format(Math.round(n)) + " €"; }
+  function euro(n) { return nf.format(Math.round(n)) + "\u00a0€"; }      // spazio che non va a capo
   function pct(x) { return Math.round(x * 100) + "%"; }
   function signedPct(x) { var v = Math.round(x * 100); return (v > 0 ? "+" : "") + v + "%"; }
   function fmtDate(ms, opts) { opts = opts || { day: "numeric", month: "short" }; opts.timeZone = "UTC"; return new Intl.DateTimeFormat("it-IT", opts).format(new Date(ms)); }
@@ -61,7 +61,7 @@
   function defaults() {
     return { repo: { owner: DEFAULT_REPO.owner, name: DEFAULT_REPO.name, branch: DEFAULT_REPO.branch, token: "" },
       apartments: [{ id: "a1", name: "Il mio appartamento", zone: "c_maggiore", bedrooms: 1, baths: 1, guests: 3, quality: "media", minPrice: 0, cost: null, channel: "airbnb", fee: null, vat: null, payers: 2 }],
-      current: "a1", configured: false, strategy: "resa", period: 30, customEvents: [] };
+      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", customEvents: [] };
   }
   function loadState() {
     var d = defaults();
@@ -197,8 +197,12 @@
     });
     return best;
   }
+  /* prezzi mostrati al lordo (quelli da mettere sul portale) o al netto della commissione del portale */
+  function netView() { return state.priceView === "netto"; }
+  function keepShare() { return 1 - aptFees(apt()).share; }
+  function pv(x) { return netView() ? Math.round(x * keepShare()) : x; }
   function pct1(x) { return (x * 100).toFixed(1).replace(".", ",").replace(",0", "") + "%"; }
-  function euro2(x) { return (Math.round(x * 100) / 100).toFixed(2).replace(".", ",").replace(",00", "") + " €"; }
+  function euro2(x) { return (Math.round(x * 100) / 100).toFixed(2).replace(".", ",").replace(",00", "") + "\u00a0€"; }
   function guestsWord(n) { return n + (n === 1 ? " ospite" : " ospiti"); }
   function zoneName(id, short) {
     var z = (model() ? model().zones : []).filter(function (x) { return x.id === id; })[0];
@@ -296,15 +300,19 @@
 
     root.appendChild(seg([["resa", "Massima resa"], ["occupazione", "Massima occupazione"]], state.strategy, function (v) { state.strategy = v; saveState(); render(); }));
     root.appendChild(chips([[30, "30 notti"], [60, "60 notti"], [90, "90 notti"]], state.period, function (v) { state.period = v; saveState(); render(); }));
+    var f = aptFees(a), net = netView();
+    root.appendChild(seg([["lordo", "Prezzi lordi"], ["netto", "Netti, tolta la commissione"]], net ? "netto" : "lordo", function (v) { state.priceView = v; saveState(); render(); }));
+    root.lastChild.classList.add("sm");
 
     root.appendChild(h("div", { class: "sum" },
-      h("div", {}, h("b", { text: euro(rec.avgPrice) }), h("span", { text: "prezzo medio a notte" })),
-      h("div", {}, h("b", { text: pct(rec.occupancy) }), h("span", { text: "notti che ti aspetti di vendere" })),
+      h("div", {}, h("b", { text: euro(pv(rec.avgPrice)) }), h("span", { text: net ? "prezzo medio a notte, netto" : "prezzo medio a notte" })),
+      h("div", {}, h("b", { text: pct(rec.occupancy) }), h("span", { text: "notti che ti aspetti di vendere, se oggi sono libere" })),
       h("div", {}, h("b", { text: euro(rec.net) }), h("span", { text: "guadagno atteso, tolte commissioni e costi" }))));
-    var f = aptFees(a);
-    root.appendChild(h("p", { class: "alt" }, "Incasso atteso " + euro(rec.revenue) +
-      (rec.fee > 0 ? ", commissioni " + f.ch.name + " " + euro(rec.fees) + " (" + pct1(rec.fee) + ")" : ", nessuna commissione") +
-      ", costi " + euro(rec.cost) + " per notte venduta" + (blank(a.cost) ? " (stima)" : "") + ". Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(other.avgPrice) + " a notte, " + pct(other.occupancy) + " di notti vendute, guadagno " + euro(other.net) + ". ",
+    var income = net
+      ? "Incasso atteso " + euro(rec.revenue - rec.fees) + " al netto delle commissioni (" + euro(rec.revenue) + " lordi" + (rec.fee > 0 ? ", " + euro(rec.fees) + " a " + f.ch.name : "") + ")"
+      : "Incasso atteso " + euro(rec.revenue) + (rec.fee > 0 ? ", commissioni " + f.ch.name + " " + euro(rec.fees) + " (" + pct1(rec.fee) + ")" : ", nessuna commissione");
+    root.appendChild(h("p", { class: "alt" }, income +
+      ", costi " + euro(rec.cost) + " per notte venduta" + (blank(a.cost) ? " (stima)" : "") + ". Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa") + ": " + euro(pv(other.avgPrice)) + " a notte" + (net ? " netti" : "") + ", " + pct(other.occupancy) + " di notti vendute, guadagno " + euro(other.net) + ". ",
       h("button", { onclick: function () { state.strategy = other.strategy; saveState(); render(); }, text: "Passa a questa" })));
     var taxAvg = rec.nights.length ? rec.nights.reduce(function (t, n) { return t + n.tax; }, 0) / rec.nights.length : 0;
     if (taxAvg > 0) {
@@ -328,7 +336,10 @@
       listView(root, rec);
     }
     root.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () { exportCsv(rec); }, text: "Esporta questi prezzi (CSV)" })));
-    root.appendChild(h("p", { class: "note", text: "Prezzi per notte pagati dall'ospite, pulizie e commissioni incluse, tassa di soggiorno esclusa. Il prezzo è quello da impostare oggi: riapri l'app nei prossimi giorni, perché cambia con le prenotazioni del mercato." }));
+    root.appendChild(h("p", { class: "note", text: (net
+      ? "Prezzi per notte al netto della commissione " + f.ch.name + " (" + pct1(f.share) + "): quanto ti resta prima dei costi. Sul portale va messo il prezzo lordo, che trovi toccando la notte."
+      : "Prezzi per notte pagati dall'ospite, pulizie e commissioni incluse, tassa di soggiorno esclusa.") +
+      " Il prezzo è quello da impostare oggi: riapri l'app nei prossimi giorni, perché cambia con le prenotazioni del mercato. La percentuale di notti vendute conta solo quelle ancora libere oggi." }));
   }
 
   function calendar(root, rec) {
@@ -348,9 +359,9 @@
         var ms = Date.UTC(y, mo, i), n = byDate[P.isoDate(ms)];
         if (!n) { grid.appendChild(h("div", { class: "cell off" }, h("span", { class: "d", text: i }))); continue; }
         var cls = "cell " + heatClass(n.uplift) + (n.measured ? "" : " guess") + (ms === today ? " today" : "");
-        var label = longDate(ms) + ": " + n.price + " euro" + (n.events.length ? ", " + n.events[0] : "");
+        var label = longDate(ms) + ": " + pv(n.price) + (netView() ? " euro netti" : " euro") + (n.events.length ? ", " + n.events[0] : "");
         grid.appendChild(h("button", { class: cls, "aria-label": label, onclick: (function (x) { return function () { daySheet(x); }; })(n) },
-          h("span", { class: "d", text: i }), h("span", { class: "p", text: n.price }),
+          h("span", { class: "d", text: i }), h("span", { class: "p", text: pv(n.price) }),
           n.weight >= 2 ? h("span", { class: "e", style: "height:" + n.weight + "px" }) : null));
       }
       root.appendChild(h("section", { class: "month" }, h("h3", { text: fmtDate(cur, { month: "long", year: "numeric" }) }),
@@ -364,9 +375,9 @@
     rec.nights.forEach(function (n) {
       tb.appendChild(h("tr", { class: "tap", onclick: function () { daySheet(n); } },
         h("td", {}, fmtDate(P.parseDate(n.date), { weekday: "short", day: "numeric", month: "short" }), n.events.length ? h("small", { text: n.events[0] }) : null),
-        h("td", {}, euro(n.price)), h("td", {}, pct(n.sell)), h("td", {}, euro(n.market))));
+        h("td", {}, euro(pv(n.price))), h("td", {}, pct(n.sell)), h("td", {}, euro(pv(n.market)))));
     });
-    root.appendChild(h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", { text: "Notte" }), h("th", { text: "Prezzo" }), h("th", { text: "Prob. vendita" }), h("th", { text: "Comparabili" }))), tb));
+    root.appendChild(h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", { text: "Notte" }), h("th", { text: netView() ? "Netto" : "Prezzo" }), h("th", { text: "Prob. vendita" }), h("th", { text: "Comparabili" }))), tb));
   }
 
   function daySheet(n) {
@@ -378,18 +389,20 @@
           return h("span", { class: "tag" }, h("i", { style: "background:var(--" + (CAT[e.category] || CAT.altro)[1] + ")" }), e.name + (e.venue ? " (" + e.venue + ")" : ""));
         })));
       }
-      body.appendChild(h("div", { class: "price-hero" }, h("b", { text: euro(n.price) }),
-        h("span", { text: n.lead === 0 ? "per stanotte" : "a notte, da impostare oggi" })));
+      var fz = aptFees(apt()), net = netView();
+      var you = pv(n.price), low = pv(n.low), high = pv(n.high), med = pv(n.market);
+      body.appendChild(h("div", { class: "price-hero" }, h("b", { text: euro(you) }),
+        h("span", { text: net ? "a notte al netto della commissione " + fz.ch.name + "; sul portale " + euro(n.price) : n.lead === 0 ? "per stanotte" : "a notte, da impostare oggi" })));
       // dove cade il prezzo rispetto ai comparabili
-      var lo = Math.min(n.floor, n.price, n.low), hi = Math.max(n.cap, n.price, n.high), span = Math.max(1, hi - lo);
+      var lo = Math.min(pv(n.floor), you, low), hi = Math.max(pv(n.cap), you, high), span = Math.max(1, hi - lo);
       function x(v) { return ((v - lo) / span * 100).toFixed(2) + "%"; }
-      var pos = (n.price - lo) / span * 100;
-      body.appendChild(h("div", { class: "band-fig", role: "img", "aria-label": "Il prezzo consigliato è " + n.price + " euro; metà dei comparabili sta tra " + n.low + " e " + n.high + " euro, mediana " + n.market },
-        h("span", { class: "lab up" + (pos < 14 ? " l" : pos > 86 ? " r" : ""), style: pos < 14 || pos > 86 ? "" : "left:" + x(n.price), text: "consigliato" }),
-        h("span", { class: "rail" }), h("span", { class: "iqr", style: "left:" + x(n.low) + ";width:" + ((n.high - n.low) / span * 100).toFixed(2) + "%" }),
-        h("span", { class: "med", style: "left:" + x(n.market) }), h("span", { class: "you", style: "left:" + x(n.price) }),
+      var pos = (you - lo) / span * 100;
+      body.appendChild(h("div", { class: "band-fig", role: "img", "aria-label": "Il prezzo consigliato è " + you + " euro; metà dei comparabili sta tra " + low + " e " + high + " euro, mediana " + med },
+        h("span", { class: "lab up" + (pos < 14 ? " l" : pos > 86 ? " r" : ""), style: pos < 14 || pos > 86 ? "" : "left:" + x(you), text: "consigliato" }),
+        h("span", { class: "rail" }), h("span", { class: "iqr", style: "left:" + x(low) + ";width:" + ((high - low) / span * 100).toFixed(2) + "%" }),
+        h("span", { class: "med", style: "left:" + x(med) }), h("span", { class: "you", style: "left:" + x(you) }),
         h("span", { class: "lab dn l", text: euro(lo) }), h("span", { class: "lab dn r", text: euro(hi) })));
-      body.appendChild(h("p", { class: "note", text: "Fascia colorata: metà degli appartamenti simili (" + euro(n.low) + "–" + euro(n.high) + "). Tacca: la loro mediana, " + euro(n.market) + "." }));
+      body.appendChild(h("p", { class: "note", text: "Fascia colorata: metà degli appartamenti simili (" + euro(low) + "–" + euro(high) + "). Tacca: la loro mediana, " + euro(med) + "." + (net ? " Anche i loro prezzi sono al netto della stessa commissione, per confrontarli alla pari." : "") }));
 
       var dl = h("dl", { class: "kv" });
       function kv(k, v) { dl.appendChild(h("dt", { text: k })); dl.appendChild(h("dd", { text: v })); }
@@ -398,7 +411,7 @@
       kv("Prezzi rispetto a una notte normale", signedPct(n.uplift) + (n.measured ? "" : " (stima)"));
       kv("Mercato già occupato oggi", pct(n.occNow));
       kv("Mercato occupato alla data (previsione)", pct(n.occFin));
-      kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(alt.price));
+      kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(pv(alt.price)));
       body.appendChild(dl);
 
       // quanto resta, e la tassa di soggiorno
@@ -420,7 +433,7 @@
       if (n.plan.length >= 2) {
         body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la notte resta libera" }));
         body.appendChild(h("div", { class: "plan" }, n.plan.map(function (p) {
-          return h("div", {}, h("b", { text: euro(p.price) }), h("span", { text: "a " + p.lead + (p.lead === 1 ? " giorno" : " giorni") }));
+          return h("div", {}, h("b", { text: euro(pv(p.price)) }), h("span", { text: "a " + p.lead + (p.lead === 1 ? " giorno" : " giorni") }));
         })));
         body.appendChild(h("p", { class: "note", text: "Il prezzo scende avvicinandosi alla data: più passa il tempo, meno occasioni restano per venderla." }));
       }
@@ -538,7 +551,7 @@
     if (!m) return emptyState(root);
     var mk = m.market, all = mk.all || {};
     root.appendChild(h("p", {}, h("b", { text: nf.format(all.n || 0) + " appartamenti interi" }), " con prezzi letti negli ultimi giorni. A metà strada: ", h("b", { text: euro(all.med || 0) }), " a notte."));
-    root.appendChild(h("p", { class: "note", text: "Prezzi riportati a una notte normale, così zone e taglie si confrontano alla pari. Per ogni riga: la fascia dove sta metà degli annunci e, col pallino, la mediana." }));
+    root.appendChild(h("p", { class: "note", text: "Prezzi riportati a una notte normale, così zone e taglie si confrontano alla pari. Per ogni riga: la fascia dove sta metà degli annunci e, col pallino, la mediana." + (netView() ? " Qui i prezzi sono quelli pubblicati su Airbnb, al lordo delle commissioni." : "") }));
     root.appendChild(chips(DIMS, ui.dim, function (v) { ui.dim = v; render(); }));
     var rows = (mk[ui.dim] || []).filter(function (r) { return r.key !== "" && r.key !== "altro"; });
     if (!rows.length) { root.appendChild(h("p", { class: "empty", text: "Ancora nessun dato per questa vista." })); return; }
@@ -550,9 +563,9 @@
       list.appendChild(h("li", {}, h("button", { class: "rb", onclick: function () { listingsSheet(ui.dim, r.key); },
         "aria-label": dimLabel(ui.dim, r.key) + ": mediana " + r.med + " euro, da " + r.p25 + " a " + r.p75 + ", " + r.n + " annunci" },
         h("span", { class: "t", text: dimLabel(ui.dim, r.key) }),
-        h("span", { class: "s", text: nf.format(r.n) + " annunci, " + r.p25 + "–" + r.p75 + " €" }),
+        h("span", { class: "s", text: nf.format(r.n) + " annunci, " + r.p25 + "–" + r.p75 + "\u00a0€" }),
         h("span", { class: "track" }, h("span", { class: "band", style: "left:" + x(r.p25) + ";width:" + ((r.p75 - r.p25) / (hi - lo) * 100).toFixed(2) + "%" }), h("span", { class: "dot", style: "left:" + x(r.med) })),
-        h("span", { class: "v" }, r.med + " €", h("small", { text: "mediana" })))));
+        h("span", { class: "v" }, r.med + "\u00a0€", h("small", { text: "mediana" })))));
     });
     root.appendChild(list);
     root.appendChild(h("p", { class: "note", style: "margin-top:12px", text: "Scala da " + euro(lo) + " a " + euro(hi) + ". Tocca una riga per vedere gli annunci." }));
@@ -609,7 +622,7 @@
           h("div", { class: "main" }, h("div", { class: "t", text: r[ix.name] || "Annuncio " + r[ix.id] }),
             h("div", { class: "s", text: zoneName(zoneIds[r[ix.zone]], true) + ", " + (br === 0 ? "monolocale" : br + " cam.") + ", " + String(r[ix.baths]).replace(".", ",") + (r[ix.baths] === 1 ? " bagno, " : " bagni, ") + r[ix.guests] + (r[ix.guests_est] ? " ospiti (stima)" : " ospiti") + (r[ix.rating] ? ", " + String(r[ix.rating]).replace(".", ",") + " su " + r[ix.reviews] + " rec." : "") +
               (ix.booked !== undefined && r[ix.booked] > 0 ? ". Prenotato per " + r[ix.booked] + (r[ix.booked] === 1 ? " data" : " date") + (r[ix.booked_price] ? " a " + r[ix.booked_price] + " € a notte" : "") : "") })),
-          h("div", { class: "side" }, r[ix.price] + " €", h("small", { text: "apri" })))));
+          h("div", { class: "side" }, r[ix.price] + "\u00a0€", h("small", { text: "apri" })))));
       });
       body.appendChild(ul);
       if (rows.length > 120) body.appendChild(h("p", { class: "note", text: "Mostrati i primi 120. L'elenco completo è nel backup (data/listings.csv)." }));
@@ -816,7 +829,7 @@
       h("button", { class: "btn primary block", disabled: data.loading, onclick: function () { loadData(true); loadRun(); }, text: data.loading ? "Aggiorno…" : "Aggiorna i dati" }),
       h("button", { class: "btn block", onclick: startScan, text: "Avvia una scansione adesso" }),
       h("button", { class: "btn block", onclick: function () { downloadUrl(base + "/releases/download/backup/bbb-backup.zip", "bbb-backup.zip"); }, text: "Scarica il backup completo (ZIP)" }),
-      h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
+      h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period, priceView: state.priceView }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
       h("button", { class: "btn block", onclick: importSettings, text: "Importa appartamenti ed eventi" }),
       h("button", { class: "btn block", onclick: function () { openExternal(base + "/actions"); }, text: "Apri le esecuzioni su GitHub" })));
     root.appendChild(h("p", { class: "note", text: "Il backup contiene tutto lo storico: prezzi giorno per giorno, catalogo, conteggi, modello. Finisce nella cartella Download del telefono." }));

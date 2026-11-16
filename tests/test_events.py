@@ -91,3 +91,26 @@ def test_seed_file_is_valid():
     assert all(e.end >= e.start and 1 <= e.weight <= 5 for e in seed)
     cos = next(e for e in seed if e.name.startswith("Cosmoprof"))
     assert (cos.start, cos.end, cos.weight) == (date(2027, 3, 18), date(2027, 3, 21), 5)
+
+
+def test_christmas_holidays_are_busy_nights():
+    """Le scansioni mostrano che dal 26 dicembre al 4 gennaio la città è molto più piena di una notte qualsiasi."""
+    from bnb import events as ev
+
+    nw = ev.night_weights(ev.holidays(date(2026, 12, 1), date(2027, 1, 31)))
+    w = lambda m, d, y=2026: nw.get(date(y, m, d), (0, []))[0]
+    assert w(12, 24) == 1 and w(12, 25) == 1
+    assert all(w(12, d) >= 2 for d in range(26, 32)) and all(w(1, d, 2027) >= 2 for d in range(1, 5))
+    assert w(12, 30) == 3 and w(12, 31) == 3 and w(1, 1, 2027) == 3
+    assert w(12, 23) == 0 and w(1, 7, 2027) == 0
+
+
+def test_typical_night_is_a_plain_weekday():
+    """Il ritmo tipico si stima su finestre di sole notti feriali e senza eventi."""
+    from bnb import model
+
+    mon, thu, fri, sat, sun = (date(2026, 12, d).toordinal() for d in (14, 17, 18, 19, 20))
+    weights = {date(2026, 12, 16).toordinal(): 2}
+    got = model._plain_windows([mon, thu, fri, sat, sun, date(2026, 12, 15).toordinal()], weights, 2)
+    # lun-mar sì; gio-ven, ven-sab, sab-dom no (venerdì o sabato); dom-lun sì; mar-mer no (evento il mercoledì)
+    assert got.tolist() == [True, False, False, False, True, False]

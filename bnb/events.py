@@ -188,10 +188,14 @@ def holidays(start: date, end: date) -> list[Event]:
         e = easter(y)
         out.append(Event("Pasqua", e, e + timedelta(days=1), category="festivita", weight=2, source="festivita",
                          nights_from=e - timedelta(days=2), nights_to=e))
+        # Capodanno: le notti dal 30 dicembre al 1° gennaio; vacanze di Natale: dal 26 dicembre al 4 gennaio
+        # la città si riempie molto più di una notte qualsiasi, e con largo anticipo (lo mostrano le scansioni)
         out.append(Event("Capodanno", date(y, 12, 31), date(y + 1, 1, 1), category="festivita", weight=3, source="festivita",
-                         nights_from=date(y, 12, 30), nights_to=date(y, 12, 31)))
+                         nights_from=date(y, 12, 30), nights_to=date(y + 1, 1, 1)))
         out.append(Event("Natale", date(y, 12, 25), date(y, 12, 26), category="festivita", weight=1, source="festivita",
-                         nights_from=date(y, 12, 24), nights_to=date(y, 12, 26)))
+                         nights_from=date(y, 12, 24), nights_to=date(y, 12, 25)))
+        out.append(Event("Vacanze di Natale", date(y, 12, 26), date(y + 1, 1, 4), category="festivita", weight=2, source="festivita",
+                         nights_from=date(y, 12, 26), nights_to=date(y + 1, 1, 4)))
         for name, (m, d) in {"Epifania": (1, 6), "Festa della Liberazione": (4, 25), "Primo Maggio": (5, 1),
                              "Festa della Repubblica": (6, 2), "Ognissanti": (11, 1), "Immacolata": (12, 8),
                              "San Petronio (patrono)": (10, 4)}.items():

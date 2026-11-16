@@ -606,6 +606,15 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
     return model
 
 
+def _plain_windows(ci, weights: dict, nights_per: int) -> np.ndarray:
+    """Finestre di sole notti feriali (né venerdì né sabato) e senza eventi: la notte "tipica"."""
+    out = []
+    for c in ci:
+        c = int(c)
+        out.append(all(weights.get(c + j, 0) < 2 and date.fromordinal(c + j).weekday() not in (4, 5) for j in range(nights_per)))
+    return np.array(out, dtype=bool)
+
+
 def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, weights: dict, zones: Zones,
             cfg: dict, calib: dict, log, trk_pairs: pd.DataFrame | None = None) -> dict:
     """Domanda: ritmo tipico di prenotazione per anticipo e, per ogni notte, quanto corre rispetto al tipico.
@@ -622,6 +631,7 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     nu = float(np.clip(calib.get("nu", 1.4), 1.0, float(nights_per)))
     empty_curve = {"lead": [0.0, 30.0, 120.0, 365.0], "logit": [float(logit(0.72)), float(logit(0.55)), float(logit(0.35)), float(logit(0.3))], "n": 0}
     w_arr = np.array([min(5, weights.get(d, 0)) for d in days])
+    weekend = np.array([date.fromordinal(int(d)).weekday() in (4, 5) for d in days])
 
     def finish(curve, C, extra, measured, theta_adj, days_n, weight_live=0.0, weight_track=0.0):
         typ = dict(THETA_PRIOR)
@@ -632,7 +642,11 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
             m = measured & (w_arr == w) & (C > 0.05)
             if m.sum() >= 3:
                 typ[w] = float((m.sum() * np.median(raw[m]) + 3 * THETA_PRIOR[w]) / (m.sum() + 3))
-        base_theta = np.array([typ[int(w)] for w in w_arr])
+        # venerdì e sabato senza eventi: la curva tipica è quella feriale, il fine settimana corre di più
+        m = measured & weekend & (w_arr < 2)
+        typ_we = float((m.sum() * np.median(raw[m]) + 3.0) / (m.sum() + 3)) if m.sum() >= 3 else 1.0
+        base_theta = np.array([typ_we if (we and w < 2) else typ[int(w)] for w, we in zip(w_arr, weekend)])
+        typ["weekend"] = typ_we
         city = np.where(measured, np.clip((C + np.nan_to_num(extra) + C0 * base_theta) / (C + C0), 0.3, 3.5), base_theta)
         U_d = 1 - np.exp(-(C + np.nan_to_num(extra)))            # quota già "consumata" per quella notte
         theta = {}
@@ -693,11 +707,19 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     city = city[city["lead"] >= 0]
     if city.empty:
         return finish(empty_curve, C_prior, np.full(n, np.nan), np.zeros(n, dtype=bool), zero_adj, 0)
-    # il "tipico" si stima senza le date delle grandi fiere, che lo scanner legge apposta e che quindi
-    # pesano più del dovuto tra le date lontane; se ne restano troppo poche si usano tutte
-    busy = np.array([max(weights.get(int(ci) + j, 0) for j in range(nights_per)) >= BUSY_WEIGHT for ci in city["ci"]], dtype=bool)
-    calm = city[~busy]
-    typical = calm if len(calm) >= max(20, 0.5 * len(city)) else city
+    # Il "tipico" è la notte feriale senza eventi. Le finestre con un venerdì o un sabato e quelle con eventi
+    # si riempiono per conto loro, e la loro velocità la misura theta: mischiarle nella curva tipica confonde
+    # l'effetto dell'anticipo con quello delle singole date (tra novembre e gennaio, per esempio, le date
+    # lontane sono le feste, molto più piene). Se le feriali sono troppo poche: tutte tranne le grandi fiere.
+    plain_mask = _plain_windows(city["ci"], weights, nights_per)
+    plain = city[plain_mask]
+    calm = city[np.array([max(weights.get(int(ci) + j, 0) for j in range(nights_per)) < BUSY_WEIGHT for ci in city["ci"]], dtype=bool)]
+    if len(plain) >= 12 and int((plain["lead"] <= 45).sum()) >= 5:
+        typical = plain
+    elif len(calm) >= max(20, 0.5 * len(city)):
+        typical = calm
+    else:
+        typical = city
     curve = booking_curve(typical)
     days_n = int(city["scan"].nunique())
     ln_ref, C, w_live = reference_curve(typical, curve, calib, n - 1, days_n, nu)
@@ -707,13 +729,15 @@ def _demand(cn: pd.DataFrame, days: list[int], today: date, nights_per: int, wei
     # quindi non risente delle differenze tra una data e l'altra; prende peso con i confronti raccolti.
     w_track = 0.0
     if trk_pairs is not None and len(trk_pairs):
+        # tutte le date tranne le grandi fiere: seguendo gli alloggi la stessa data è vista più volte, quindi
+        # qui non c'è da separare l'anticipo dalle date, e più confronti danno una misura più stabile
         tp = trk_pairs.copy()
         ords = [date.fromisoformat(x).toordinal() for x in tp["checkin"]]
         tp = tp[[max(weights.get(o + j, 0) for j in range(nights_per)) < BUSY_WEIGHT for o in ords]]
         if len(tp) >= 6:
             H = min(int(cfg["scan"].get("track_days", 30)) + 1, n - 1)
             h_trk, wgt = track.hazard_by_lead(tp, H)
-            w = np.minimum(1.0, wgt / 60.0) * min(1.0, tp["scan"].nunique() / 6.0)
+            w = np.minimum(1.0, wgt / 60.0) * min(1.0, tp["scan"].nunique() / 4.0)
             dC = C[:-1] - C[1:]
             dC[:H] = (1 - w) * dC[:H] + w * h_trk
             C = np.concatenate([np.cumsum(dC[::-1])[::-1] + C[-1], [C[-1]]])
