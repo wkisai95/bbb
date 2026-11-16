@@ -61,7 +61,7 @@
   function defaults() {
     return { repo: { owner: DEFAULT_REPO.owner, name: DEFAULT_REPO.name, branch: DEFAULT_REPO.branch, token: "" },
       apartments: [{ id: "a1", name: "Il mio appartamento", zone: "c_maggiore", bedrooms: 1, baths: 1, guests: 3, quality: "media", minPrice: 0, cost: null, channel: "airbnb", fee: null, vat: null, payers: 2 }],
-      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", customEvents: [] };
+      current: "a1", configured: false, strategy: "resa", period: 30, priceView: "lordo", selection: [], customEvents: [] };
   }
   function loadState() {
     var d = defaults();
@@ -180,8 +180,8 @@
     return { ch: ch, share: P.feeShare(m, ch.id, a.fee, a.vat), pct: blank(a.fee) ? ch.fee : +a.fee,
       vat: blank(a.vat) ? !!ch.vat : !!a.vat, payers: blank(a.payers) ? Math.min(2, a.guests || 2) : +a.payers };
   }
-  function recommend(strategy, days, from) {
-    var m = model(), a = apt(), f = aptFees(a);
+  function recommend(strategy, days, from, which) {
+    var m = model(), a = which || apt(), f = aptFees(a);
     var start = from === undefined ? Math.max(todayMs(), P.parseDate(m.start)) : from;
     return P.recommend(m, { zone: a.zone, bedrooms: a.bedrooms, baths: a.baths, guests: a.guests, quality: a.quality,
       minPrice: a.minPrice || 0, cost: blank(a.cost) ? null : +a.cost, fee: f.share, payers: f.payers, taxMode: f.ch.tax,
@@ -199,8 +199,144 @@
   }
   /* prezzi mostrati al lordo (quelli da mettere sul portale) o al netto della commissione del portale */
   function netView() { return state.priceView === "netto"; }
-  function keepShare() { return 1 - aptFees(apt()).share; }
-  function pv(x) { return netView() ? Math.round(x * keepShare()) : x; }
+  function keepShare(which) { return 1 - aptFees(which || apt()).share; }
+  function pv(x, which) { return netView() ? Math.round(x * keepShare(which)) : x; }
+
+  // ------------------------------------------------------------------ più appartamenti dello stesso proprietario
+  function ownerKey(a) { return String(a.owner || "").trim().toLowerCase(); }
+  function ownerName(a) { return String(a.owner || "").trim() || "Nessun proprietario indicato"; }
+  function ownerGroups() {
+    var map = {}, order = [];
+    state.apartments.forEach(function (a) {
+      var k = ownerKey(a);
+      if (!map[k]) { map[k] = { key: k, name: ownerName(a), list: [] }; order.push(k); }
+      map[k].list.push(a);
+    });
+    return order.map(function (k) { return map[k]; }).sort(function (x, y) {
+      if (!x.key !== !y.key) return x.key ? -1 : 1;              // prima quelli con un proprietario indicato
+      return x.name.localeCompare(y.name, "it");
+    });
+  }
+  /* appartamenti da vedere insieme: almeno due, tutti dello stesso proprietario (altrimenti nessuno) */
+  function selection() {
+    var ids = Array.isArray(state.selection) ? state.selection : [];
+    var list = state.apartments.filter(function (a) { return ids.indexOf(a.id) >= 0; });
+    if (list.length < 2) return [];
+    var k = ownerKey(list[0]);
+    list = list.filter(function (a) { return ownerKey(a) === k; });
+    return list.length >= 2 ? list : [];
+  }
+  function controls(root) {
+    root.appendChild(seg([["resa", "Massima resa"], ["occupazione", "Massima occupazione"]], state.strategy, function (v) { state.strategy = v; saveState(); render(); }));
+    root.appendChild(chips([[30, "30 notti"], [60, "60 notti"], [90, "90 notti"]], state.period, function (v) { state.period = v; saveState(); render(); }));
+    root.appendChild(seg([["lordo", "Prezzi lordi"], ["netto", "Netti, tolta la commissione"]], netView() ? "netto" : "lordo", function (v) { state.priceView = v; saveState(); render(); }));
+    root.lastChild.classList.add("sm");
+  }
+  function pickApartments() {
+    var chosen = selection().map(function (a) { return a.id; });
+    if (!chosen.length) chosen = [apt().id];
+    openSheet("Scegli gli appartamenti", function (body) {
+      body.appendChild(h("p", { class: "note", text: "Se hanno lo stesso proprietario puoi vederne più d'uno insieme, con incassi e guadagni sommati. Il proprietario si indica in Modifica." }));
+      ownerGroups().forEach(function (g) {
+        var ids = g.list.map(function (a) { return a.id; });
+        body.appendChild(h("div", { class: "grp-h" }, h("h3", { text: g.name }),
+          g.list.length >= 2 ? h("button", { class: "btn quiet", onclick: function () { chosen = ids.slice(); refreshSheet(); }, text: "Seleziona tutti (" + g.list.length + ")" }) : null));
+        body.appendChild(h("ul", { class: "rows" }, g.list.map(function (a) {
+          var box = h("input", { type: "checkbox", id: "pk-" + a.id, checked: chosen.indexOf(a.id) >= 0 });
+          box.addEventListener("change", function () {
+            if (box.checked) {
+              if (chosen.some(function (id) { return ids.indexOf(id) < 0; })) { chosen = [a.id]; toast("Insieme si vedono solo appartamenti dello stesso proprietario"); }
+              else chosen.push(a.id);
+            } else {
+              chosen = chosen.filter(function (id) { return id !== a.id; });
+            }
+            refreshSheet();
+          });
+          return h("li", {}, h("label", { class: "row pick", for: "pk-" + a.id }, box,
+            h("div", { class: "main" }, h("div", { class: "t", text: a.name }), h("div", { class: "s", text: aptSpec(a) + " · " + aptFees(a).ch.name }))));
+        })));
+      });
+      body.appendChild(h("div", { class: "stack" }, h("button", { class: "btn primary block", disabled: !chosen.length, onclick: function () {
+        state.selection = chosen.length >= 2 ? chosen.slice() : [];
+        state.current = chosen[0];
+        saveState(); closeSheet(); render();
+      }, text: chosen.length >= 2 ? "Vedi insieme " + chosen.length + " appartamenti" : "Vedi questo appartamento" })));
+    });
+  }
+  function csvText(rows) {
+    return rows.map(function (r) { return r.map(function (c) { c = String(c); return /[",;\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(";"); }).join("\r\n");
+  }
+  function slugOf(x) {
+    return String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "appartamenti";
+  }
+
+  function viewGroup(root, list) {
+    var m = model(), net = netView(), owner = ownerName(list[0]);
+    var otherS = state.strategy === "resa" ? "occupazione" : "resa";
+    var t0 = P.parseDate(m.start), stale = Math.round((todayMs() - t0) / DAY);
+    var rows = list.map(function (a) {
+      return { a: a, f: aptFees(a), rec: recommend(state.strategy, state.period, undefined, a), other: recommend(otherS, state.period, undefined, a) };
+    });
+    root.appendChild(h("div", { class: "apt" },
+      h("div", {}, h("div", { class: "apt-name", text: owner }), h("div", { class: "apt-spec", text: list.length + " appartamenti insieme: " + list.map(function (a) { return a.name; }).join(", ") })),
+      h("button", { class: "btn", onclick: pickApartments, text: "Cambia" })));
+    if (stale >= 2) root.appendChild(banner("warn", "I dati sono del " + fmtDate(t0, { day: "numeric", month: "long" }) + ": la scansione non gira da " + stale + " giorni.", h("button", { class: "btn quiet", onclick: function () { go("dati"); }, text: "Controlla" })));
+    controls(root);
+
+    var T = { revenue: 0, fees: 0, net: 0, occ: 0, price: 0, otherNet: 0, hostTax: 0 }, hostNames = [];
+    rows.forEach(function (r) {
+      T.revenue += r.rec.revenue; T.fees += r.rec.fees; T.net += r.rec.net; T.occ += r.rec.occupancy;
+      T.price += pv(r.rec.avgPrice, r.a); T.otherNet += r.other.net;
+      if (r.f.ch.tax !== "portal" && r.rec.tax > 0) { T.hostTax += r.rec.tax; hostNames.push(r.a.name); }
+    });
+    var n = rows.length, costs = T.revenue - T.fees - T.net;
+    root.appendChild(h("div", { class: "sum" },
+      h("div", {}, h("b", { text: euro(T.price / n) }), h("span", { text: net ? "prezzo medio a notte, netto" : "prezzo medio a notte" })),
+      h("div", {}, h("b", { text: pct(T.occ / n) }), h("span", { text: "notti che ti aspetti di vendere, se oggi sono libere" })),
+      h("div", {}, h("b", { text: euro(T.net) }), h("span", { text: "guadagno atteso in tutto, tolte commissioni e costi" }))));
+    var income = net
+      ? "Incasso atteso " + euro(T.revenue - T.fees) + " al netto delle commissioni (" + euro(T.revenue) + " lordi, " + euro(T.fees) + " di commissioni)"
+      : "Incasso atteso " + euro(T.revenue) + ", commissioni " + euro(T.fees);
+    root.appendChild(h("p", { class: "alt" }, income + ", costi " + euro(costs) + ". Con " + (otherS === "resa" ? "massima resa" : "massima occupazione") + " il guadagno sarebbe " + euro(T.otherNet) + ". ",
+      h("button", { onclick: function () { state.strategy = otherS; saveState(); render(); }, text: "Passa a questa" })));
+    if (T.hostTax > 0) root.appendChild(h("p", { class: "alt", text: "Tassa di soggiorno che incassi e versi tu (" + hostNames.join(", ") + "): circa " + euro(T.hostTax) + " nel periodo. Non è un tuo guadagno." }));
+
+    root.appendChild(h("h2", { text: "Appartamento per appartamento" }));
+    var tb = h("tbody", {});
+    rows.forEach(function (r) {
+      tb.appendChild(h("tr", { class: "tap", onclick: function () { state.selection = []; state.current = r.a.id; saveState(); render(); } },
+        h("td", {}, r.a.name, h("small", { text: aptSpec(r.a) + " · " + r.f.ch.name })),
+        h("td", {}, euro(pv(r.rec.avgPrice, r.a))), h("td", {}, pct(r.rec.occupancy)), h("td", {}, euro(r.rec.net))));
+    });
+    root.appendChild(h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", { text: "" }), h("th", { text: net ? "Netto medio" : "Prezzo medio" }), h("th", { text: "Notti vendute" }), h("th", { text: "Guadagno" }))), tb));
+    root.appendChild(h("p", { class: "note", style: "margin-top:8px", text: "Tocca un appartamento per vedere solo il suo calendario." }));
+
+    root.appendChild(h("h2", { text: "Prezzi notte per notte" }));
+    var gb = h("tbody", {});
+    rows[0].rec.nights.forEach(function (first, k) {
+      var tr = h("tr", {}, h("td", {}, fmtDate(P.parseDate(first.date), { weekday: "short", day: "numeric", month: "short" }), first.events.length ? h("small", { text: first.events[0] }) : null));
+      rows.forEach(function (r) {
+        var x = r.rec.nights[k];
+        tr.appendChild(h("td", {}, h("button", { class: "cellbtn", type: "button", "aria-label": r.a.name + ", " + longDate(P.parseDate(x.date)) + ": " + pv(x.price, r.a) + (net ? " euro netti" : " euro"),
+          onclick: function () { daySheet(x, r.a); }, text: String(pv(x.price, r.a)) })));
+      });
+      gb.appendChild(tr);
+    });
+    root.appendChild(h("div", { class: "scrollx" }, h("table", { class: "table gt" },
+      h("thead", {}, h("tr", {}, h("th", { text: "Notte" }), rows.map(function (r) { return h("th", { title: r.a.name, text: r.a.name }); }))), gb)));
+    root.appendChild(h("p", { class: "note", text: (net ? "Prezzi in euro al netto della commissione del portale di ciascun appartamento." : "Prezzi in euro pagati dall'ospite, da mettere sul portale.") + " Tocca un prezzo per i dettagli della notte. La percentuale di notti vendute conta solo quelle ancora libere oggi." }));
+    root.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () { exportGroupCsv(owner, rows); }, text: "Esporta i prezzi di tutti (CSV)" })));
+  }
+  function exportGroupCsv(owner, rows) {
+    var out = [["proprietario", "appartamento", "data", "prezzo_consigliato", "probabilita_vendita", "commissione_portale", "netto_dopo_commissione", "tassa_soggiorno", "tassa_riscossa_da", "prezzo_mediano_comparabili", "eventi"]];
+    rows.forEach(function (r) {
+      r.rec.nights.forEach(function (n) {
+        out.push([owner, r.a.name, n.date, n.price, n.sell.toFixed(3), n.fee.toFixed(2), n.payout.toFixed(2), n.tax.toFixed(2), r.f.ch.tax === "portal" ? r.f.ch.name : "host", n.market, n.events.join(" | ")]);
+      });
+    });
+    saveFile("prezzi-" + slugOf(owner) + "-" + state.strategy + "-" + rows[0].rec.nights[0].date + ".csv", "text/csv",
+      "\ufeff# " + owner + " · " + rows.length + " appartamenti · strategia: " + state.strategy + "\r\n" + csvText(out));
+  }
   function pct1(x) { return (x * 100).toFixed(1).replace(".", ",").replace(",0", "") + "%"; }
   function euro2(x) { return (Math.round(x * 100) / 100).toFixed(2).replace(".", ",").replace(",00", "") + "\u00a0€"; }
   function guestsWord(n) { return n + (n === 1 ? " ospite" : " ospiti"); }
@@ -288,6 +424,8 @@
   function viewPrezzi(root) {
     var m = model();
     if (!m) return emptyState(root);
+    var group = selection();
+    if (group.length >= 2) return viewGroup(root, group);
     var a = apt();
     var rec = recommend(state.strategy, state.period), other = recommend(state.strategy === "resa" ? "occupazione" : "resa", state.period);
     var t0 = P.parseDate(m.start), stale = Math.round((todayMs() - t0) / DAY);
@@ -297,12 +435,10 @@
       h("button", { class: "btn", onclick: function () { editApartment(a.id); }, text: "Modifica" })));
     if (!state.configured) root.appendChild(banner("warn", "Questi prezzi valgono per un appartamento di esempio.", h("button", { class: "btn quiet", onclick: function () { editApartment(a.id); }, text: "Imposta il tuo" })));
     if (stale >= 2) root.appendChild(banner("warn", "I dati sono del " + fmtDate(t0, { day: "numeric", month: "long" }) + ": la scansione non gira da " + stale + " giorni.", h("button", { class: "btn quiet", onclick: function () { go("dati"); }, text: "Controlla" })));
+    if (state.apartments.length >= 2) root.appendChild(h("button", { class: "btn quiet pickbtn", onclick: pickApartments, text: "Scegli uno o più appartamenti (" + state.apartments.length + ")" }));
 
-    root.appendChild(seg([["resa", "Massima resa"], ["occupazione", "Massima occupazione"]], state.strategy, function (v) { state.strategy = v; saveState(); render(); }));
-    root.appendChild(chips([[30, "30 notti"], [60, "60 notti"], [90, "90 notti"]], state.period, function (v) { state.period = v; saveState(); render(); }));
+    controls(root);
     var f = aptFees(a), net = netView();
-    root.appendChild(seg([["lordo", "Prezzi lordi"], ["netto", "Netti, tolta la commissione"]], net ? "netto" : "lordo", function (v) { state.priceView = v; saveState(); render(); }));
-    root.lastChild.classList.add("sm");
 
     root.appendChild(h("div", { class: "sum" },
       h("div", {}, h("b", { text: euro(pv(rec.avgPrice)) }), h("span", { text: net ? "prezzo medio a notte, netto" : "prezzo medio a notte" })),
@@ -380,21 +516,22 @@
     root.appendChild(h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", { text: "Notte" }), h("th", { text: netView() ? "Netto" : "Prezzo" }), h("th", { text: "Prob. vendita" }), h("th", { text: "Comparabili" }))), tb));
   }
 
-  function daySheet(n) {
-    var m = model(), ms = P.parseDate(n.date);
+  function daySheet(n, which) {
+    var m = model(), ms = P.parseDate(n.date), aa = which || apt();
     openSheet(longDate(ms), function (body) {
-      var alt = recommend(state.strategy === "resa" ? "occupazione" : "resa", 1, ms).nights[0];
+      if (which) body.appendChild(h("p", { class: "apt-spec", style: "margin:-6px 0 10px", text: aa.name + " · " + aptSpec(aa) }));
+      var alt = recommend(state.strategy === "resa" ? "occupazione" : "resa", 1, ms, aa).nights[0];
       if (n.eventList.length) {
         body.appendChild(h("p", { class: "note" }, n.eventList.slice(0, 4).map(function (e) {
           return h("span", { class: "tag" }, h("i", { style: "background:var(--" + (CAT[e.category] || CAT.altro)[1] + ")" }), e.name + (e.venue ? " (" + e.venue + ")" : ""));
         })));
       }
-      var fz = aptFees(apt()), net = netView();
-      var you = pv(n.price), low = pv(n.low), high = pv(n.high), med = pv(n.market);
+      var fz = aptFees(aa), net = netView();
+      var you = pv(n.price, aa), low = pv(n.low, aa), high = pv(n.high, aa), med = pv(n.market, aa);
       body.appendChild(h("div", { class: "price-hero" }, h("b", { text: euro(you) }),
         h("span", { text: net ? "a notte al netto della commissione " + fz.ch.name + "; sul portale " + euro(n.price) : n.lead === 0 ? "per stanotte" : "a notte, da impostare oggi" })));
       // dove cade il prezzo rispetto ai comparabili
-      var lo = Math.min(pv(n.floor), you, low), hi = Math.max(pv(n.cap), you, high), span = Math.max(1, hi - lo);
+      var lo = Math.min(pv(n.floor, aa), you, low), hi = Math.max(pv(n.cap, aa), you, high), span = Math.max(1, hi - lo);
       function x(v) { return ((v - lo) / span * 100).toFixed(2) + "%"; }
       var pos = (you - lo) / span * 100;
       body.appendChild(h("div", { class: "band-fig", role: "img", "aria-label": "Il prezzo consigliato è " + you + " euro; metà dei comparabili sta tra " + low + " e " + high + " euro, mediana " + med },
@@ -411,11 +548,11 @@
       kv("Prezzi rispetto a una notte normale", signedPct(n.uplift) + (n.measured ? "" : " (stima)"));
       kv("Mercato già occupato oggi", pct(n.occNow));
       kv("Mercato occupato alla data (previsione)", pct(n.occFin));
-      kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(pv(alt.price)));
+      kv("Con " + (state.strategy === "resa" ? "massima occupazione" : "massima resa"), euro(pv(alt.price, aa)));
       body.appendChild(dl);
 
       // quanto resta, e la tassa di soggiorno
-      var f = aptFees(apt()), d2 = h("dl", { class: "kv" });
+      var f = aptFees(aa), d2 = h("dl", { class: "kv" });
       function kv2(k, v) { d2.appendChild(h("dt", { text: k })); d2.appendChild(h("dd", { text: v })); }
       body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la vendi a " + euro(n.price) }));
       if (n.fee > 0) kv2("Commissione " + f.ch.name + " (" + pct1(f.share) + ")", "−" + euro2(n.fee));
@@ -433,7 +570,7 @@
       if (n.plan.length >= 2) {
         body.appendChild(h("h3", { style: "margin-top:18px", text: "Se la notte resta libera" }));
         body.appendChild(h("div", { class: "plan" }, n.plan.map(function (p) {
-          return h("div", {}, h("b", { text: euro(pv(p.price)) }), h("span", { text: "a " + p.lead + (p.lead === 1 ? " giorno" : " giorni") }));
+          return h("div", {}, h("b", { text: euro(pv(p.price, aa)) }), h("span", { text: "a " + p.lead + (p.lead === 1 ? " giorno" : " giorni") }));
         })));
         body.appendChild(h("p", { class: "note", text: "Il prezzo scende avvicinandosi alla data: più passa il tempo, meno occasioni restano per venderla." }));
       }
@@ -465,8 +602,8 @@
     rec.nights.forEach(function (n) {
       rows.push([n.date, n.price, n.sell.toFixed(3), n.fee.toFixed(2), n.payout.toFixed(2), n.tax.toFixed(2), f.ch.tax === "portal" ? f.ch.name : "host", n.market, n.low, n.high, n.uplift.toFixed(3), n.measured ? "si" : "no", n.events.join(" | ")]);
     });
-    var csv = rows.map(function (r) { return r.map(function (c) { c = String(c); return /[",;\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(";"); }).join("\r\n");
-    saveFile("prezzi-" + rec.strategy + "-" + rec.nights[0].date + ".csv", "text/csv", "﻿# " + a.name + " · " + aptSpec(a) + " · strategia: " + rec.strategy + " · portale: " + f.ch.name + " (" + pct1(f.share) + ") · tassa di soggiorno per " + guestsWord(f.payers) + "\r\n" + csv);
+    var csv = csvText(rows);
+    saveFile("prezzi-" + slugOf(a.name) + "-" + rec.strategy + "-" + rec.nights[0].date + ".csv", "text/csv", "﻿# " + a.name + " · " + aptSpec(a) + " · strategia: " + rec.strategy + " · portale: " + f.ch.name + " (" + pct1(f.share) + ") · tassa di soggiorno per " + guestsWord(f.payers) + "\r\n" + csv);
   }
 
   function editApartment(id) {
@@ -483,6 +620,12 @@
       var defCost = P.defaultCost(m, P.attrLevel(m, d.zone, d.bedrooms, d.baths, d.guests, d.quality));
       var cost = h("input", { type: "number", inputmode: "numeric", min: 0, step: 5, value: d.cost === null || d.cost === undefined ? "" : d.cost, placeholder: defCost + " (stima)", id: "f-cost" });
       body.appendChild(h("div", { class: "field" }, h("label", { for: "f-name", text: "Nome" }), name));
+      var owners = [];
+      state.apartments.forEach(function (x) { var o = String(x.owner || "").trim(); if (o && owners.indexOf(o) < 0) owners.push(o); });
+      var owner = h("input", { type: "text", value: d.owner || "", maxlength: 40, id: "f-owner", list: "f-owners", autocomplete: "off", placeholder: "lascia vuoto se è tuo" });
+      body.appendChild(h("div", { class: "field" }, h("label", { for: "f-owner", text: "Proprietario" }), owner,
+        h("datalist", { id: "f-owners" }, owners.map(function (o) { return h("option", { value: o }); })),
+        h("span", { class: "hint", text: "Gli appartamenti dello stesso proprietario si possono vedere insieme, con incassi e guadagni sommati." })));
       body.appendChild(h("div", { class: "field" }, h("label", { for: "f-zone", text: "Zona" }), zone));
       body.appendChild(h("div", { class: "two" },
         stepper("Camere da letto", d.bedrooms, 0, 6, 1, function (v) { return v === 0 ? "Monolocale" : String(v); }, function (v) { d.bedrooms = v; }),
@@ -513,24 +656,25 @@
         : "Qui la incassi tu dall'ospite e la versi al Comune: da " + euro2(tt.bands[0][1]) + " a " + euro2(tt.bands[tt.bands.length - 1][1]) + " a persona a notte, secondo il prezzo.")
         + " Non la pagano i minori di 14 anni e i residenti a Bologna. Tariffe " + tt.year + " del Comune." }));
       function keep() {
-        d.name = name.value.trim() || "Il mio appartamento"; d.zone = zone.value; d.minPrice = Math.max(0, +minp.value || 0); d.cost = cost.value === "" ? null : Math.max(0, +cost.value);
+        d.name = name.value.trim() || "Il mio appartamento"; d.owner = owner.value.trim(); d.zone = zone.value; d.minPrice = Math.max(0, +minp.value || 0); d.cost = cost.value === "" ? null : Math.max(0, +cost.value);
         d.fee = feeIn.value === "" ? null : Math.min(60, Math.max(0, +String(feeIn.value).replace(",", ".")));
       }
-      [name, zone, minp, cost].forEach(function (el) { el.addEventListener("change", keep); });
+      [name, owner, zone, minp, cost].forEach(function (el) { el.addEventListener("change", keep); });
       feeIn.addEventListener("change", function () { keep(); refreshSheet(); });
       chan.addEventListener("change", function () { keep(); d.channel = chan.value; d.fee = null; d.vat = null; refreshSheet(); });
       body.appendChild(h("div", { class: "stack" },
         h("button", { class: "btn primary block", onclick: function () { keep(); Object.assign(a, d); state.configured = true; saveState(); closeSheet(); render(); toast("Appartamento salvato"); }, text: "Salva" }),
         state.apartments.length > 1 ? h("button", { class: "btn block danger", onclick: function () {
-          state.apartments = state.apartments.filter(function (x) { return x.id !== a.id; }); state.current = state.apartments[0].id; saveState(); closeSheet(); render(); toast("Appartamento eliminato"); }, text: "Elimina questo appartamento" }) : null,
+          state.apartments = state.apartments.filter(function (x) { return x.id !== a.id; }); state.current = state.apartments[0].id;
+          state.selection = (state.selection || []).filter(function (id) { return id !== a.id; }); saveState(); closeSheet(); render(); toast("Appartamento eliminato"); }, text: "Elimina questo appartamento" }) : null,
         h("button", { class: "btn block", onclick: function () {
           keep(); Object.assign(a, d);
           var n = Object.assign({}, d, { id: "a" + Date.now(), name: "Appartamento " + (state.apartments.length + 1) });
-          state.apartments.push(n); state.current = n.id; state.configured = true; saveState(); closeSheet(); render(); editApartment(n.id); }, text: "Aggiungi un altro appartamento" })));
+          state.apartments.push(n); state.current = n.id; state.selection = []; state.configured = true; saveState(); closeSheet(); render(); editApartment(n.id); }, text: "Aggiungi un altro appartamento" })));
       if (state.apartments.length > 1) {
         body.appendChild(h("h3", { style: "margin-top:16px", text: "Passa a un altro" }));
         body.appendChild(h("ul", { class: "rows" }, state.apartments.filter(function (x) { return x.id !== a.id; }).map(function (x) {
-          return h("li", {}, h("button", { class: "row", onclick: function () { state.current = x.id; saveState(); closeSheet(); render(); } },
+          return h("li", {}, h("button", { class: "row", onclick: function () { state.current = x.id; state.selection = []; saveState(); closeSheet(); render(); } },
             h("div", { class: "main" }, h("div", { class: "t", text: x.name }), h("div", { class: "s", text: aptSpec(x) }))));
         })));
       }
@@ -877,7 +1021,7 @@
         try {
           var j = JSON.parse(String(rd.result));
           if (!Array.isArray(j.apartments) || !j.apartments.length) throw new Error("vuoto");
-          state.apartments = j.apartments; state.current = j.apartments[0].id; state.customEvents = Array.isArray(j.customEvents) ? j.customEvents : [];
+          state.apartments = j.apartments; state.current = j.apartments[0].id; state.selection = []; state.customEvents = Array.isArray(j.customEvents) ? j.customEvents : [];
           state.configured = true; saveState(); eff = null; render(); toast("Importati " + j.apartments.length + " appartamenti");
         } catch (e) { toast("File non valido"); }
       };
