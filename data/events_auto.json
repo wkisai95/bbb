@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-15",
+ "updated": "2026-11-16",
  "sources": {
   "bolognafiere": true,
   "bolognawelcome": true
@@ -814,21 +814,6 @@
    "id": "pestmed-2028-03-01",
    "night_first": "2028-02-29",
    "night_last": "2028-03-02"
-  },
-  {
-   "name": "Gigi D'Alessio",
-   "start": "2026-11-15",
-   "end": "2026-11-15",
-   "venue": "Unipol Arena",
-   "category": "concerto",
-   "weight": 1,
-   "source": "auto",
-   "note": "",
-   "nights_from": null,
-   "nights_to": null,
-   "id": "gigi-d-alessio-2026-11-15",
-   "night_first": "2026-11-15",
-   "night_last": "2026-11-15"
   },
   {
    "name": "Anna",
