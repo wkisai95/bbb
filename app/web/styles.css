@@ -117,6 +117,8 @@ p { margin: 0 0 10px; }
 .seg.sm { background: none; border: 1px solid var(--line); padding: 2px; margin-bottom: 4px; }
 .seg.sm button { min-height: 34px; font-size: 13.5px; }
 .seg.sm button[aria-pressed="true"] { background: var(--accent-wash); color: var(--ink); }
+/* testo di sistema grande o schermo stretto: le scelte non stanno affiancate e vanno una sotto l'altra (vedi fitRows) */
+.seg.stack { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); }
 
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
 .chip { border: 1px solid var(--line-2); background: none; border-radius: 999px; min-height: 36px; padding: 0 14px; font-size: 14px; font-weight: 520; color: var(--ink-2); }
@@ -124,6 +126,7 @@ p { margin: 0 0 10px; }
 
 /* ---------- appartamento */
 .apt { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0 14px; }
+.apt > div:first-child { min-width: 0; overflow-wrap: anywhere; }
 .apt-name { font-weight: 660; font-size: 17px; font-stretch: 104%; }
 .apt-spec { font-size: 13.5px; color: var(--ink-2); }
 
@@ -133,6 +136,8 @@ p { margin: 0 0 10px; }
 .sum > div + div { border-left: 1px solid var(--line); padding-left: 12px; }
 .sum b { display: block; font-size: 25px; line-height: 1.1; font-weight: 700; font-stretch: 96%; letter-spacing: -0.01em; }
 .sum span { display: block; font-size: 12.5px; color: var(--ink-2); margin-top: 3px; line-height: 1.25; }
+.sum.stack { grid-template-columns: minmax(0, 1fr); }
+.sum.stack > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
 .alt { font-size: 13.5px; color: var(--ink-2); margin: 8px 0 0; }
 .alt button { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 620; text-decoration: underline; text-underline-offset: 3px; }
 
@@ -152,10 +157,10 @@ p { margin: 0 0 10px; }
 /* ---------- calendario: tabellone a quadretti */
 .month { margin-top: 18px; }
 .month h3 { text-transform: capitalize; margin-bottom: 8px; font-size: 16px; }
-.dow, .grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .dow span { font-size: 11.5px; color: var(--ink-3); text-align: center; padding-bottom: 4px; font-weight: 560; }
 .grid { gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.cell { position: relative; background: var(--card); min-height: 58px; border: 0; padding: 0; display: block; text-align: center; color: var(--ink); }
+.cell { position: relative; background: var(--card); min-height: 58px; border: 0; padding: 0; display: block; text-align: center; color: var(--ink); overflow: hidden; }
 .cell.off { background: var(--paper); }
 .cell .d { position: absolute; top: 4px; left: 5px; font-size: 11px; line-height: 1; color: var(--ink-3); font-weight: 520; }
 .cell .p { display: block; padding-top: 21px; font-size: 17.5px; line-height: 1.1; font-weight: 660; font-stretch: 78%; letter-spacing: -0.005em; }
@@ -181,6 +186,8 @@ p { margin: 0 0 10px; }
 .table th:first-child, .table td:first-child { text-align: left; padding-left: 0; }
 .table td { text-align: right; padding: 9px 0 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-variant-numeric: tabular-nums; }
 .table td small { display: block; color: var(--ink-3); font-size: 12px; line-height: 1.3; font-variant-numeric: normal; }
+/* con il testo grande la prima colonna può andare a capo anche dentro le parole, così i numeri restano nello schermo */
+.table:not(.gt) th:first-child, .table:not(.gt) td:first-child { overflow-wrap: anywhere; }
 .table tr.tap { cursor: pointer; }
 
 .rows { list-style: none; margin: 0; padding: 0; }
@@ -230,8 +237,8 @@ p { margin: 0 0 10px; }
 .banner.ok svg { color: var(--good); }
 .empty { padding: 36px 0; text-align: center; color: var(--ink-2); }
 .empty h2 { margin-top: 0; }
-.kv { display: grid; grid-template-columns: 1fr auto; gap: 0; font-size: 14.5px; margin: 0; }
-.kv dt { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0; font-size: 14.5px; margin: 0; }
+.kv dt { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); overflow-wrap: anywhere; }
 .kv dd { padding: 9px 0; border-bottom: 1px solid var(--line); margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 /* ---------- scheda dal basso */

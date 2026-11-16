@@ -6,7 +6,9 @@ un appartamento come il tuo. Un'app Android mostra il risultato.
 
 **Installare l'app:** scarica [`bbb.apk`](https://github.com/wkisai95/bbb/raw/apk/bbb.apk) sul telefono e aprilo
 (Android 8 o successivo; alla prima installazione Android chiede di consentire le app da questa fonte).
-Le versioni sono anche nelle [release](https://github.com/wkisai95/bbb/releases/latest).
+Le versioni sono anche nelle [release](https://github.com/wkisai95/bbb/releases/latest). Dalla 1.0.8 l'app avvisa
+quando ne esce una nuova e la scarica con il numero nel nome (per esempio `bbb-1.0.9.apk`); la versione installata
+è scritta in fondo alla sezione Dati.
 
 ## Cosa trovi nell'app
 

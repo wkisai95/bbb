@@ -292,15 +292,20 @@
         h("button", { class: "btn primary block", onclick: function () {
           var ok = P.cleanSteps(rows);
           if (ok.length !== rows.length) { toast("Sconti tra 0 e 80%, giorni tra 0 e 120"); return; }
-          state.aggressive = ok; saveState(); closeSheet(); render(); toast("Sconti salvati");
+          state.aggressive = ok; saveState(); closeSheet(); render(); refreshSheet(); toast("Sconti salvati");
         }, text: "Salva" })));
     });
   }
   function ownersSheet() {
     openSheet("Resa per proprietario", function (body) {
       var net = netView(), out = [], T = { inc: 0, fees: 0, net: 0, sold: 0, nights: 0, tax: 0, n: 0 };
-      body.appendChild(h("p", { class: "note", text: "Con " + STRAT_NAME[state.strategy] + ", per " + periodLabel(state.period) + (net ? ", incassi al netto delle commissioni." : ", incassi lordi.") + " Tocca un proprietario per vedere i suoi appartamenti." }));
+      body.appendChild(seg(STRATS, state.strategy, function (v) { state.strategy = v; saveState(); render(); refreshSheet(); }));
+      if (state.strategy === "aggressiva") {
+        body.appendChild(h("p", { class: "alt", style: "margin:8px 0 0" }, stepsText(aggSteps()) + " ",
+          h("button", { onclick: editSteps, text: "Cambia gli sconti" })));
+      }
       body.appendChild(chips(PERIODS, state.period, function (v) { state.period = v; saveState(); render(); refreshSheet(); }));
+      body.appendChild(h("p", { class: "note", text: "Con " + STRAT_NAME[state.strategy] + ", per " + periodLabel(state.period) + (net ? ", incassi al netto delle commissioni." : ", incassi lordi.") + " Tocca un proprietario per vedere i suoi appartamenti." }));
       var tb = h("tbody", {});
       ownerGroups().forEach(function (g) {
         var G = { inc: 0, fees: 0, net: 0, sold: 0, nights: 0, tax: 0 };
@@ -474,6 +479,36 @@
     else window.open(url, "_blank", "noopener");
   }
 
+  // ------------------------------------------------------------------ versione nuova dell'app
+  var update = null;          // { version: "1.0.9", url: "…/bbb.apk" } se su GitHub c'è un'app più recente di questa
+  function verNum(v) { var m = /(\d+)\.(\d+)\.(\d+)/.exec(String(v || "")); return m ? (+m[1]) * 1e6 + (+m[2]) * 1e3 + (+m[3]) : 0; }
+  function myVersion() { try { return native && native.version ? String(native.version()) : ""; } catch (e) { return ""; } }
+  function checkUpdate() {
+    var mine = verNum(myVersion());
+    if (!mine) return Promise.resolve();                       // aperta nel browser: non c'è un'app da aggiornare
+    return gh("/releases?per_page=30").then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {
+      var best = null;
+      (Array.isArray(list) ? list : []).forEach(function (x) {
+        var t = /^app-v(\d+\.\d+\.\d+)$/.exec(x.tag_name || "");
+        var apk = (x.assets || []).filter(function (a) { return /\.apk$/i.test(a.name); })[0];
+        if (t && apk && !x.draft && !x.prerelease && (!best || verNum(t[1]) > verNum(best.version))) best = { version: t[1], url: apk.browser_download_url };
+      });
+      var before = update && update.version;
+      update = best && verNum(best.version) > mine ? best : null;
+      if ((update && update.version) !== before) render();
+    }).catch(function () { /* senza rete si riprova al prossimo avvio */ });
+  }
+  function updateBanner() {
+    if (!update) return null;
+    return banner("warn", "C'è una versione nuova dell'app, la " + update.version + " (questa è la " + myVersion() + ").",
+      h("button", { class: "btn quiet", onclick: getUpdate, text: "Scaricala" }));
+  }
+  function getUpdate() {
+    var name = "bbb-" + update.version + ".apk";            // il numero nel nome evita di riaprire un file vecchio
+    if (native && native.download) { native.download(update.url, name, ""); toast("Scarico " + name + ": quando è finito tocca la notifica per installarla"); }
+    else openExternal(update.url);
+  }
+
   // ------------------------------------------------------------------ schede dal basso
   var sheetStack = [];
   function openSheet(title, build) {
@@ -486,6 +521,7 @@
     root.appendChild(back); root.appendChild(sh);
     sheetStack.push({ back: back, sh: sh, body: body, build: build });
     build(body);
+    fitRows(sh);
     requestAnimationFrame(function () { back.classList.add("open"); sh.classList.add("open"); });
     try { history.pushState({ sheet: sheetStack.length }, ""); } catch (e) { /* senza cronologia va bene lo stesso */ }
     return body;
@@ -495,19 +531,28 @@
     if (!s) return false;
     s.back.classList.remove("open"); s.sh.classList.remove("open");
     setTimeout(function () { s.back.remove(); s.sh.remove(); }, 230);
-    if (fromPop !== true) { try { history.back(); } catch (e) { /* idem */ } }
+    // il passo indietro nella cronologia genera un popstate: va ignorato, se no chiude anche la scheda sotto
+    if (fromPop !== true) { try { skipPop++; history.back(); } catch (e) { skipPop = Math.max(0, skipPop - 1); } }
     return true;
   }
   var skipPop = 0;
   window.addEventListener("popstate", function () { if (skipPop) { skipPop--; return; } closeSheet(true); });
   window.bbbBack = function () { if (sheetStack.length) { closeSheet(); return true; } if (ui.tab !== "prezzi") { go("prezzi"); return true; } return false; };
-  function refreshSheet() { var s = sheetStack[sheetStack.length - 1]; if (s) { s.body.textContent = ""; s.build(s.body); } }
+  function refreshSheet() { var s = sheetStack[sheetStack.length - 1]; if (s) { s.body.textContent = ""; s.build(s.body); fitRows(s.sh); } }
 
   // ------------------------------------------------------------------ comandi riusabili
   function seg(options, value, onpick) {
     return h("div", { class: "seg", role: "group" }, options.map(function (o) {
       return h("button", { type: "button", "aria-pressed": String(o[0] === value), onclick: function () { onpick(o[0]); }, text: o[1] });
     }));
+  }
+  /* Android ingrandisce il testo come nelle impostazioni del telefono: se le scelte affiancate o i tre
+     numeri del riepilogo escono dallo schermo, li metto uno sotto l'altro */
+  function fitRows(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll(".seg, .sum"), function (s) {
+      s.classList.remove("stack");
+      if (s.scrollWidth > s.clientWidth + 1) s.classList.add("stack");
+    });
   }
   function chips(options, value, onpick) {
     return h("div", { class: "chips", role: "group" }, options.map(function (o) {
@@ -1084,7 +1129,7 @@
     var base = "https://github.com/" + state.repo.owner + "/" + state.repo.name;
     root.appendChild(h("h2", { text: "Azioni" }));
     root.appendChild(h("div", { class: "stack" },
-      h("button", { class: "btn primary block", disabled: data.loading, onclick: function () { loadData(true); loadRun(); }, text: data.loading ? "Aggiorno…" : "Aggiorna i dati" }),
+      h("button", { class: "btn primary block", disabled: data.loading, onclick: function () { loadData(true); loadRun(); checkUpdate(); }, text: data.loading ? "Aggiorno…" : "Aggiorna i dati" }),
       h("button", { class: "btn block", onclick: startScan, text: "Avvia una scansione adesso" }),
       h("button", { class: "btn block", onclick: function () { downloadUrl(base + "/releases/download/backup/bbb-backup.zip", "bbb-backup.zip"); }, text: "Scarica il backup completo (ZIP)" }),
       h("button", { class: "btn block", onclick: function () { saveFile("bbb-impostazioni.json", "application/json", JSON.stringify({ apartments: state.apartments, customEvents: state.customEvents, strategy: state.strategy, period: state.period, priceView: state.priceView, aggressive: state.aggressive }, null, 1)); }, text: "Esporta appartamenti ed eventi" }),
@@ -1167,15 +1212,19 @@
     document.getElementById("stamp").textContent = m ? "dati del " + fmtDate(P.parseDate(m.start), { day: "numeric", month: "short" }) + (data.cached ? " (copia)" : "") : "";
     Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) { if (b.dataset.tab === ui.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     try {
+      if (update && (ui.tab === "prezzi" || ui.tab === "dati")) root.appendChild(updateBanner());
       ({ prezzi: viewPrezzi, mercato: viewMercato, eventi: viewEventi, dati: viewDati })[ui.tab](root);
     } catch (e) {
       root.textContent = "";
       root.appendChild(banner("bad", "Qualcosa non ha funzionato nel mostrare questa pagina (" + (e && e.message) + "). Prova ad aggiornare i dati dalla sezione Dati."));
       if (window.console) console.error(e);
     }
+    fitRows(root);
   }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) { b.addEventListener("click", function () { go(b.dataset.tab); }); });
-  window.addEventListener("resize", function () { if (ui.tab === "eventi" || ui.tab === "dati") render(); });
-  window.bbbState = function () { return { state: state, data: data, ui: ui }; };
+  window.addEventListener("resize", function () { if (ui.tab === "eventi" || ui.tab === "dati") render(); fitRows(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitRows(); });
+  window.bbbState = function () { return { state: state, data: data, ui: ui, update: update }; };
   loadData(false);
+  checkUpdate();
 })();

@@ -158,6 +158,8 @@ class MainActivity : Activity() {
                 val request = DownloadManager.Request(uri)
                     .setTitle(fileName)
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                // così la notifica di fine download apre l'installazione dell'aggiornamento
+                if (fileName.endsWith(".apk", ignoreCase = true)) request.setMimeType("application/vnd.android.package-archive")
                 if (auth.isNotEmpty()) request.addRequestHeader("Authorization", auth)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
