@@ -1,0 +1,55 @@
+{
+ "date": "2026-11-17",
+ "started": "2026-11-17T12:07:02Z",
+ "stopped": "",
+ "windows": 59,
+ "census": 15,
+ "prices": 34797,
+ "details": 38,
+ "phases": [
+  {
+   "name": "offerta",
+   "requests": 3,
+   "secs": 5.3
+  },
+  {
+   "name": "date seguite",
+   "requests": 742,
+   "secs": 1271.0
+  },
+  {
+   "name": "date vicine",
+   "requests": 165,
+   "secs": 275.7
+  },
+  {
+   "name": "date lontane ed eventi",
+   "requests": 223,
+   "secs": 380.8
+  },
+  {
+   "name": "capienze",
+   "requests": 39,
+   "secs": 80.3
+  }
+ ],
+ "track": {
+  "windows": 15,
+  "complete": 15,
+  "requests": 442,
+  "splits": 2,
+  "resplits": 0,
+  "found": 22507,
+  "expected": 22703
+ },
+ "requests": 1174,
+ "errors": 1,
+ "error_samples": [
+  "HTTPError('HTTP Error 410: ')"
+ ],
+ "listings": 4216,
+ "secs": 2017.1,
+ "finished": "2026-11-17T12:40:39Z",
+ "windows_planned": 59,
+ "source": "AirbnbClient"
+}
