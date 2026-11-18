@@ -44,7 +44,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 2318690,Bologna  2passi dalle 2torri,Rental unit,44.50311,11.34777,c_stazione,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.84000,44,0,0,32.00000,,,0
 2329387,TONYS PLACE HOME HOLYDAYS BOLOGNA,Apartment,44.51604,11.27732,borgopanigale,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,4.93000,399,0,1,1.00000,2026-11-15,2026-11-18,4
 2359237,DIDI Apartment,Condo,44.49091,11.37744,mazzini,San Donato - San Vitale,1.00000,1.00000,1.00000,2.00000,ia,4.77000,52,0,0,2.00000,2026-11-15,2026-11-18,4
-2378587,Z8 Terra - Comfortable two bedrooms apartment,Vacation home,44.50188,11.35155,c_universita,Santo Stefano,2.00000,5.00000,1.00000,7.00000,ia,4.78000,346,0,0,1.00000,,,0
+2378587,Z8 Terra - Comfortable two bedrooms apartment,Vacation home,44.50188,11.35155,c_universita,Santo Stefano,2.00000,5.00000,1.00000,7.00000,ia,4.78000,346,0,1,1.00000,2026-11-18,2026-11-18,1
 2390692,[Historic Centre] Enchanting Retreat + Sunny Patio,Condo,44.48787,11.35473,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.81000,116,0,1,1.00000,2026-11-15,2026-11-18,4
 2409234,bungalow with two bedrooms,Vacation home,44.51470,11.28499,borgopanigale,Borgo Panigale - Reno,2.00000,5.00000,1.50000,6.00000,ia,4.76000,126,0,1,1.00000,2026-11-15,2026-11-18,4
 2423689,IN FIERA 8: elegant front fair,Condo,44.50521,11.36354,fiera,San Donato - San Vitale,2.00000,6.00000,2.00000,6.00000,ia,4.90000,20,0,0,2.00000,2026-11-15,2026-11-18,4
@@ -124,7 +124,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 7157747,"Two-room apartment, Downtown, University, S. Orsola, Sismer",Condo,44.48896,11.36042,sanvitale,Santo Stefano,1.00000,2.00000,1.00000,2.00000,ia,4.90000,61,0,1,2.00000,2026-11-15,2026-11-18,4
 7183613,Casa Ranocchi - Elegant home in central Bologna,Apartment,44.49442,11.34515,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.91000,292,1,0,2.00000,2026-11-15,2026-11-16,2
 7195704,Beautiful and spacious apartment in downtown,Rental unit,44.50031,11.33894,c_marconi,Porto - Saragozza,2.00000,2.00000,3.00000,4.00000,ia,5.00000,3,0,0,5.00000,,,0
-7197274,City Center Beautiful loft with terrace,Apartment,44.49533,11.34174,c_maggiore,Porto - Saragozza,3.00000,3.00000,2.00000,6.00000,ia,4.99000,390,0,2,1.00000,2026-11-15,2026-11-18,4
+7197274,City Center Beautiful loft with terrace,Apartment,44.49533,11.34174,c_maggiore,Porto - Saragozza,3.00000,3.00000,2.00000,6.00000,ia,4.99000,391,0,2,1.00000,2026-11-15,2026-11-18,4
 7238747,Mansarda Teatro Duse | Centro,Rental unit,44.48795,11.34915,c_sstefano,Santo Stefano,2.00000,6.00000,2.00000,8.00000,ia,4.90000,216,0,0,1.00000,,,0
 7270070,casina del Pratello,Loft,44.49675,11.33462,c_pratello,Porto - Saragozza,0.00000,2.00000,1.00000,2.00000,ia,5.00000,2,0,0,31.00000,,,0
 7274563,"Apt 16 – 2BR, Balcony & Lift, Near Fair & Station",Vacation home,44.51521,11.35101,bolognina,Navile,2.00000,3.00000,1.00000,4.00000,ia,4.77000,48,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -144,7 +144,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 8417950,Apartments to rent in Bologna,Apartment,44.49612,11.35029,c_universita,Santo Stefano,1.00000,3.00000,1.00000,3.00000,ia,4.68000,125,0,0,2.00000,2026-11-16,2026-11-18,3
 8642390,The Gateway - just in the historical city center,Vacation home,44.50462,11.33934,bolognina,Porto - Saragozza,2.00000,5.00000,2.00000,6.00000,ia,4.94000,79,0,1,2.00000,2026-11-15,2026-11-15,1
 8650395,"""Il Focolare"" apartment",Condo,44.49343,11.38175,mazzini,San Donato - San Vitale,1.00000,1.00000,1.00000,2.00000,ia,4.91000,312,0,1,3.00000,2026-11-15,2026-11-15,1
-8697489,Z8 Aria - Nice studio flat,Vacation home,44.50188,11.35155,c_universita,Santo Stefano,0.00000,4.00000,1.00000,3.00000,ia,4.86000,196,1,0,2.00000,2026-11-15,2026-11-15,1
+8697489,Z8 Aria - Nice studio flat,Vacation home,44.50188,11.35155,c_universita,Santo Stefano,0.00000,4.00000,1.00000,3.00000,ia,4.86000,196,1,0,2.00000,2026-11-15,2026-11-18,2
 8732902,Panoramic Loggia in Medieval Town,Vacation home,44.49596,11.35054,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.95000,613,0,2,2.00000,2026-11-15,2026-11-18,4
 8984680,Bologna Bella Apartment,Apartment,44.49611,11.33643,c_pratello,Porto - Saragozza,1.00000,3.00000,1.00000,3.00000,ia,4.86000,245,0,2,2.00000,2026-11-15,2026-11-18,4
 8998336,Two Towers Attic with terrace,Serviced apartment,44.49438,11.34542,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.67000,9,0,0,3.00000,,,0
@@ -303,7 +303,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 17554061,Lovely central Apartament.,Apartment,44.49697,11.33256,c_pratello,Porto - Saragozza,2.00000,4.00000,1.00000,4.00000,ia,4.94000,17,0,0,2.00000,2026-11-15,2026-11-18,4
 17555471,House at Talon Park,Condo,44.47840,11.28449,casalecchio,,2.00000,3.00000,1.00000,5.00000,pdp,4.75000,12,0,0,,2026-11-15,2026-11-18,4
 17585875,Bright two-room apartment in the heart of Bologna,Apartment,44.49591,11.33119,c_pratello,Porto - Saragozza,1.00000,3.00000,1.00000,3.00000,ia,4.92000,642,0,2,1.00000,2026-11-15,2026-11-18,4
-17589220,Garibalda’s house,Apartment,44.48981,11.34232,c_saragozza,Santo Stefano,1.00000,1.00000,1.00000,4.00000,ia,4.95000,191,0,2,2.00000,2026-11-15,2026-11-18,4
+17589220,Garibalda’s house,Apartment,44.48981,11.34232,c_saragozza,Santo Stefano,1.00000,1.00000,1.00000,4.00000,ia,4.95000,192,0,2,2.00000,2026-11-15,2026-11-18,4
 17620131,Casa Caravaggio,Condo,44.48859,11.29201,santaviola,,1.00000,2.00000,1.00000,4.00000,pdp,4.80000,15,0,0,,2026-11-15,2026-11-18,4
 17667552,Spacious apart next to TRAIN STATION with PARKING,Home,44.50461,11.33964,bolognina,Porto - Saragozza,3.00000,5.00000,2.00000,8.00000,ia,4.72000,43,0,0,1.00000,2026-11-15,2026-11-18,4
 17725476,BolHouse,Condo,44.48701,11.35584,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.97000,123,0,1,1.00000,2026-11-15,2026-11-18,4
@@ -427,7 +427,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 22366684,GuestHost - Bright Apartment near Central Station,Vacation home,44.50813,11.34836,bolognina,Navile,1.00000,2.00000,1.00000,4.00000,ia,4.45000,133,0,0,2.00000,,,0
 22374933,Appartamento Cioppi-Bologna,Apartment,44.50295,11.35147,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.77000,39,0,1,1.00000,2026-11-15,2026-11-18,4
 22448352,The Roof Terrace,Rental unit,44.47899,11.35992,murri,Santo Stefano,1.00000,1.00000,1.00000,4.00000,ia,5.00000,29,0,0,31.00000,,,0
-22461202,TINY HOUSE with independent entrance and parking.,Vacation home,44.51341,11.34452,bolognina,Navile,1.00000,1.00000,1.00000,2.00000,ia,4.95000,624,0,2,1.00000,2026-11-15,2026-11-18,4
+22461202,TINY HOUSE with independent entrance and parking.,Vacation home,44.51341,11.34452,bolognina,Navile,1.00000,1.00000,1.00000,2.00000,ia,4.95000,625,0,2,1.00000,2026-11-15,2026-11-18,4
 22508568,Sant'Orsola Suite Apartment - Suite Deluxe,Apartment,44.49595,11.37494,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.53000,51,0,0,1.00000,2026-11-15,2026-11-18,4
 22546221,Apartment Palazzo del Toro,Apartment,44.49646,11.33648,c_marconi,Porto - Saragozza,1.00000,4.00000,1.00000,4.00000,ia,4.70000,54,0,0,2.00000,2026-11-15,2026-11-18,4
 22634574,Pandolf,Apartment,44.50333,11.34316,c_stazione,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.85000,55,0,1,1.00000,2026-11-15,2026-11-18,4
@@ -791,7 +791,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 36752810,FlatinBo Apartments Rizzoli - Bellombra Garisenda,Rental unit,44.48284,11.33857,colli,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,5.00000,1,0,0,31.00000,,,0
 36793830,Fiera Comfort Apartment 1,Apartment,44.50657,11.36686,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.78000,337,1,0,1.00000,2026-11-15,2026-11-18,4
 36796002,Fiera Comfort Apartment 2,Apartment,44.50657,11.36686,fiera,San Donato - San Vitale,1.00000,3.00000,1.00000,3.00000,ia,4.84000,332,1,0,1.00000,2026-11-15,2026-11-18,4
-36872750,Studio near downtown 10 min walk from 2 towers,Apartment,44.48890,11.36075,sanvitale,Santo Stefano,0.00000,2.00000,1.00000,2.00000,ia,4.95000,164,0,1,1.00000,2026-11-15,2026-11-18,4
+36872750,Studio near downtown 10 min walk from 2 towers,Apartment,44.48890,11.36075,sanvitale,Santo Stefano,0.00000,2.00000,1.00000,2.00000,ia,4.95000,164,0,2,1.00000,2026-11-15,2026-11-18,4
 36954840,The Blue Loft. Design & parking in the city center,Vacation home,44.50009,11.33535,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.98000,364,0,2,1.00000,2026-11-15,2026-11-18,4
 37103553,A lovely house on Bologna's hills,Condo,44.43683,11.35641,savena,,3.00000,3.00000,2.00000,5.00000,pdp,4.89000,88,0,1,,2026-11-15,2026-11-18,4
 37112731,Polese 36,Vacation home,44.50084,11.33993,c_stazione,Porto - Saragozza,1.00000,3.00000,1.00000,4.00000,ia,4.73000,26,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -947,7 +947,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 41836186,Casa Petronio Bologna - Free Parking & Breakfast,Vacation home,44.49020,11.35222,c_sstefano,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.99000,320,0,2,1.00000,2026-11-15,2026-11-18,4
 42000551,Alma Apartment,Condo,44.51271,11.35212,bolognina,Navile,2.00000,4.00000,1.00000,4.00000,ia,5.00000,134,0,2,2.00000,2026-11-15,2026-11-18,4
 42007737,nuovo appartamento al borghetto,Vacation home,44.51399,11.28373,borgopanigale,Borgo Panigale - Reno,2.00000,6.00000,1.00000,6.00000,ia,5.00000,7,0,0,1.00000,,,0
-42015824,Lexus27 Bologna - Entire apartment with garage,Apartment,44.51124,11.32922,saffi,Navile,1.00000,2.00000,1.00000,3.00000,ia,4.97000,182,0,2,1.00000,2026-11-15,2026-11-18,4
+42015824,Lexus27 Bologna - Entire apartment with garage,Apartment,44.51124,11.32922,saffi,Navile,1.00000,2.00000,1.00000,3.00000,ia,4.97000,183,0,2,1.00000,2026-11-15,2026-11-18,4
 42031130,Realkasa Senzanome Flat,Apartment,44.49126,11.33681,c_saragozza,Porto - Saragozza,1.00000,1.00000,1.00000,3.00000,ia,4.67000,57,0,0,2.00000,2026-11-15,2026-11-18,4
 42058821,Scandellari Apartments - Apartment Comfort & Wi-Fi,Vacation home,44.50195,11.32661,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,2.00000,ia,4.76000,17,0,0,2.00000,2026-11-17,2026-11-18,2
 42117803,Casa di Greta Studio S.orsola,Apartment,44.48989,11.36526,sanvitale,San Donato - San Vitale,1.00000,1.00000,1.00000,2.00000,ia,5.00000,1,0,0,2.00000,2026-11-15,2026-11-18,4
@@ -1094,7 +1094,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 45872100,UR-NEST Marconi B,Vacation home,44.49678,11.33764,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.33000,9,0,0,1.00000,2026-11-15,2026-11-18,4
 45931985,"Gelsomino Apartment, Maison Louise Bologna",Vacation home,44.48825,11.36859,sanvitale,San Donato - San Vitale,1.00000,1.00000,1.00000,2.00000,ia,4.76000,34,1,0,2.00000,2026-11-15,2026-11-18,4
 45965405,UR-NEST Montegrappa,Apartment,44.49494,11.34093,c_maggiore,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.68000,22,0,0,1.00000,2026-11-15,2026-11-18,4
-46001007,ODA ROOMS BO - FAIR-CENTER METEO EU - FICO EATALY,Vacation home,44.51810,11.35431,bolognina,Navile,3.00000,3.00000,3.00000,5.00000,ia,4.98000,64,0,1,1.00000,2026-11-15,2026-11-18,4
+46001007,ODA ROOMS BO - FAIR-CENTER METEO EU - FICO EATALY,Vacation home,44.51810,11.35431,bolognina,Navile,3.00000,3.00000,3.00000,5.00000,ia,4.98000,64,0,2,1.00000,2026-11-15,2026-11-18,4
 46006244,Comfortable and Elegant in the historic center of Bologna,Apartment,44.48679,11.34149,c_saragozza,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.62000,104,0,0,2.00000,2026-11-16,2026-11-18,3
 46015891,Delle Tovaglie Suites,Condo,44.48864,11.34163,c_saragozza,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.86000,530,0,0,1.00000,2026-11-15,2026-11-18,4
 46049102,Via Emilia House BLQ - By AyDesHOUSE,Apartment,44.50829,11.29660,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,3.00000,ia,4.78000,36,0,0,1.00000,2026-11-17,2026-11-17,1
@@ -1151,7 +1151,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 49784772,2 Tourist house Bologna - Self Check in,Vacation home,44.49504,11.34430,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.57000,84,1,0,1.00000,2026-11-15,2026-11-18,4
 49786197,Cesira Apartment. Free reserved parking,Condo,44.48188,11.37809,mazzini,Savena,1.00000,2.00000,1.00000,4.00000,ia,4.82000,121,1,0,2.00000,2026-11-15,2026-11-18,4
 49847017,Luxurious Apartment in the Heart of the Historic Center,Condo,44.49442,11.34290,c_maggiore,Santo Stefano,2.00000,3.00000,1.00000,5.00000,ia,4.33000,24,0,0,1.00000,2026-11-15,2026-11-18,4
-49869527,San Pietro House by Studio Vita,Condo,44.50231,11.35226,c_universita,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.76000,155,1,0,1.00000,2026-11-15,2026-11-18,4
+49869527,San Pietro House by Studio Vita,Condo,44.50231,11.35226,c_universita,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.76000,156,1,0,1.00000,2026-11-15,2026-11-18,4
 49892152,Apartment ADELE: reserved free parking,Vacation home,44.48188,11.37809,mazzini,Savena,1.00000,2.00000,1.00000,4.00000,ia,4.83000,162,1,0,2.00000,2026-11-15,2026-11-18,4
 49943749,[City Center] - CasAvesella,Vacation home,44.50027,11.34181,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,4.00000,ia,4.89000,322,0,1,1.00000,2026-11-15,2026-11-18,4
 50064172,Casa del Sole by Life Studio,Apartment,44.49997,11.34398,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,3.00000,ia,4.87000,85,0,1,2.00000,2026-11-15,2026-11-18,4
@@ -1319,7 +1319,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 54349048,"Little house Bo, minutes from Bellaria",Condo,44.46977,11.41420,sanlazzaro,,1.00000,1.00000,1.00000,3.00000,pdp,4.89000,102,0,1,,2026-11-15,2026-11-18,4
 54407416,GuestHost - Bologna Saragozza District Apartment,Vacation home,44.48875,11.32228,saragozza,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.60000,83,0,0,2.00000,2026-11-15,2026-11-18,4
 54408801,GuestHost - 500mt to Certosa Classic Apartment,Vacation home,44.49551,11.31565,saragozza,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.41000,71,0,0,2.00000,2026-11-15,2026-11-18,4
-546168253174284813,Nice apartment between the Fair and the Centre,Apartment,44.50512,11.36275,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.90000,144,0,1,1.00000,2026-11-15,2026-11-18,4
+546168253174284813,Nice apartment between the Fair and the Centre,Apartment,44.50512,11.36275,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.90000,145,0,1,1.00000,2026-11-15,2026-11-18,4
 551216308426028478,Design Loft city center Bologna,Loft,44.50198,11.33762,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.95000,417,0,1,1.00000,2026-11-15,2026-11-18,4
 551895527457997797,Casa Ellie - Bologna,Apartment,44.49204,11.36932,sanvitale,San Donato - San Vitale,2.00000,3.00000,1.00000,4.00000,ia,4.50000,108,1,0,2.00000,2026-11-15,2026-11-18,4
 552585019160254276,Iris Home - All' Osp. Maggiore a 10 min dal Cento,Condo,44.49865,11.31317,saffi,Porto - Saragozza,2.00000,3.00000,1.00000,4.00000,ia,4.50000,12,0,0,1.00000,,,0
@@ -1346,7 +1346,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 570739510049269976,Casa Sorriso-delizioso e confortevole appartamento,Condo,44.47726,11.39010,mazzini,Savena,1.00000,2.00000,1.00000,4.00000,ia,4.84000,49,0,0,3.00000,,,0
 570741844217805604,6 single beds in Santa Viola,Condo,44.51144,11.29656,santaviola,Borgo Panigale - Reno,3.00000,6.00000,1.00000,6.00000,ia,4.96000,24,0,0,3.00000,,,0
 570883523834511250,Charming apartment in the heart of Bologna,Condo,44.49411,11.34482,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.86000,382,0,1,1.00000,2026-11-15,2026-11-18,4
-571600379219728035,Lovely mini apartment in Bologna,Apartment,44.47037,11.37589,savena,Savena,1.00000,2.00000,1.00000,3.00000,ia,4.90000,184,0,1,2.00000,2026-11-15,2026-11-18,4
+571600379219728035,Lovely mini apartment in Bologna,Apartment,44.47037,11.37589,savena,Savena,1.00000,2.00000,1.00000,3.00000,ia,4.90000,185,0,1,2.00000,2026-11-15,2026-11-18,4
 576645147673150131,RealKasa Sun Flat,Rental unit,44.49095,11.35713,c_sstefano,Santo Stefano,0.00000,1.00000,1.00000,2.00000,ia,4.08000,12,0,0,2.00000,,,0
 577247502109905629,"La Finestra sul cortile, Entire Apartment",Condo,44.49296,11.35246,c_universita,Santo Stefano,2.00000,6.00000,1.00000,10.00000,ia,4.75000,73,0,0,1.00000,2026-11-15,2026-11-18,4
 577848069262468008,Giudei House Smart 2,Vacation home,44.49521,11.34688,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.77000,234,1,0,1.00000,2026-11-15,2026-11-18,4
@@ -1362,7 +1362,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 580151725587287763,"Palazzo pedretti 207, spacious 1 br apartment by h",Apartment,44.49406,11.37381,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.40000,5,0,0,2.00000,2026-11-16,2026-11-16,1
 580335999114671389,Capo di Lucca Home -in the center with terrace,Condo,44.49953,11.34758,c_stazione,Santo Stefano,1.00000,1.00000,1.00000,4.00000,ia,4.77000,120,0,0,1.00000,2026-11-15,2026-11-18,4
 581629401693793286,Santa Croce Apartment P3,Vacation home,44.49642,11.32932,c_pratello,Porto - Saragozza,2.00000,2.00000,2.00000,3.00000,ia,4.87000,45,1,0,2.00000,2026-11-15,2026-11-18,4
-583124711515998403,Casa del Mare by Life Studio,Condo,44.49641,11.34778,c_universita,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.86000,115,0,1,1.00000,2026-11-15,2026-11-18,4
+583124711515998403,Casa del Mare by Life Studio,Condo,44.49641,11.34778,c_universita,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.86000,116,0,1,1.00000,2026-11-15,2026-11-18,4
 583167654980899388,Azeglio Luxury Home: Spaziosa ed Elegante,Condo,44.49147,11.34212,c_maggiore,Santo Stefano,2.00000,3.00000,3.00000,6.00000,ia,4.77000,79,0,0,3.00000,,,0
 586875517298257368,"Goito Luxury Apartment, in the Historical Center",Condo,44.49675,11.34530,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.84000,108,0,1,1.00000,2026-11-15,2026-11-18,4
 587357495948313553,Casa Giò: Tranquility just steps from the center,Apartment,44.48901,11.32379,saragozza,Porto - Saragozza,3.00000,4.00000,3.00000,6.00000,ia,4.98000,121,0,2,1.00000,2026-11-15,2026-11-18,4
@@ -1412,7 +1412,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 622936922299423826,Comfortable accommodation for short periods,Vacation home,44.49635,11.37391,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.74000,53,0,0,2.00000,2026-11-15,2026-11-18,4
 623867264169391773,Studio in the Sun,Condo,44.49894,11.34439,c_stazione,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.40000,15,0,0,1.00000,2026-11-15,2026-11-18,4
 624251417184157119,"Dimora D'Arco, formerly Palazzo Mattesilani Vecchietti",Condo,44.48897,11.34011,c_saragozza,Porto - Saragozza,1.00000,2.00000,2.00000,4.00000,ia,5.00000,69,0,2,2.00000,2026-11-15,2026-11-18,4
-624251564748001708,"ARCHED HOUSES, formerly Palazzo Lodovisi Tornelli, 16th century",Condo,44.49148,11.35386,c_sstefano,Santo Stefano,2.00000,4.00000,2.00000,6.00000,ia,4.94000,109,0,2,2.00000,2026-11-15,2026-11-18,4
+624251564748001708,"ARCHED HOUSES, formerly Palazzo Lodovisi Tornelli, 16th century",Condo,44.49148,11.35386,c_sstefano,Santo Stefano,2.00000,4.00000,2.00000,6.00000,ia,4.94000,110,0,2,2.00000,2026-11-15,2026-11-18,4
 626632722974570420,URBAN B. SPACIOUS 4 ROOM APARTMENT IN THE CENTER,Condo,44.50061,11.35254,c_universita,Santo Stefano,4.00000,6.00000,2.00000,7.00000,ia,4.94000,63,0,1,2.00000,2026-11-15,2026-11-18,4
 628821327460343222,Casa Galliera Bologna Center,Condo,44.50080,11.34340,c_stazione,Porto - Saragozza,2.00000,4.00000,2.00000,5.00000,ia,4.93000,135,0,1,2.00000,2026-11-15,2026-11-18,4
 628999936499178271,Llarge independent apartment via Pasubio 18,Condo,44.49805,11.31964,saffi,Porto - Saragozza,2.00000,3.00000,1.00000,6.00000,ia,4.74000,31,0,0,1.00000,,,0
@@ -1601,7 +1601,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 777524490513683248,Bolove51 · Loft in 16th-century stables,Apartment,44.49076,11.35496,c_sstefano,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,5.00000,2,0,0,2.00000,2026-11-15,2026-11-18,4
 778226528309544607,The Unicorn open space,Rental unit,44.50536,11.35748,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.67000,3,0,0,31.00000,,,0
 778807569488145117,Apartment Avesella 9 in Bologna,Vacation home,44.49892,11.34126,c_stazione,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.00000,19,0,0,1.00000,2026-11-15,2026-11-18,4
-779488211114029728,Adele's house (free private parking),Apartment,44.48208,11.37969,mazzini,Savena,1.00000,3.00000,1.00000,4.00000,ia,4.84000,282,0,1,1.00000,2026-11-15,2026-11-18,4
+779488211114029728,Adele's house (free private parking),Apartment,44.48208,11.37969,mazzini,Savena,1.00000,3.00000,1.00000,4.00000,ia,4.84000,283,0,1,1.00000,2026-11-15,2026-11-18,4
 779674614589683983,Aurora's house  (free private parking),Apartment,44.48188,11.37838,mazzini,Savena,1.00000,2.00000,1.00000,4.00000,ia,4.92000,382,0,1,1.00000,2026-11-15,2026-11-18,4
 781183729810627490,Marsala Terrace Apartment,Apartment,44.49658,11.34762,c_universita,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.71000,35,0,0,3.00000,2026-11-16,2026-11-18,2
 781784122464776907,Chez Cristina by Wonderful Italy,Apartment,44.48748,11.35358,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.00000,8,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -1764,7 +1764,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 846861574861583034,Il Cielo sopra Bologna,Rental unit,44.49954,11.34532,c_stazione,Santo Stefano,3.00000,4.00000,2.00000,8.00000,ia,4.93000,107,0,0,1.00000,,,0
 847708599264567566,Bologna Sweet Home - Private Parking,Home,44.50143,11.36618,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.95000,563,0,2,1.00000,2026-11-15,2026-11-18,4
 847732163641793640,Il Nido apartment,Condo,44.49396,11.31900,saragozza,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.75000,72,1,0,1.00000,2026-11-15,2026-11-18,4
-847815907409352064,Casa Pratello,Apartment,44.49540,11.33131,c_pratello,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.71000,41,0,0,2.00000,2026-11-15,2026-11-18,4
+847815907409352064,Casa Pratello,Apartment,44.49540,11.33131,c_pratello,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.71000,42,0,0,2.00000,2026-11-15,2026-11-18,4
 848385981535740670,The Traveler apartment,Apartment,44.44730,11.41260,sanlazzaro,,1.00000,1.00000,1.00000,2.00000,pdp,4.90000,71,0,0,,2026-11-15,2026-11-18,4
 849091924539531744,Cozy apartment two steps from the center Bologna,Apartment,44.49036,11.37005,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.93000,328,0,1,1.00000,2026-11-15,2026-11-18,4
 849924832313533259,Bologna Rimesse Apartment,Condo,44.49563,11.37241,sanvitale,San Donato - San Vitale,1.00000,1.00000,1.00000,2.00000,ia,4.93000,98,0,2,2.00000,2026-11-15,2026-11-18,4
@@ -1818,7 +1818,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 860856802741760129,apartment in the center of bologna,Vacation home,44.50042,11.35120,c_universita,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,4.92000,12,0,1,1.00000,2026-11-15,2026-11-18,4
 861549412052395591,House Vicolo Mandria,Apartment,44.49530,11.34607,c_maggiore,Santo Stefano,2.00000,2.00000,2.00000,6.00000,ia,4.84000,148,0,1,2.00000,2026-11-15,2026-11-18,4
 862062942178910997,"Old Town Loft, Piazza Santo Stefano -Netflix-",Apartment,44.49177,11.35026,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.95000,460,0,1,1.00000,2026-11-15,2026-11-18,4
-862063661098610146,Golden Suite by Studio Vita,Condo,44.49509,11.34729,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,4.00000,ia,4.97000,91,0,1,2.00000,2026-11-15,2026-11-18,4
+862063661098610146,Golden Suite by Studio Vita,Condo,44.49509,11.34729,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,4.00000,ia,4.97000,93,0,1,2.00000,2026-11-15,2026-11-18,4
 862343801186928107,Piazza Maggiore Luxury Apartment,Condo,44.49334,11.34219,c_maggiore,Porto - Saragozza,2.00000,2.00000,2.00000,4.00000,ia,4.95000,44,0,0,10.00000,,,0
 862808285698762851,Le2M new comfortable studio apartment with parking,Apartment,44.50648,11.35850,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.89000,46,1,0,1.00000,2026-11-15,2026-11-18,4
 863117680458655249,studio with terrace A,Vacation home,44.50193,11.35305,fiera,Santo Stefano,0.00000,1.00000,1.00000,2.00000,ia,5.00000,10,0,0,2.00000,2026-11-15,2026-11-18,4
@@ -1846,7 +1846,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 872385933537952620,Villa Laura Holiday House,Vacation home,44.47897,11.38186,mazzini,Savena,1.00000,3.00000,1.00000,4.00000,ia,5.00000,13,0,1,1.00000,2026-11-15,2026-11-18,3
 872994485358661292,HouSmart Milazzo 5,Apartment,44.50340,11.34055,c_stazione,Porto - Saragozza,1.00000,2.00000,1.00000,2.00000,ia,4.67000,18,0,0,2.00000,2026-11-15,2026-11-18,4
 873051216407909567,Berretta Loft 2,Rental unit,44.50573,11.30808,saffi,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,4.85000,53,0,0,2.00000,,,0
-873116175979520427,Casa Barberia,Vacation home,44.49217,11.33772,c_saragozza,Porto - Saragozza,2.00000,2.00000,3.00000,4.00000,ia,4.93000,263,0,0,1.00000,,,0
+873116175979520427,Casa Barberia,Vacation home,44.49217,11.33772,c_saragozza,Porto - Saragozza,2.00000,2.00000,3.00000,4.00000,ia,4.94000,277,0,2,1.00000,2026-11-18,2026-11-18,1
 874338925884289514,Everyday Apartments Petroni 18/4,Apartment,44.49457,11.35094,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.69000,13,1,0,2.00000,2026-11-15,2026-11-18,4
 874374234677065405,"""Ci Vuole Leggerezza"" Apartment  Free Parking",Apartment,44.49732,11.29374,santaviola,Borgo Panigale - Reno,2.00000,2.00000,1.00000,5.00000,ia,5.00000,33,0,1,1.00000,2026-11-15,2026-11-18,4
 874438339687269057,Stylish apartment in the heart of Bologna,Apartment,44.49592,11.35142,c_universita,Santo Stefano,2.00000,3.00000,1.00000,6.00000,ia,5.00000,7,0,1,2.00000,2026-11-15,2026-11-18,4
@@ -1883,7 +1883,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 890700897482200378,[Suite Toffee Gold] Free Parking,Vacation home,44.50635,11.29477,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,4.95000,132,0,2,1.00000,2026-11-15,2026-11-18,4
 891290521596252400,Oasis in the Center with Garden by Synergy,Condo,44.49856,11.34710,c_universita,Santo Stefano,1.00000,3.00000,1.00000,5.00000,ia,4.87000,118,0,1,1.00000,2026-11-15,2026-11-18,4
 892595680973705126,Realkasa De Pepoli Suite,Apartment,44.49308,11.34811,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.66000,65,0,0,2.00000,2026-11-15,2026-11-18,4
-892809155385948981,Grey Sant'Orsola Apartment,Condo,44.49824,11.36594,sanvitale,San Donato - San Vitale,2.00000,3.00000,1.00000,4.00000,ia,5.00000,7,0,1,1.00000,2026-11-15,2026-11-18,4
+892809155385948981,Grey Sant'Orsola Apartment,Condo,44.49824,11.36594,sanvitale,San Donato - San Vitale,2.00000,3.00000,1.00000,4.00000,ia,4.88000,8,0,1,1.00000,2026-11-15,2026-11-18,4
 893245947342955309,Tra Fiera e Osp.S.Orsola,Rental unit,44.49659,11.37087,sanvitale,San Donato - San Vitale,1.00000,1.00000,1.00000,4.00000,ia,4.83000,6,0,0,2.00000,,,0
 893354174946417895,Appartamento White and Black Sant'Orsola,Apartment,44.49704,11.36503,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.71000,17,0,0,1.00000,2026-11-15,2026-11-18,4
 894130853899702129,Realkasa Montebello Flat,Rental unit,44.50310,11.34271,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.20000,10,0,0,2.00000,,,0
@@ -2005,7 +2005,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 949149651521230012,GuestHost - Remittances & Hospital Sant'Orsola Apt,Vacation home,44.48994,11.37312,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.26000,58,0,0,2.00000,2026-11-15,2026-11-18,4
 950555954462882386,This must be your colorful place,Vacation home,44.50550,11.33039,saffi,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,5.00000,22,0,1,1.00000,2026-11-15,2026-11-18,4
 950584409208515896,Large studio apartment in Bologna,Vacation home,44.47886,11.36680,murri,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.90000,58,0,0,3.00000,,,0
-950596295635721793,FrenkHome open space,Apartment,44.44128,11.35351,savena,,1.00000,2.00000,1.00000,4.00000,pdp,4.88000,147,0,1,,2026-11-15,2026-11-18,4
+950596295635721793,FrenkHome open space,Apartment,44.44128,11.35351,savena,,1.00000,2.00000,1.00000,4.00000,pdp,4.89000,148,0,1,,2026-11-15,2026-11-18,4
 951944148489929283,Two-room apartment in the city center,Apartment,44.49549,11.33252,c_pratello,Porto - Saragozza,1.00000,3.00000,1.00000,4.00000,ia,4.67000,99,0,0,1.00000,2026-11-15,2026-11-18,4
 952766216782135551,"Ubaldini, Bologna By Short Holidays",Apartment,44.49502,11.35434,c_universita,Santo Stefano,2.00000,4.00000,2.00000,6.00000,ia,4.54000,26,0,0,1.00000,2026-11-15,2026-11-18,4
 953019464996097731,Antica Dimora Mascarella 1598 Historic Apartment,Apartment,44.49787,11.34906,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.79000,62,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -2044,7 +2044,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 970026200053290218,Studying in Bologna,Apartment,44.47839,11.39027,mazzini,Savena,2.00000,4.00000,1.00000,4.00000,ia,4.88000,16,1,0,2.00000,2026-11-15,2026-11-18,4
 970346851308311801,Spacious apartment in the historic center,Vacation home,44.49551,11.33073,c_pratello,Porto - Saragozza,2.00000,2.00000,1.00000,6.00000,ia,4.68000,38,0,0,1.00000,2026-11-15,2026-11-18,4
 971616553191530263,Attic in the heart of Bologna,Apartment,44.49919,11.34118,c_stazione,Porto - Saragozza,1.00000,2.00000,1.00000,2.00000,ia,4.73000,132,0,0,2.00000,2026-11-15,2026-11-18,4
-972455998685165989,Romantic attic room with panoramic view,Apartment,44.48670,11.34111,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.94000,147,0,1,2.00000,2026-11-15,2026-11-18,4
+972455998685165989,Romantic attic room with panoramic view,Apartment,44.48670,11.34111,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.94000,148,0,1,2.00000,2026-11-15,2026-11-18,4
 972534473256767407,Home in city/airport,Condo,44.51118,11.29098,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,4.81000,53,0,0,31.00000,,,0
 972884063986014762,Mansarda nel centro storico - Chez Arianna,Rental unit,44.49001,11.34964,c_sstefano,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.95000,63,0,0,3.00000,,,0
 972991279156820891,appartamento Be & Bo,Rental unit,44.47672,11.37848,mazzini,Savena,2.00000,2.00000,1.00000,3.00000,ia,4.33000,9,0,0,3.00000,,,0
@@ -2062,7 +2062,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 979615807960449644,Realkasa Giulia Flat,Apartment,44.50478,11.34395,bolognina,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.33000,3,0,0,2.00000,2026-11-15,2026-11-18,4
 980155956712160497,Residence 1 Central Bo,Vacation home,44.50447,11.33850,bolognina,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.68000,189,0,0,1.00000,2026-11-15,2026-11-18,4
 980189158730175458,HouSmart Tovaglie 9 int. 6,Apartment,44.48825,11.34098,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.25000,4,0,0,2.00000,2026-11-15,2026-11-18,4
-980301135993088476,Bright Apartment with Balcony & San Luca View,Vacation home,44.50211,11.33646,c_marconi,Porto - Saragozza,1.00000,3.00000,1.00000,3.00000,ia,4.93000,240,0,1,1.00000,2026-11-15,2026-11-18,4
+980301135993088476,Bright Apartment with Balcony & San Luca View,Vacation home,44.50211,11.33646,c_marconi,Porto - Saragozza,1.00000,3.00000,1.00000,3.00000,ia,4.93000,240,0,2,1.00000,2026-11-15,2026-11-18,4
 980823030348823016,Romantic flat in the heart of Bologna,Condo,44.49787,11.34351,c_stazione,Santo Stefano,2.00000,3.00000,1.00000,4.00000,ia,4.86000,21,1,0,1.00000,2026-11-15,2026-11-18,4
 980872366487230461,"Casa San mamolo 2, con terrazza",Rental unit,44.48598,11.33939,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.32000,19,0,0,2.00000,,,0
 981082883349332373,Alemanni54 - exclusive apartment with garden,Condo,44.49838,11.37388,sanvitale,San Donato - San Vitale,2.00000,3.00000,2.50000,5.00000,ia,5.00000,20,0,2,2.00000,2026-11-15,2026-11-18,4
@@ -2102,8 +2102,8 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 996149724987775147,Family apartment Piazza Sette Chiese x 7,Vacation home,44.49205,11.34783,c_maggiore,Santo Stefano,2.00000,4.00000,2.00000,7.00000,ia,4.75000,44,0,0,1.00000,2026-11-15,2026-11-18,4
 996159047043746591,True Italian Stay,Apartment,44.45375,11.27331,casalecchio,,1.00000,2.00000,1.00000,2.00000,pdp,5.00000,30,0,1,,2026-11-15,2026-11-18,4
 996839446315361788,Breathtaking Bologna Views • Balcony • Walk Center,Condo,44.48149,11.33431,colli,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.93000,217,0,1,1.00000,2026-11-15,2026-11-18,4
-997707431699065990,Luxury Apartment with Garage & Jacuzzi fair Zone,Vacation home,44.50342,11.36453,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.90000,51,1,0,1.00000,2026-11-15,2026-11-18,4
-999089934260431851,[2 Steps to the Station] Urban Oasis,Vacation home,44.51153,11.34637,bolognina,Navile,1.00000,2.00000,1.00000,3.00000,ia,4.86000,147,1,0,2.00000,2026-11-15,2026-11-18,4
+997707431699065990,Luxury Apartment with Garage & Jacuzzi fair Zone,Vacation home,44.50342,11.36453,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.90000,52,1,0,1.00000,2026-11-15,2026-11-18,4
+999089934260431851,[2 Steps to the Station] Urban Oasis,Vacation home,44.51153,11.34637,bolognina,Navile,1.00000,2.00000,1.00000,3.00000,ia,4.86000,148,1,0,2.00000,2026-11-15,2026-11-18,4
 999853257555416393,borghetto36,Vacation home,44.49358,11.35948,sanvitale,San Donato - San Vitale,2.00000,2.00000,1.00000,3.00000,ia,4.80000,5,1,0,2.00000,2026-11-15,2026-11-18,4
 1000504961889262493,Giudei House Loft 1,Vacation home,44.49528,11.34692,c_maggiore,Santo Stefano,0.00000,1.00000,1.00000,2.00000,ia,4.68000,143,0,0,1.00000,2026-11-15,2026-11-18,4
 1000691909534238502,[City Center] Bright apartment,Vacation home,44.48578,11.35028,c_sstefano,Santo Stefano,2.00000,5.00000,2.00000,9.00000,ia,4.96000,25,0,1,1.00000,2026-11-15,2026-11-18,4
@@ -2209,31 +2209,31 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1049390431557759579,bright & quiet apartment,Vacation home,44.51446,11.28432,borgopanigale,Borgo Panigale - Reno,1.00000,1.00000,1.50000,4.00000,ia,5.00000,8,1,0,1.00000,2026-11-15,2026-11-18,4
 1049433886209235940,Bologna giardini,Apartment,44.48664,11.35019,c_sstefano,Santo Stefano,1.00000,1.00000,1.00000,3.00000,ia,5.00000,5,0,0,2.00000,2026-11-15,2026-11-18,4
 1049739290677250897,GuestHost - Heart of Bologna: City Center Living,Vacation home,44.49241,11.35091,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.31000,78,0,0,2.00000,2026-11-15,2026-11-18,4
-1050487785018388961,Casa Milonga by Studio Life,Apartment,44.49818,11.34642,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.79000,62,1,0,1.00000,2026-11-15,2026-11-18,4
+1050487785018388961,Casa Milonga by Studio Life,Apartment,44.49818,11.34642,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.75000,64,1,0,1.00000,2026-11-15,2026-11-18,4
 1050512993075760721,Casa Vittoria by Life Studio,Apartment,44.48680,11.34206,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.80000,87,1,0,1.00000,2026-11-15,2026-11-18,4
-1050574495024541739,Welcome To La Casa di Sandro [Under  the Towers],Vacation home,44.49412,11.35221,c_universita,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.80000,104,0,0,2.00000,2026-11-15,2026-11-18,4
+1050574495024541739,Welcome To La Casa di Sandro [Under  the Towers],Vacation home,44.49412,11.35221,c_universita,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.80000,105,0,0,2.00000,2026-11-15,2026-11-18,4
 1050840664065287148,"""Bentivogli 66"" Apartment",Apartment,44.49833,11.36384,sanvitale,San Donato - San Vitale,1.00000,1.00000,1.00000,4.00000,ia,4.87000,54,0,1,1.00000,2026-11-15,2026-11-18,4
 1051181931533788582,"""Il Quinto"" Bilocale nel cuore della Modernità",Rental unit,44.49692,11.33689,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,4.89000,9,0,0,1.00000,,,0
 1051196663110896726,"Three-room ""Il Quinto"" in the heart of modernity",Rental unit,44.49692,11.33689,c_marconi,Porto - Saragozza,2.00000,3.00000,1.50000,5.00000,ia,4.90000,10,0,0,1.00000,,,0
 1051200857827574990,Casa Marconi 8 - Bologna City Centre,Apartment,44.49603,11.33730,c_pratello,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,4.69000,173,0,0,1.00000,2026-11-15,2026-11-18,4
 1052160598938607156,[Central Station] Studio in the Historic Centre,Condo,44.50078,11.34014,c_stazione,Porto - Saragozza,0.00000,2.00000,1.00000,4.00000,ia,4.83000,107,0,1,2.00000,2026-11-15,2026-11-18,4
 1053658943920660654,"Historic Center, Suite Penthouse Frassinago",Apartment,44.49305,11.33235,c_pratello,Porto - Saragozza,2.00000,2.00000,2.00000,4.00000,ia,4.78000,222,0,0,1.00000,2026-11-15,2026-11-18,4
-1054918485341240691,Residenza Ariosto - Two-room apartment,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.90000,31,1,0,1.00000,2026-11-15,2026-11-18,4
+1054918485341240691,Residenza Ariosto - Two-room apartment,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.88000,32,1,0,1.00000,2026-11-15,2026-11-18,4
 1054984912732864229,Residenza Ariosto-Bilo Superior,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.60000,15,1,0,1.00000,2026-11-15,2026-11-18,4
 1054995049005215103,Residenza Ariosto -Mono Superior,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,0.00000,2.00000,1.00000,3.00000,ia,4.78000,59,1,0,1.00000,2026-11-15,2026-11-18,4
-1055004709408265627,Residenza Ariosto - Studio apartment,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,0.00000,1.00000,1.00000,2.00000,ia,4.72000,58,0,1,1.00000,2026-11-15,2026-11-18,4
+1055004709408265627,Residenza Ariosto - Studio apartment,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,0.00000,1.00000,1.00000,2.00000,ia,4.73000,59,0,1,1.00000,2026-11-15,2026-11-18,4
 1055488687246886998,Urbanicooh Garisenda - Piazza Maggiore View,Vacation home,44.49341,11.34391,c_maggiore,Santo Stefano,3.00000,4.00000,2.00000,6.00000,ia,4.93000,15,0,1,1.00000,2026-11-15,2026-11-18,4
 1055503069423985478,Urbanicooh Asinelli - Piazza Maggiore View,Vacation home,44.49341,11.34391,c_maggiore,Santo Stefano,2.00000,2.00000,2.00000,4.00000,ia,4.65000,20,0,0,1.00000,2026-11-15,2026-11-18,4
 1055522863811198154,Ariosto residence with balcony,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.50000,10,1,0,1.00000,2026-11-15,2026-11-18,4
 1055548966746649232,ResidenceAriosto-Vista on the rooftops,Vacation home,44.49756,11.34483,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.86000,29,0,1,2.00000,2026-11-15,2026-11-18,4
-1055560890415733078,Ariosto Residence - Maisonette,Vacation home,44.49756,11.34483,c_maggiore,Santo Stefano,1.00000,3.00000,2.00000,4.00000,ia,4.88000,145,0,1,1.00000,2026-11-15,2026-11-18,4
+1055560890415733078,Ariosto Residence - Maisonette,Vacation home,44.49756,11.34483,c_maggiore,Santo Stefano,1.00000,3.00000,2.00000,4.00000,ia,4.88000,146,0,1,1.00000,2026-11-15,2026-11-18,4
 1055583349206812062,CozyApartment with small balcony,Vacation home,44.49756,11.34483,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.91000,34,0,1,1.00000,2026-11-15,2026-11-18,4
 1055594288159256676,Ariosto for Families Residence,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,2.00000,3.00000,1.00000,4.00000,ia,4.84000,76,0,1,1.00000,2026-11-15,2026-11-18,4
 1055611818779537659,Ariosto for Friends Residence,Vacation home,44.49741,11.34470,c_maggiore,Santo Stefano,2.00000,3.00000,1.00000,4.00000,ia,4.84000,91,0,1,1.00000,2026-11-15,2026-11-18,4
 1055631661481433571,Petroni 38 by Life Studio,Vacation home,44.49591,11.35062,c_universita,Santo Stefano,2.00000,4.00000,2.00000,5.00000,ia,4.85000,54,1,0,1.00000,2026-11-15,2026-11-18,4
 1055647813994489651,Studio Vita - Superior Two-Room Apartment,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.72000,32,1,0,1.00000,2026-11-15,2026-11-18,4
-1055671888061329467,Studio Vita - Two-room apartment,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.77000,108,1,0,1.00000,2026-11-15,2026-11-18,4
-1055682256081069678,Studio Vita - Superior Studio,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,0.00000,2.00000,1.00000,3.00000,ia,4.86000,73,1,0,1.00000,2026-11-15,2026-11-18,4
+1055671888061329467,Studio Vita - Two-room apartment,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.76000,110,1,0,1.00000,2026-11-15,2026-11-18,4
+1055682256081069678,Studio Vita - Superior Studio,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,0.00000,2.00000,1.00000,3.00000,ia,4.87000,75,1,0,1.00000,2026-11-15,2026-11-18,4
 1055789603128093589,Apartment in the Stadium Area!,Condo,44.49214,11.30335,santaviola,Porto - Saragozza,2.00000,3.00000,1.00000,4.00000,ia,5.00000,4,0,0,2.00000,2026-11-15,2026-11-18,4
 1055926459588671297,Urbanicooh Azzoguidi - Asinelli Tower View,Vacation home,44.49341,11.34391,c_maggiore,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.38000,13,0,0,1.00000,2026-11-15,2026-11-18,4
 1055967296659081358,whouse suite apartment indipendenza,Rental unit,44.49724,11.34207,c_maggiore,Porto - Saragozza,1.00000,,1.00000,3.00000,ia,,0,0,0,2.00000,,,0
@@ -2241,13 +2241,13 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1056012860533604593,Urbanicooh S. Petronio - Asinelli Tower View,Vacation home,44.49358,11.34470,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,5.00000,1,0,0,1.00000,2026-11-15,2026-11-18,4
 1056246072211039585,Studio Vita - Studio apartment,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,0.00000,2.00000,1.00000,2.00000,ia,4.75000,61,1,0,1.00000,2026-11-15,2026-11-18,4
 1056273804331005115,Studio Vita for families,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,2.00000,4.00000,1.50000,5.00000,ia,4.82000,34,1,0,1.00000,2026-11-15,2026-11-18,4
-1056291846059533274,Studio Vita for friends,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,2.00000,4.00000,1.00000,5.00000,ia,4.82000,74,0,1,1.00000,2026-11-15,2026-11-18,4
+1056291846059533274,Studio Vita for friends,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,2.00000,4.00000,1.00000,5.00000,ia,4.83000,75,0,1,1.00000,2026-11-15,2026-11-18,4
 1056306235732483547,Studio Vita - Four-room apartment,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,3.00000,5.00000,2.00000,6.00000,ia,4.74000,62,0,1,1.00000,2026-11-15,2026-11-18,4
 1056321299365880044,La Casa Magenta by Wonderful Italy,Apartment,44.49043,11.35065,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.57000,7,0,0,1.00000,2026-11-15,2026-11-18,4
 1056325499587214661,Studio Vita-3 bedrooms Apartment,Vacation home,44.49633,11.34823,c_universita,Santo Stefano,3.00000,5.00000,2.00000,7.00000,ia,4.77000,53,1,0,1.00000,2026-11-15,2026-11-18,4
 1056429602668020480,FamilyBO Apartments Bologna Delight Front Station,Condo,44.50433,11.34401,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,4.00000,ia,4.50000,20,0,0,1.00000,2026-11-15,2026-11-18,4
 1056561839367819312,Margherita Suite,Rental unit,44.49253,11.34098,c_maggiore,Porto - Saragozza,1.00000,1.00000,1.00000,4.00000,ia,4.79000,42,0,0,1.00000,,,0
-1056973699836145903,Studio d 'Azeglio by Studio Vita,Vacation home,44.48727,11.33950,c_saragozza,Porto - Saragozza,0.00000,2.00000,1.00000,2.00000,ia,4.83000,121,0,1,1.00000,2026-11-15,2026-11-18,4
+1056973699836145903,Studio d 'Azeglio by Studio Vita,Vacation home,44.48727,11.33950,c_saragozza,Porto - Saragozza,0.00000,2.00000,1.00000,2.00000,ia,4.83000,122,0,1,1.00000,2026-11-15,2026-11-18,4
 1056987100279867517,San Gervasio Grey Studio,Vacation home,44.49613,11.33782,c_marconi,Porto - Saragozza,0.00000,1.00000,1.00000,2.00000,ia,4.90000,78,0,1,1.00000,2026-11-15,2026-11-18,4
 1057000330125412965,San Gervasio Yellow Studio,Vacation home,44.49613,11.33782,c_marconi,Porto - Saragozza,0.00000,1.00000,1.00000,2.00000,ia,4.80000,10,1,0,1.00000,2026-11-15,2026-11-18,4
 1057382632816232349,The colorful house,Condo,44.49570,11.36242,sanvitale,San Donato - San Vitale,2.00000,3.00000,1.00000,6.00000,ia,4.81000,136,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -2356,7 +2356,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1097080361970735083,Sweet Home Graziella near the station for 6 people,Condo,44.51481,11.34203,bolognina,Navile,2.00000,4.00000,2.00000,6.00000,ia,4.94000,51,0,1,2.00000,2026-11-15,2026-11-18,4
 1097100389138160582,Realkasa Guerrini Apartment,Rental unit,44.49622,11.32194,saragozza,Porto - Saragozza,2.00000,2.00000,1.50000,6.00000,ia,4.60000,10,0,0,2.00000,,,0
 1097106397945942436,Elegant & Spacious Apt | Near Fair & Center Bus,Apartment,44.54152,11.35664,corticella,Navile,2.00000,4.00000,1.00000,5.00000,ia,4.95000,85,0,1,1.00000,2026-11-15,2026-11-18,4
-1097807081676500724,Bologna| Free parking in Bologna city centre,Condo,44.48682,11.33806,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.77000,104,0,1,1.00000,2026-11-15,2026-11-18,4
+1097807081676500724,Bologna| Free parking in Bologna city centre,Condo,44.48682,11.33806,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.77000,104,0,0,1.00000,2026-11-15,2026-11-18,4
 1098272967720735237,Studio with terrace old town,Rental unit,44.49985,11.34073,c_stazione,Porto - Saragozza,1.00000,3.00000,1.00000,4.00000,ia,4.78000,32,0,0,25.00000,,,0
 1098729559699420104,"La Casa di Ulisse, historic center, Bologna",Apartment,44.49850,11.32965,c_pratello,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.92000,167,0,1,2.00000,2026-11-15,2026-11-18,4
 1098744158521321503,"Il Rifugio di Penelope, historic center, Bologna",Condo,44.49849,11.32965,c_pratello,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.85000,171,1,0,1.00000,2026-11-15,2026-11-18,4
@@ -2547,7 +2547,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1165875165310546384,La Casina di Silvi Delightful studio apartment in the fair area,Apartment,44.50973,11.35343,bolognina,Navile,1.00000,2.00000,1.00000,2.00000,ia,4.94000,17,0,1,1.00000,2026-11-15,2026-11-18,4
 1166465096771388978,Mama Janet by SOGI Gestioni,Apartment,44.49929,11.33538,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.53000,15,0,0,2.00000,2026-11-15,2026-11-18,4
 1166712828726255118,Apartment Bologna-Stadio 1,Condo,44.49165,11.30554,saragozza,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.75000,40,1,0,1.00000,2026-11-15,2026-11-18,4
-1167212496134869843,Apartment Dalia: free reserved parking,Vacation home,44.48197,11.37813,mazzini,Savena,1.00000,2.00000,1.00000,4.00000,ia,4.85000,97,1,0,2.00000,2026-11-15,2026-11-18,4
+1167212496134869843,Apartment Dalia: free reserved parking,Vacation home,44.48197,11.37813,mazzini,Savena,1.00000,2.00000,1.00000,4.00000,ia,4.85000,97,0,1,2.00000,2026-11-15,2026-11-18,4
 1167325588837388771,Casa Chiara,Rental unit,44.49718,11.33263,c_pratello,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,,0,0,0,2.00000,,,0
 1167398552354808573,Appartamento 2 camere 2 bagni 5 posti letto,Rental unit,44.48875,11.28821,santaviola,Borgo Panigale - Reno,1.00000,5.00000,2.00000,5.00000,ia,5.00000,2,0,0,31.00000,,,0
 1168594751585633198,Bologna City Center via del Borgo 1,Apartment,44.49814,11.34811,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.94000,110,0,1,2.00000,2026-11-15,2026-11-18,4
@@ -2610,7 +2610,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1202842834356697939,"Casa Petroni, in the heart of Bologna",Apartment,44.49591,11.35062,c_universita,Santo Stefano,1.00000,2.00000,1.00000,2.00000,ia,4.71000,31,0,0,1.00000,2026-11-18,2026-11-18,1
 1203365640428242821,Goito Suite 3 • Piazza Maggiore • Due Torri,Apartment,44.49675,11.34530,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,3.00000,ia,4.66000,106,0,0,1.00000,2026-11-16,2026-11-18,3
 1203368354611179513,Goito Suite 1 • Piazza Maggiore • Due Torri,Apartment,44.49675,11.34530,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.56000,96,0,0,1.00000,2026-11-15,2026-11-18,4
-1203663280364393909,San Carlo Flat city centre.,Rental unit,44.49998,11.34056,c_stazione,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.86000,7,0,0,1.00000,,,0
+1203663280364393909,San Carlo Flat city centre.,Apartment,44.49998,11.34056,c_stazione,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.90000,10,0,1,1.00000,2026-11-18,2026-11-18,1
 1205037741571117378,Carbonara 1 Luxury Suites - Ground Floor,Vacation home,44.49579,11.34485,c_maggiore,Santo Stefano,3.00000,4.00000,2.00000,7.00000,ia,4.94000,16,0,1,1.00000,2026-11-15,2026-11-18,4
 1205050331728309433,Gelsi di Sacerno,Home,44.55380,11.23611,altro,,3.00000,6.00000,2.00000,9.00000,pdp,4.98000,53,0,1,,2026-11-15,2026-11-18,4
 1205094896494611180,Carbonara 2 Luxury Suites - Mid Floor A (elevator),Vacation home,44.49509,11.34389,c_maggiore,Santo Stefano,2.00000,3.00000,1.00000,6.00000,ia,4.78000,49,1,0,1.00000,2026-11-15,2026-11-18,4
@@ -2774,7 +2774,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1278281143433087780,AMA Esclusive SPA Bologna [5 min da Aereoporto],Condo,44.51099,11.29525,santaviola,Borgo Panigale - Reno,1.00000,1.00000,1.00000,4.00000,ia,4.61000,23,0,0,365.00000,,,0
 1278309924274941899,benvenuti in samu home,Rental unit,44.49296,11.38020,sanvitale,San Donato - San Vitale,2.00000,2.00000,1.00000,4.00000,ia,,0,0,0,2.00000,,,0
 1279101008616147849,Appartamento a Bologna confortevole e spazioso,Condo,44.51510,11.34647,bolognina,Navile,2.00000,2.00000,1.00000,4.00000,ia,5.00000,2,0,0,31.00000,,,0
-1279607877483927378,Historic center four-room apartment with large terrace.,Condo,44.49607,11.32992,c_pratello,Porto - Saragozza,3.00000,4.00000,2.00000,6.00000,ia,4.92000,59,0,2,1.00000,2026-11-15,2026-11-18,4
+1279607877483927378,Historic center four-room apartment with large terrace.,Condo,44.49607,11.32992,c_pratello,Porto - Saragozza,3.00000,4.00000,2.00000,6.00000,ia,4.92000,60,0,2,1.00000,2026-11-15,2026-11-18,4
 1280341162949935128,Casa Ca'Juno,Home,44.42645,11.26423,altro,,1.00000,2.00000,2.00000,4.00000,pdp,,0,0,0,,2026-11-15,2026-11-18,4
 1280445725287710753,Carracci 85 - Free Parking - Station-Center-Fiera,Condo,44.50900,11.33125,saffi,Navile,2.00000,2.00000,1.00000,4.00000,ia,4.57000,23,0,0,1.00000,2026-11-15,2026-11-18,4
 1280945138741114034,Ground floor tower apartment,Apartment,44.47806,11.39503,sanlazzaro,Savena,1.00000,2.00000,1.00000,4.00000,ia,,0,0,0,2.00000,2026-11-18,2026-11-18,1
@@ -2910,7 +2910,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1344967416052842019,Classic Two-Room Apartment 15,Apartment,44.49088,11.32064,saragozza,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.63000,8,0,0,2.00000,2026-11-15,2026-11-18,4
 1346200456983288411,"Peaceful oasis in Bologna, 2 bedrooms, garden, suite",Apartment,44.49335,11.35257,c_universita,Santo Stefano,2.00000,2.00000,1.00000,6.00000,ia,4.60000,5,0,0,1.00000,2026-11-15,2026-11-18,4
 1346220745011369681,La Casa degli Asinelli - TWA,Rental unit,44.49017,11.31568,saragozza,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.17000,6,0,0,2.00000,,,0
-1346294771760479104,Studio 2,Apartment,44.51216,11.28661,borgopanigale,Borgo Panigale - Reno,1.00000,2.00000,1.00000,3.00000,ia,4.96000,214,0,1,1.00000,2026-11-15,2026-11-18,4
+1346294771760479104,Studio 2,Apartment,44.51216,11.28661,borgopanigale,Borgo Panigale - Reno,1.00000,2.00000,1.00000,3.00000,ia,4.96000,215,0,1,1.00000,2026-11-15,2026-11-18,4
 1346969870550674953,GiNa Guest House.,Apartment,44.50904,11.30299,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,5.00000,6,0,1,1.00000,2026-11-15,2026-11-18,4
 1350052240230571789,"Coco House, Bologna",Condo,44.49678,11.34646,c_universita,Santo Stefano,2.00000,4.00000,1.00000,5.00000,ia,4.91000,33,0,0,3.00000,,,0
 1350711399252382314,Santa Margherita Studio,Vacation home,44.49276,11.34011,c_maggiore,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.71000,7,0,0,3.00000,,,0
@@ -2934,7 +2934,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1357734288641098697,Tecnopolo Aparthotel,Rental unit,44.51704,11.35999,fiera,Navile,1.00000,1.00000,1.00000,4.00000,ia,4.56000,9,0,0,3.00000,,,0
 1359305263058525074,Casa Piave39 pochi passi dal centro di Bologna,Rental unit,44.50035,11.31314,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.50000,22,0,0,1.00000,,,0
 1360124402556615505,HouSmart Lorenzo Coast 17,Apartment,44.51049,11.34350,bolognina,Navile,3.00000,3.00000,1.50000,6.00000,ia,,0,0,0,2.00000,2026-11-15,2026-11-18,4
-1360700692426289635,GuestHost - Central Charm near Bologna Station,Vacation home,44.50463,11.34123,c_stazione,Porto - Saragozza,2.00000,3.00000,1.00000,5.00000,ia,4.38000,55,0,0,2.00000,2026-11-15,2026-11-18,4
+1360700692426289635,GuestHost - Central Charm near Bologna Station,Vacation home,44.50463,11.34123,c_stazione,Porto - Saragozza,2.00000,3.00000,1.00000,5.00000,ia,4.39000,56,0,0,2.00000,2026-11-15,2026-11-18,4
 1360789294541424004,Cri's Nest,Vacation home,44.50272,11.36576,fiera,San Donato - San Vitale,1.00000,3.00000,1.00000,4.00000,ia,4.74000,38,0,0,1.00000,2026-11-15,2026-11-18,4
 1360808128350524049,Studio 4,Apartment,44.51228,11.28678,borgopanigale,Borgo Panigale - Reno,1.00000,3.00000,1.00000,3.00000,ia,4.94000,192,0,2,1.00000,2026-11-15,2026-11-18,4
 1362455209896522276,Righi Loft,Rental unit,44.49889,11.34492,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.91000,58,0,0,1.00000,,,0
@@ -2987,7 +2987,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1376674657829347687,Suite Sant'Orsola,Vacation home,44.48220,11.37107,mazzini,Santo Stefano,2.00000,3.00000,1.00000,5.00000,ia,4.68000,41,0,0,1.00000,2026-11-15,2026-11-18,4
 1376682600838504158,Mazzini Suite,Apartment,44.48220,11.37107,mazzini,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.75000,59,0,0,1.00000,2026-11-15,2026-11-18,4
 1376791723096215132,HouSmart Azzo Gardino 4,Apartment,44.49985,11.33794,c_marconi,Porto - Saragozza,2.00000,3.00000,2.00000,6.00000,ia,4.00000,1,0,0,2.00000,2026-11-15,2026-11-18,4
-1376795338199682939,"Casa Valdonica, in the heart of Bologna",Apartment,44.49624,11.34735,c_universita,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.93000,74,0,2,2.00000,2026-11-15,2026-11-18,4
+1376795338199682939,"Casa Valdonica, in the heart of Bologna",Apartment,44.49624,11.34735,c_universita,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.93000,74,0,1,2.00000,2026-11-15,2026-11-18,4
 1378136354314845782,Marconi 34 Homes ~ Give Me the Shot!,Condo,44.50052,11.33863,c_marconi,Porto - Saragozza,2.00000,2.00000,2.00000,4.00000,ia,4.98000,87,0,1,2.00000,2026-11-15,2026-11-18,4
 1378460541438824570,"Saffi Loft 1, Free Parking",Rental unit,44.50143,11.32058,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.97000,31,0,0,1.00000,,,0
 1378512538879605780,"Saffi Loft 2, Free Parking",Rental unit,44.50143,11.32058,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.74000,27,0,0,1.00000,,,0
@@ -3044,7 +3044,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1391374336039370872,Cavour Suite Apartment 3 - Piazza Maggiore,Apartment,44.49446,11.34441,c_maggiore,Santo Stefano,1.00000,1.00000,1.00000,4.00000,ia,4.67000,3,1,0,1.00000,2026-11-15,2026-11-18,4
 1391945781244680751,Green chill in via Martucci free parking.,Apartment,44.47796,11.33354,colli,Santo Stefano,2.00000,4.00000,1.00000,6.00000,ia,4.89000,9,0,1,3.00000,2026-11-15,2026-11-18,2
 1393657163380464615,Appartamento Lancia - Executive Residence,Rental unit,44.49920,11.33801,c_marconi,Porto - Saragozza,2.00000,3.00000,2.00000,4.00000,ia,,0,0,0,31.00000,,,0
-1394003705176041931,Bologna BnB,Apartment,44.50418,11.34399,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.92000,12,0,1,1.00000,2026-11-15,2026-11-18,4
+1394003705176041931,Bologna BnB,Apartment,44.50418,11.34399,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.92000,13,0,1,1.00000,2026-11-15,2026-11-18,4
 1394693841819761909,[centre Baita] RoofTop,Apartment,44.49225,11.33532,c_pratello,Porto - Saragozza,3.00000,3.00000,2.00000,5.00000,ia,4.95000,75,0,1,2.00000,2026-11-15,2026-11-18,4
 1394733909887192597,Studio apartment in the stadium area,Apartment,44.50020,11.29265,santaviola,Borgo Panigale - Reno,1.00000,1.00000,1.00000,2.00000,ia,4.88000,8,0,0,1.00000,2026-11-15,2026-11-18,4
 1394788819793158807,Scalo 10 | Spacious loft with parking space,Apartment,44.50166,11.32682,saffi,Porto - Saragozza,0.00000,2.00000,1.00000,4.00000,ia,4.78000,18,1,0,1.00000,2026-11-15,2026-11-18,4
@@ -3148,7 +3148,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1435585974108584877,[BolognaCentro]-2Bedr&Terrace-Near Central Station,Vacation home,44.50162,11.33105,saffi,Porto - Saragozza,2.00000,3.00000,1.00000,6.00000,ia,4.93000,114,1,0,1.00000,2026-11-15,2026-11-18,4
 1435616241037953087,Free Parking · Comfort Home between the Fair and the Center,Apartment,44.50485,11.36780,fiera,San Donato - San Vitale,2.00000,5.00000,1.00000,6.00000,ia,4.60000,15,0,0,2.00000,2026-11-15,2026-11-18,4
 1436221087567619151,Suite Turati 2,Vacation home,44.47790,11.28090,casalecchio,,1.00000,1.00000,1.00000,4.00000,pdp,4.65000,23,0,0,,2026-11-15,2026-11-18,4
-1436225486580130548,Luxury Station Oasis + Balcony,Vacation home,44.50386,11.33176,saffi,Porto - Saragozza,2.00000,3.00000,2.00000,6.00000,ia,4.98000,105,0,2,1.00000,2026-11-15,2026-11-18,4
+1436225486580130548,Luxury Station Oasis + Balcony,Vacation home,44.50386,11.33176,saffi,Porto - Saragozza,2.00000,3.00000,2.00000,6.00000,ia,4.98000,106,0,2,1.00000,2026-11-15,2026-11-18,4
 1437519438310564019,"Dimore D'Azeglio, Charming in the Historic Center",Apartment,44.48651,11.33914,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,,0,0,0,1.00000,2026-11-15,2026-11-18,4
 1437714063077163638,Massarenti 46,Rental unit,44.49391,11.35932,sanvitale,San Donato - San Vitale,2.00000,2.00000,1.00000,3.00000,ia,5.00000,1,0,0,2.00000,,,0
 1438226952684687792,Il Garibaldino (2 rooms; 1 bathroom),Apartment,44.48110,11.27810,casalecchio,,2.00000,4.00000,1.00000,5.00000,pdp,5.00000,14,0,2,,2026-11-15,2026-11-18,4
@@ -3224,12 +3224,12 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1470232856688958631,Suite Emilia 2 • Airport • Fairground • Ducati,Vacation home,44.52101,11.26621,borgopanigale,Borgo Panigale - Reno,1.00000,1.00000,1.00000,2.00000,ia,4.74000,23,1,0,1.00000,2026-11-15,2026-11-18,4
 1470895773541524980,Emilia Loft 4,Rental unit,44.50280,11.31606,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.50000,12,0,0,1.00000,,,0
 1470903660474041046,Astra 1 - Modern retreat with an elegant taste,Vacation home,44.50080,11.32475,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.75000,20,0,0,1.00000,2026-11-15,2026-11-18,4
-1470914934072899940,Astra 3 – A touch of style in the heart of Bologna,Vacation home,44.50121,11.32306,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.79000,24,0,0,1.00000,2026-11-15,2026-11-16,2
+1470914934072899940,Astra 3 – A touch of style in the heart of Bologna,Vacation home,44.50121,11.32306,saffi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.79000,24,0,0,1.00000,2026-11-15,2026-11-18,3
 1470944313204501201,Astra 2 – Smart comfort in the city center,Vacation home,44.49993,11.32321,saffi,Porto - Saragozza,1.00000,3.00000,1.00000,4.00000,ia,4.63000,40,0,0,1.00000,2026-11-15,2026-11-18,4
 1470961020142164778,"Casa Indipendenza, a bright stay in the historic center",Apartment,44.50022,11.34434,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.79000,24,0,0,1.00000,2026-11-16,2026-11-18,3
 1471011368625198675,Emilia Loft 5,Rental unit,44.50280,11.31606,saffi,Porto - Saragozza,0.00000,2.00000,1.00000,2.00000,ia,4.56000,9,0,0,1.00000,,,0
 1471118486667663115,"[Walk to the Center,Drive to the Door]AlteMuraHome",Vacation home,44.48608,11.33986,c_saragozza,Santo Stefano,2.00000,3.00000,1.00000,6.00000,ia,4.96000,72,0,1,1.00000,2026-11-15,2026-11-18,4
-1471156283148625295,Modern Oasis | Outdoor Space,Vacation home,44.47946,11.38568,mazzini,Savena,1.00000,3.00000,1.00000,4.00000,ia,5.00000,60,0,2,2.00000,2026-11-15,2026-11-18,4
+1471156283148625295,Modern Oasis | Outdoor Space,Vacation home,44.47946,11.38568,mazzini,Savena,1.00000,3.00000,1.00000,4.00000,ia,5.00000,61,0,2,2.00000,2026-11-15,2026-11-18,4
 1471521434584293563,Griffoni Home,Apartment,44.49231,11.33875,c_maggiore,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.20000,20,0,0,2.00000,2026-11-15,2026-11-18,4
 1471800068762332675,Angels House Bologna,Apartment,44.48608,11.34936,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.94000,69,0,2,2.00000,2026-11-15,2026-11-18,4
 1473765072944640089,"Luxury Art Apartment, Bologna in the heart of city",Vacation home,44.49992,11.33489,c_marconi,Porto - Saragozza,2.00000,2.00000,1.00000,4.00000,ia,4.83000,77,1,0,1.00000,2026-11-15,2026-11-18,4
@@ -3314,7 +3314,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1513230874814371932,Small Village,Apartment,44.49916,11.34835,c_universita,Santo Stefano,1.00000,1.00000,1.00000,5.00000,ia,4.90000,10,0,1,2.00000,2026-11-15,2026-11-18,4
 1513656523505555492,Indipendenza Loft 4,Rental unit,44.50068,11.34407,c_stazione,Porto - Saragozza,3.00000,5.00000,2.00000,6.00000,ia,4.75000,8,0,0,1.00000,,,0
 1515720516554062501,Maison Unipol Arena,Apartment,44.48430,11.24201,casalecchio,,1.00000,2.00000,1.00000,4.00000,pdp,4.83000,69,1,0,,2026-11-15,2026-11-18,4
-1515764006174785699,Historic Center + Private Parking Space | Design & Comfort,Vacation home,44.49904,11.33973,c_marconi,Porto - Saragozza,2.00000,3.00000,1.00000,5.00000,ia,4.92000,106,0,1,1.00000,2026-11-15,2026-11-18,4
+1515764006174785699,Historic Center + Private Parking Space | Design & Comfort,Vacation home,44.49904,11.33973,c_marconi,Porto - Saragozza,2.00000,3.00000,1.00000,5.00000,ia,4.93000,107,0,1,1.00000,2026-11-15,2026-11-18,4
 1515843069303916713,Casa Bonvicini 1 - Tecnopolo - Bologna Fair,Vacation home,44.51937,11.35730,bolognina,Navile,0.00000,1.00000,1.00000,3.00000,ia,4.91000,11,0,0,1.00000,2026-11-15,2026-11-18,4
 1515884470858036763,Casa Bonvicini 2 - Tecnopolo - Bologna Fair,Vacation home,44.51937,11.35730,bolognina,Navile,0.00000,2.00000,1.00000,4.00000,ia,4.33000,15,0,0,1.00000,2026-11-15,2026-11-18,4
 1516701809730539397,Irnerio 43 by Bologna District,Apartment,44.49928,11.35161,c_universita,Santo Stefano,1.00000,1.00000,1.00000,4.00000,ia,4.44000,18,0,0,2.00000,2026-11-15,2026-11-18,4
@@ -3362,7 +3362,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1541223031017734771,HouSmart Val D'Aposa 5,Apartment,44.49226,11.34024,c_maggiore,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,5.00000,1,0,0,2.00000,2026-11-15,2026-11-18,4
 1541409485705505926,Living Historic Palaces - Goito,Vacation home,44.49681,11.34495,c_maggiore,Santo Stefano,1.00000,3.00000,1.00000,4.00000,ia,4.96000,28,0,2,1.00000,2026-11-15,2026-11-18,4
 1541613726826389266,Historic 2BR with Piazza Maggiore Views,Vacation home,44.49394,11.34425,c_maggiore,Santo Stefano,2.00000,2.00000,1.00000,3.00000,ia,4.92000,63,0,1,1.00000,2026-11-15,2026-11-18,4
-1546992990259886191,A stone's throw from the Duomo,Apartment,44.49183,11.33915,c_saragozza,Porto - Saragozza,3.00000,3.00000,1.00000,6.00000,ia,4.89000,56,0,1,1.00000,2026-11-15,2026-11-18,4
+1546992990259886191,A stone's throw from the Duomo,Apartment,44.49183,11.33915,c_saragozza,Porto - Saragozza,3.00000,3.00000,1.00000,6.00000,ia,4.89000,57,0,1,1.00000,2026-11-15,2026-11-18,4
 1547191018607135748,Petroni 38 by Bologna District,Apartment,44.49591,11.35062,c_universita,Santo Stefano,1.00000,1.00000,2.00000,4.00000,ia,4.42000,26,0,0,1.00000,2026-11-15,2026-11-18,4
 1547666685013850766,[From Ara House]• Near San Luca and Portici Unesco,Vacation home,44.49285,11.31196,saragozza,Porto - Saragozza,2.00000,3.00000,1.00000,4.00000,ia,4.90000,31,0,1,1.00000,2026-11-15,2026-11-18,4
 1549328465971593908,"""Ivanna"" apartment Central Station",Apartment,44.50719,11.34570,bolognina,Navile,2.00000,2.00000,1.00000,3.00000,ia,3.67000,3,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -3515,7 +3515,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1605733957519771562,"Minerva, luxury loft in Bologna Centre",Vacation home,44.50027,11.33554,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,4.73000,15,0,0,1.00000,2026-11-15,2026-11-18,4
 1605816830771763613,Real estate Borgo San Pietro,Apartment,44.49814,11.34908,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.71000,7,0,0,1.00000,2026-11-15,2026-11-18,4
 1606421420985610005,Appartamento da 4 persone,Rental unit,44.50723,11.36966,fiera,San Donato - San Vitale,2.00000,2.00000,0.00000,4.00000,ia,5.00000,3,0,0,1.00000,,,0
-1606607597379759998,House Primula - Gionic Apartments Bologna,Apartment,44.50866,11.28454,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,4.86000,36,1,0,1.00000,2026-11-15,2026-11-18,4
+1606607597379759998,House Primula - Gionic Apartments Bologna,Apartment,44.50866,11.28454,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,4.86000,37,1,0,1.00000,2026-11-15,2026-11-18,4
 1607146422004617097,Mamma Mia Holidays - Suite Carducci,Apartment,44.49307,11.34134,c_maggiore,Porto - Saragozza,2.00000,2.00000,2.00000,4.00000,ia,5.00000,3,1,0,1.00000,2026-11-15,2026-11-18,4
 1607165007984222819,Villa Primodì,Vacation home,44.48853,11.36323,sanvitale,Santo Stefano,6.00000,6.00000,6.00000,16.00000,ia,,0,0,0,1.00000,2026-11-15,2026-11-18,4
 1607348875932260716,Casa De' Ruini,Condo,44.48820,11.34260,c_saragozza,Santo Stefano,2.00000,2.00000,1.00000,4.00000,pdp,5.00000,3,0,0,,2026-11-15,2026-11-18,4
@@ -3529,8 +3529,8 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1609347611802865721,A stone's throw from the Fair,Vacation home,44.50946,11.35394,bolognina,Navile,2.00000,3.00000,1.00000,6.00000,ia,4.73000,11,0,0,2.00000,2026-11-15,2026-11-18,4
 1609419999787317690,Luxury Design Penthouse - Historic View 3 Bedroom,Apartment,44.50174,11.34129,c_stazione,Porto - Saragozza,3.00000,3.00000,2.00000,8.00000,ia,4.93000,15,0,0,1.00000,2026-11-15,2026-11-18,4
 1609480019431678492,ABiTa Corticella - Comfortable stay in Bologna,Condo,44.54679,11.35801,corticella,Navile,2.00000,4.00000,1.00000,5.00000,ia,4.89000,9,0,1,1.00000,2026-11-15,2026-11-18,4
-1609502461791511866,"Apt historic centre, explore everything on foot",Apartment,44.49860,11.34394,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.73000,22,0,0,1.00000,2026-11-15,2026-11-18,4
-1610101482555809024,"Station-Side Retreat – Easy Arrival, Easy Living",Vacation home,44.50104,11.34895,c_stazione,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.94000,53,0,1,1.00000,2026-11-15,2026-11-18,4
+1609502461791511866,"Apt historic centre, explore everything on foot",Vacation home,44.49860,11.34394,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.73000,22,0,0,1.00000,2026-11-15,2026-11-18,4
+1610101482555809024,"Station-Side Retreat – Easy Arrival, Easy Living",Vacation home,44.50104,11.34895,c_stazione,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.94000,54,0,1,1.00000,2026-11-15,2026-11-18,4
 1610396314902839501,Corte Borgonuovo city centre bologna,Condo,44.49172,11.34880,c_sstefano,Santo Stefano,3.00000,3.00000,1.00000,6.00000,ia,5.00000,18,0,1,2.00000,2026-11-15,2026-11-18,4
 1610746411951537147,"Princi House, Bologna Centre",Vacation home,44.49314,11.37213,sanvitale,San Donato - San Vitale,2.00000,2.00000,1.00000,4.00000,ia,4.50000,10,0,0,1.00000,2026-11-15,2026-11-18,4
 1611656958484949874,Corte Panigale,Condo,44.51968,11.27764,borgopanigale,Borgo Panigale - Reno,1.00000,2.00000,1.00000,4.00000,ia,5.00000,19,0,1,1.00000,2026-11-15,2026-11-15,1
@@ -3546,7 +3546,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1614040595663099318,"Apartment in the Sant'Orsola area, a short walk from the center",Condo,44.48967,11.36637,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.88000,8,0,1,1.00000,2026-11-15,2026-11-18,4
 1614391103116245075,Apt 2 bed 2 bath with private parking Bologna,Condo,44.49291,11.37694,sanvitale,San Donato - San Vitale,2.00000,3.00000,2.00000,5.00000,ia,5.00000,1,0,0,1.00000,2026-11-15,2026-11-18,4
 1614481278092774830,Monolocale nel Centro Universitario,Vacation home,44.49879,11.35684,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.30000,10,0,0,1.00000,,,0
-1614555576359029757,Tower Station - Bologna Escape - Fiera,Vacation home,44.51193,11.33691,bolognina,Navile,1.00000,2.00000,1.00000,4.00000,ia,5.00000,5,0,0,1.00000,2026-11-15,2026-11-18,4
+1614555576359029757,Tower Station - Bologna Escape - Fiera,Vacation home,44.51193,11.33691,bolognina,Navile,1.00000,2.00000,1.00000,4.00000,ia,5.00000,5,0,1,1.00000,2026-11-15,2026-11-18,4
 1614583969951985885,GuestHost - Casa Ermete Comfy Apartment San Donato,Vacation home,44.50440,11.36474,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.50000,6,0,0,2.00000,2026-11-15,2026-11-18,4
 1614676522563133060,The Modern Nest - BeMyHost,Vacation home,44.50134,11.33540,c_marconi,Porto - Saragozza,2.00000,3.00000,1.00000,4.00000,ia,4.97000,32,0,1,1.00000,2026-11-15,2026-11-18,4
 1615231223131777105,Azzo Gardino Suite,Vacation home,44.50024,11.33772,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.82000,11,0,0,1.00000,,,0
@@ -3580,7 +3580,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1622451813028832432,"Two-Room Apartment 401, Palazzo Archimede",Apartment,44.50050,11.34435,c_stazione,Santo Stefano,1.00000,2.00000,2.00000,4.00000,ia,4.67000,3,1,0,1.00000,2026-11-15,2026-11-18,4
 1623017198256453760,La Sosta - 3 minutes from Bologna Airport,Apartment,44.53520,11.30400,borgopanigale,,1.00000,2.00000,1.00000,1.00000,pdp,5.00000,6,0,0,,2026-11-15,2026-11-18,4
 1623048997526400249,[Piazza Maggiore] Stay in the Heart of Bologna,Apartment,44.49327,11.34371,c_maggiore,Santo Stefano,2.00000,2.00000,2.00000,4.00000,ia,4.96000,23,0,1,1.00000,2026-11-15,2026-11-18,4
-1623814345577621382,Corina's Place in Bologna,Vacation home,44.46217,11.36482,savena,Savena,3.00000,4.00000,3.00000,8.00000,ia,5.00000,5,1,0,1.00000,2026-11-15,2026-11-18,4
+1623814345577621382,Corina's Place in Bologna,Vacation home,44.46217,11.36482,savena,Savena,3.00000,4.00000,3.00000,8.00000,ia,5.00000,5,0,2,1.00000,2026-11-15,2026-11-18,4
 1623817992785225317,Penthouse with a private terrace in the center of Bologna,Condo,44.49916,11.33316,c_marconi,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,4.98000,65,0,2,1.00000,2026-11-15,2026-11-18,4
 1623892812528296124,Nosadella 12,Rental unit,44.49224,11.33557,c_pratello,Porto - Saragozza,0.00000,1.00000,1.00000,2.00000,ia,5.00000,4,0,0,2.00000,,,0
 1624058652435806562,Bologna House Tubertini Apartment,Vacation home,44.49532,11.34573,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,4.83000,6,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -3637,7 +3637,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1635708193202350259,Cinzia's City Pad Comfort Near Central Station,Rental unit,44.50419,11.34487,bolognina,Porto - Saragozza,1.00000,2.00000,1.00000,2.00000,ia,5.00000,2,0,0,30.00000,,,0
 1636309418366145651,Sant'Isaia Comfort Apartment,Rental unit,44.49428,11.32910,saragozza,Porto - Saragozza,2.00000,2.00000,1.00000,4.00000,ia,5.00000,18,0,0,2.00000,,,0
 1636808942899293807,Studio apartment within walking distance of the Two Towers,Vacation home,44.49511,11.35375,c_universita,Santo Stefano,0.00000,1.00000,1.00000,2.00000,ia,,0,0,0,1.00000,2026-11-15,2026-11-18,4
-1636839241643308250,Historic two-room apartment in the heart of the center,Vacation home,44.49551,11.34733,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.75000,4,0,0,1.00000,2026-11-15,2026-11-18,4
+1636839241643308250,Historic two-room apartment in the heart of the center,Vacation home,44.49551,11.34733,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,3.00000,ia,4.80000,5,0,0,1.00000,2026-11-15,2026-11-18,4
 1636959416412768739,Charming independent and central two-room apartment,Vacation home,44.49427,11.33922,c_maggiore,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,5.00000,26,0,2,2.00000,2026-11-15,2026-11-18,4
 1636994827246435830,"Casa Allegra, new and centrally located",Apartment,44.49010,11.35423,c_sstefano,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.97000,38,0,2,2.00000,2026-11-15,2026-11-18,4
 1637045499616723595,"87 sqm, 2 bedrooms, 6 guests · station & center",Apartment,44.50533,11.33491,bolognina,Porto - Saragozza,2.00000,4.00000,1.00000,6.00000,ia,4.95000,42,0,2,1.00000,2026-11-15,2026-11-18,4
@@ -3816,7 +3816,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1670894563964394860,The Sanctuary of Light• Historic Center,Apartment,44.49833,11.33792,c_marconi,Porto - Saragozza,2.00000,3.00000,2.00000,6.00000,ia,4.86000,7,1,0,1.00000,2026-11-15,2026-11-18,4
 1670894888406252126,Turati Apartment 8 - Bologna Short Rental,Vacation home,44.48980,11.32040,saragozza,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,ia,4.48000,25,0,0,1.00000,2026-11-15,2026-11-18,4
 1671617531356758772,Luxury suite in the city centre 6 guests,Apartment,44.49230,11.34093,c_maggiore,Porto - Saragozza,2.00000,3.00000,2.00000,6.00000,ia,4.82000,11,0,1,1.00000,2026-11-15,2026-11-18,4
-1671728890901985950,Hidden Garden Oasis • Bologna Centre,Vacation home,44.49954,11.34894,c_universita,Santo Stefano,3.00000,4.00000,2.00000,6.00000,ia,4.93000,28,1,0,1.00000,2026-11-15,2026-11-18,4
+1671728890901985950,Hidden Garden Oasis • Bologna Centre,Vacation home,44.49954,11.34894,c_universita,Santo Stefano,3.00000,4.00000,2.00000,6.00000,ia,4.93000,28,0,1,1.00000,2026-11-15,2026-11-18,4
 1672690202063506052,"Studio w/ balcony & A/C, 15 min to city center",Apartment,44.50706,11.29689,santaviola,Borgo Panigale - Reno,1.00000,2.00000,1.00000,3.00000,ia,,0,0,0,1.00000,2026-11-15,2026-11-18,4
 1673100938601217990,"Casa Accademia, in the heart of Bologna",Apartment,44.49710,11.35191,c_universita,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,4.60000,10,0,0,1.00000,2026-11-16,2026-11-17,2
 1673127388072463095,Borgo central apartment,Apartment,44.49833,11.34776,c_universita,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,5.00000,9,0,1,1.00000,2026-11-15,2026-11-18,4
@@ -3843,9 +3843,9 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1678398395441050976,Central Elegant Stay • Balcony,Vacation home,44.49893,11.34362,c_stazione,Porto - Saragozza,2.00000,3.00000,1.00000,4.00000,ia,4.95000,44,0,2,1.00000,2026-11-15,2026-11-18,4
 1678464080293854515,Porta Zamboni Apartment,Apartment,44.49863,11.35857,sanvitale,San Donato - San Vitale,4.00000,5.00000,2.00000,8.00000,ia,4.75000,8,0,0,1.00000,2026-11-15,2026-11-18,4
 1678866456083330799,"Home Levante 158/2, Appartamento max 2 ospiti",Vacation home,44.47957,11.38573,mazzini,Savena,1.00000,1.00000,1.00000,2.00000,ia,,0,0,0,2.00000,,,0
-1678901961188365466,"Light, Calm & Connected • Balcony",Vacation home,44.51417,11.34106,bolognina,Navile,1.00000,2.00000,1.00000,4.00000,ia,5.00000,27,0,1,1.00000,2026-11-15,2026-11-18,4
+1678901961188365466,"Light, Calm & Connected • Balcony",Vacation home,44.51417,11.34106,bolognina,Navile,1.00000,2.00000,1.00000,4.00000,ia,5.00000,27,0,2,1.00000,2026-11-15,2026-11-18,4
 1679665614246920570,Bologna Foot Hill,Rental unit,44.48463,11.33499,colli,Santo Stefano,1.00000,2.00000,1.00000,2.00000,ia,,0,0,0,31.00000,,,0
-1680344118114923028,Classic Hideaway for Couples • Historic Centre,Vacation home,44.49893,11.34362,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,5.00000,43,0,2,1.00000,2026-11-15,2026-11-18,4
+1680344118114923028,Classic Hideaway for Couples • Historic Centre,Vacation home,44.49893,11.34362,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,5.00000,44,0,2,1.00000,2026-11-15,2026-11-18,4
 1680363027538670755,Bologna House Station 55 BIS,Vacation home,44.50764,11.34133,bolognina,Navile,1.00000,1.00000,1.00000,2.00000,ia,4.86000,43,0,1,1.00000,2026-11-15,2026-11-18,4
 1680446294770203615,"Spacest - Apartment in Via Irnerio, Bolo - 203951",Rental unit,44.50106,11.34805,c_stazione,Santo Stefano,2.00000,2.00000,2.00000,2.00000,ia,,0,0,0,31.00000,,,0
 1681021099830170204,[10min from city center] Cirenaica Comfort Home,Apartment,44.49678,11.36498,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,4.00000,ia,4.90000,20,1,0,2.00000,2026-11-15,2026-11-18,4
@@ -3869,7 +3869,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1688859611815202874,Luxury Rooftop + Terrace | Herb Market,Vacation home,44.49775,11.33967,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,5.00000,29,0,2,2.00000,2026-11-15,2026-11-18,4
 1688974157131659682,Stress-Free Residential Stay + Parking,Vacation home,44.52039,11.32145,navile,Navile,1.00000,1.00000,1.00000,2.00000,ia,5.00000,19,0,1,1.00000,2026-11-15,2026-11-18,4
 1688975723251540982,Palazzo Marescalchi,Vacation home,44.49427,11.33922,c_maggiore,Porto - Saragozza,1.00000,2.00000,1.00000,2.00000,ia,5.00000,2,0,0,4.00000,,,0
-1689943811151115993,Fattori Deluxe Apartment,Apartment,44.50671,11.29323,santaviola,Borgo Panigale - Reno,1.00000,1.00000,1.00000,2.00000,ia,,0,0,0,1.00000,2026-11-17,2026-11-17,1
+1689943811151115993,Fattori Deluxe Apartment,Apartment,44.50671,11.29323,santaviola,Borgo Panigale - Reno,1.00000,1.00000,1.00000,2.00000,ia,,0,0,0,1.00000,2026-11-17,2026-11-18,2
 1689983188532241877,ma maison - deluxe apartment in the historic center,Condo,44.50020,11.32907,saffi,Porto - Saragozza,2.00000,3.00000,2.00000,6.00000,ia,4.93000,40,0,1,1.00000,2026-11-15,2026-11-18,4
 1690510874567395649,Attic Sant'Orsola,Apartment,44.49207,11.36502,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.92000,24,0,1,1.00000,2026-11-15,2026-11-18,4
 1690579859376488251,Mascarella Cozy Studio by Wonderful Italy,Vacation home,44.50102,11.35307,c_universita,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,,0,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -3897,9 +3897,9 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1696483681991474119,Mamma Mia Holidays - Asinelli Suite,Apartment,44.49333,11.34234,c_maggiore,Santo Stefano,2.00000,2.00000,1.00000,4.00000,ia,4.83000,6,1,0,1.00000,2026-11-15,2026-11-18,4
 1696506394018122763,1 Bedroom apartment with Balcony,Vacation home,44.50418,11.34915,bolognina,Santo Stefano,1.00000,1.00000,2.00000,4.00000,ia,5.00000,2,0,0,1.00000,2026-11-15,2026-11-18,4
 1696516489106198863,Cozy studio with terrace,Vacation home,44.50418,11.34915,bolognina,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,5.00000,1,0,0,1.00000,2026-11-15,2026-11-18,4
-1696524109466855000,Mamma Mia Holidays - Nettuno Suite,Apartment,44.49333,11.34234,c_maggiore,Santo Stefano,2.00000,2.00000,2.00000,4.00000,ia,4.89000,9,0,2,1.00000,2026-11-15,2026-11-18,4
+1696524109466855000,Mamma Mia Holidays - F. Guccini,Apartment,44.49333,11.34234,c_maggiore,Santo Stefano,2.00000,2.00000,2.00000,4.00000,ia,4.89000,9,0,2,1.00000,2026-11-15,2026-11-18,4
 1696538077884096724,Bright Studio with terrace & Loft Bed,Vacation home,44.50303,11.35262,bolognina,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,,0,0,0,1.00000,2026-11-15,2026-11-18,4
-1696539279579536773,Mamma Mia Holidays - San Luca Suite,Apartment,44.49333,11.34234,c_maggiore,Santo Stefano,3.00000,3.00000,2.00000,5.00000,ia,5.00000,4,1,0,1.00000,2026-11-15,2026-11-18,4
+1696539279579536773,Mamma Mia Holidays - Lucio Dalla Suite,Apartment,44.49333,11.34234,c_maggiore,Santo Stefano,3.00000,3.00000,2.00000,5.00000,ia,5.00000,4,1,0,1.00000,2026-11-15,2026-11-18,4
 1696546492094517195,Spacious Apartment close to train station,Vacation home,44.50381,11.34949,bolognina,Santo Stefano,2.00000,3.00000,1.00000,5.00000,ia,4.75000,4,0,0,1.00000,2026-11-15,2026-11-18,4
 1696952887801424140,Casa Binca,Apartment,44.48956,11.35329,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,5.00000,1,0,0,1.00000,2026-11-15,2026-11-18,4
 1697029703773583610,Apartment with Sauna,Apartment,44.50656,11.36202,fiera,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.00000,1,0,0,1.00000,2026-11-15,2026-11-18,4
@@ -4026,7 +4026,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1741110228679995054,Attic Sant'Orsola 3,Vacation home,44.49316,11.36960,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,5.00000,10,0,1,1.00000,2026-11-15,2026-11-18,4
 1741114250298848354,Attic Sant'Orsola 4,Vacation home,44.49316,11.36960,sanvitale,San Donato - San Vitale,1.00000,2.00000,1.00000,3.00000,ia,4.83000,6,1,0,1.00000,2026-11-15,2026-11-18,4
 1742520445411126320,Family Comfort • 2 Bedrooms • 2 Bathrooms,Vacation home,44.47955,11.38566,mazzini,Savena,2.00000,3.00000,2.00000,5.00000,ia,5.00000,9,0,2,2.00000,2026-11-15,2026-11-18,4
-1742591750741916606,Bertiera 6 by Studio Vita,Apartment,44.49850,11.34450,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,5.00000,7,0,1,1.00000,2026-11-15,2026-11-18,4
+1742591750741916606,Bertiera 6 by Studio Vita,Apartment,44.49850,11.34450,c_stazione,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,5.00000,9,0,1,1.00000,2026-11-15,2026-11-18,4
 1742592280304053511,San Carlo,Apartment,44.50015,11.34075,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,5.00000,23,0,2,1.00000,2026-11-15,2026-11-18,4
 1742903329630460834,"Finelli Luxury Apartment, in the center of Bologna",Vacation home,44.50172,11.34941,c_stazione,Santo Stefano,2.00000,3.00000,1.00000,6.00000,ia,5.00000,6,0,1,1.00000,2026-11-15,2026-11-18,4
 1743494297071014871,Liberty Villa Apartment with Private Garden,Rental unit,44.48106,11.33657,colli,Santo Stefano,3.00000,5.00000,2.50000,8.00000,ia,5.00000,2,0,0,1.00000,,,0
@@ -4076,7 +4076,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1760754392846756483,"Castiglione Apartment, In the Heart of Bologna",Vacation home,44.48777,11.34782,c_sstefano,Santo Stefano,2.00000,3.00000,1.00000,5.00000,ia,5.00000,5,0,0,1.00000,2026-11-15,2026-11-18,4
 1760916726710228843,Designer loft with a terrace overlooking the hills in the city center,Apartment,44.48573,11.33925,c_saragozza,Santo Stefano,1.00000,1.00000,1.00000,2.00000,ia,4.67000,6,1,0,2.00000,2026-11-15,2026-11-18,4
 1761416148477460921,Tovaglie Luxury Apartment in the Heart of Bologna,Vacation home,44.48851,11.34236,c_saragozza,Santo Stefano,2.00000,3.00000,2.00000,5.00000,ia,4.43000,7,0,0,1.00000,2026-11-15,2026-11-18,4
-1761442209219630858,San Petronio Vecchio 57,Vacation home,44.48894,11.35453,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.57000,7,0,0,2.00000,2026-11-15,2026-11-18,4
+1761442209219630858,San Petronio Vecchio 57,Vacation home,44.48894,11.35453,c_sstefano,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.38000,8,0,0,2.00000,2026-11-15,2026-11-18,4
 1761558598123197270,[The most central] - Full of History,Apartment,44.49423,11.34522,c_maggiore,Santo Stefano,2.00000,3.00000,1.00000,6.00000,ia,5.00000,17,0,1,1.00000,2026-11-15,2026-11-18,4
 1761561658597312680,Braina Kutir,Apartment,44.48824,11.34956,c_sstefano,Santo Stefano,2.00000,3.00000,2.50000,6.00000,ia,,0,1,0,2.00000,2026-11-15,2026-11-18,4
 1761653696620388991,Vinazzetti Home,Vacation home,44.49489,11.35296,c_universita,Santo Stefano,3.00000,4.00000,1.00000,7.00000,ia,5.00000,3,0,0,1.00000,2026-11-18,2026-11-18,1
@@ -4150,7 +4150,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1781944756731620559,GuestHost - Le Due Torri Apartment with courtyard!,Vacation home,44.49620,11.34740,c_universita,Santo Stefano,1.00000,3.00000,1.00000,3.00000,pdp,,0,0,0,,2026-11-15,2026-11-18,4
 1781956328846857301,"Near the fairgrounds | 2 bedrooms, terrace, sleeps 6",Apartment,44.50280,11.36990,fiera,San Donato - San Vitale,2.00000,3.00000,1.00000,6.00000,pdp,3.90000,10,0,0,,2026-11-15,2026-11-18,4
 1782462939097935324,Maison Lalla,Apartment,44.49410,11.33270,c_pratello,Porto - Saragozza,4.00000,4.00000,4.00000,8.00000,pdp,,0,0,0,,2026-11-15,2026-11-18,4
-1782543735103509886,Casa Jenny,Vacation home,44.50740,11.34390,bolognina,Navile,1.00000,2.00000,1.00000,3.00000,pdp,,0,0,0,,2026-11-15,2026-11-18,4
+1782543735103509886,Casa Jenny,Vacation home,44.50740,11.34390,bolognina,Navile,1.00000,2.00000,1.00000,3.00000,pdp,5.00000,3,0,0,,2026-11-15,2026-11-18,4
 1782620465804827952,Oberdan 19 Suites - Nettuno apartment,Apartment,44.49640,11.34610,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,pdp,5.00000,3,0,0,,2026-11-15,2026-11-18,4
 1785071954422915102,Alma Living – The Two Towers ,Apartment,44.49440,11.35340,c_universita,Santo Stefano,1.00000,2.00000,1.00000,4.00000,pdp,,0,0,0,,2026-11-15,2026-11-18,4
 1785724848804596417,Modern apartment 20 minutes walk from city center ,Apartment,44.48540,11.36150,murri,Santo Stefano,2.00000,2.00000,1.00000,4.00000,pdp,,0,0,0,,2026-11-15,2026-11-18,4
@@ -4220,3 +4220,4 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1818468161879660728,D'Azeglio's Balcony – BeMyHost,Vacation home,44.49270,11.34210,c_maggiore,Santo Stefano,1.00000,2.00000,1.00000,4.00000,pdp,,0,1,0,,2026-11-15,2026-11-18,4
 1820325396688042847,Casa Poeti,Apartment,44.49180,11.33840,c_saragozza,Porto - Saragozza,1.00000,2.00000,1.00000,4.00000,pdp,,0,1,0,,2026-11-18,2026-11-18,1
 1820952657309310403,Urnest Matteucci,Vacation home,44.48280,11.37120,mazzini,Santo Stefano,1.00000,2.00000,1.00000,4.00000,pdp,,0,0,0,,2026-11-18,2026-11-18,1
+1821099380800214254,Bologna By Side De Falegname,Apartment,44.49900,11.34280,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,pdp,,0,0,0,,2026-11-18,2026-11-18,1

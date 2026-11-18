@@ -1,55 +1,55 @@
 {
  "date": "2026-11-18",
- "started": "2026-11-18T11:57:20Z",
+ "started": "2026-11-18T17:53:40Z",
  "stopped": "",
  "windows": 67,
  "census": 15,
- "prices": 37093,
- "details": 5,
+ "prices": 37994,
+ "details": 1,
  "phases": [
   {
    "name": "offerta",
    "requests": 3,
-   "secs": 3.3
+   "secs": 5.7
   },
   {
    "name": "date seguite",
-   "requests": 826,
-   "secs": 1408.1
+   "requests": 869,
+   "secs": 1486.1
   },
   {
    "name": "date vicine",
    "requests": 165,
-   "secs": 282.8
+   "secs": 280.3
   },
   {
    "name": "date lontane ed eventi",
    "requests": 284,
-   "secs": 477.5
+   "secs": 485.9
   },
   {
    "name": "capienze",
-   "requests": 6,
-   "secs": 22.5
+   "requests": 2,
+   "secs": 17.0
   }
  ],
  "track": {
   "windows": 15,
   "complete": 15,
-  "requests": 526,
+  "requests": 569,
   "splits": 4,
-  "resplits": 11,
-  "found": 22770,
-  "expected": 22995
+  "resplits": 19,
+  "found": 22663,
+  "expected": 22852
  },
- "requests": 1286,
+ "requests": 1325,
  "errors": 1,
  "error_samples": [
   "HTTPError('HTTP Error 410: ')"
  ],
- "listings": 4221,
- "secs": 2198.2,
- "finished": "2026-11-18T12:33:58Z",
+ "listings": 4222,
+ "secs": 2278.4,
+ "finished": "2026-11-18T18:31:38Z",
  "windows_planned": 67,
  "source": "AirbnbClient"
 }
