@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17",
+ "updated": "2026-11-18",
  "sources": {
   "bolognafiere": true,
   "bolognawelcome": true
@@ -634,6 +634,21 @@
    "id": "play-festival-del-gioco-2027-04-23",
    "night_first": "2027-04-22",
    "night_last": "2027-04-24"
+  },
+  {
+   "name": "Veronafil",
+   "start": "2027-05-06",
+   "end": "2027-05-08",
+   "venue": "BolognaFiere",
+   "category": "fiera",
+   "weight": 1,
+   "source": "auto",
+   "note": "",
+   "nights_from": null,
+   "nights_to": null,
+   "id": "veronafil-2027-05-06",
+   "night_first": "2027-05-05",
+   "night_last": "2027-05-07"
   },
   {
    "name": "ZOOMARK 2027",
