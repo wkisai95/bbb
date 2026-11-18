@@ -6,13 +6,13 @@
  "last_scan": "2026-11-18",
  "run": {
   "date": "2026-11-18",
-  "requests": 1325,
+  "requests": 1296,
   "errors": 1,
-  "prices": 37994,
+  "prices": 38292,
   "windows": 67,
   "census": 15,
   "stopped": "",
-  "secs": 2278.4
+  "secs": 2214.1
  },
  "inside_airbnb": {
   "snapshot": "2026-09-19",
@@ -25,6 +25,6 @@
  "warnings": [],
  "scan_days": 4,
  "listings": 3133,
- "n_obs": 91562,
+ "n_obs": 91795,
  "median_price": 132
 }

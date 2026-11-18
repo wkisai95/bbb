@@ -2434,7 +2434,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1115133974167801992,Nice apartment with private garden,Vacation home,44.48750,11.33592,c_saragozza,Santo Stefano,1.00000,2.00000,1.00000,4.00000,ia,4.68000,63,0,0,1.00000,2026-11-15,2026-11-18,4
 1115166447283624823,Luxury 2bed apartment in top location,Rental unit,44.49311,11.34630,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,4.00000,ia,4.38000,8,0,0,4.00000,,,0
 1115291911662950964,Memo Apartment,Apartment,44.50257,11.34138,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,4.00000,ia,4.75000,20,1,0,1.00000,2026-11-15,2026-11-18,4
-1115705845205716168,Pokapaya B&B in Borgo Panigale,Vacation home,44.52064,11.26794,borgopanigale,Borgo Panigale - Reno,2.00000,2.00000,1.00000,4.00000,ia,4.97000,35,0,1,1.00000,2026-11-15,2026-11-16,2
+1115705845205716168,Pokapaya B&B in Borgo Panigale,Vacation home,44.52064,11.26794,borgopanigale,Borgo Panigale - Reno,2.00000,2.00000,1.00000,4.00000,ia,4.97000,35,0,1,1.00000,2026-11-15,2026-11-18,3
 1116063451625575725,"New Two-Room Apartment  Close to Fiera, Airport and Train",Apartment,44.51423,11.34647,bolognina,Navile,1.00000,1.00000,1.00000,2.00000,ia,4.93000,29,1,0,2.00000,2026-11-15,2026-11-18,4
 1116096806215833555,Bilocale in centro a bologna,Rental unit,44.49989,11.34043,c_stazione,Porto - Saragozza,1.00000,1.00000,1.00000,2.00000,ia,5.00000,1,0,0,31.00000,,,0
 1116113339821789156,"New Studio Apartment Close to Fair, Airport and Train",Apartment,44.51311,11.34528,bolognina,Navile,1.00000,1.00000,1.50000,2.00000,ia,4.95000,20,0,1,2.00000,2026-11-15,2026-11-18,4
@@ -3488,7 +3488,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1597172321951006531,Cartoleria 24 - First floor - int. 4,Apartment,44.49023,11.34847,c_sstefano,Santo Stefano,1.00000,2.00000,1.50000,4.00000,ia,4.95000,22,0,2,2.00000,2026-11-15,2026-11-18,4
 1597195354201674727,Brunello Apartment in the Heart of Bologna,Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,3.00000,3.00000,2.00000,6.00000,ia,4.85000,41,0,1,1.00000,2026-11-15,2026-11-18,4
 1597201560767071822,Amarone Elegant Stay in the Heart of Bologna,Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,2.00000,3.00000,1.00000,6.00000,ia,4.25000,4,0,0,1.00000,2026-11-16,2026-11-18,3
-1597204871156078394,Sassicaia Home – 5 Minutes Walk to Piazza Maggiore,Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,5.00000,6,0,1,1.00000,2026-11-15,2026-11-17,3
+1597204871156078394,Sassicaia Home – 5 Minutes Walk to Piazza Maggiore,Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,5.00000,6,0,1,1.00000,2026-11-15,2026-11-18,4
 1597764783988499248,"Lambrusco, luxury Apt in the Heart of Bologna",Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,4.86000,7,1,0,1.00000,2026-11-16,2026-11-18,3
 1597816612830077986,"Malvasia Luxury, 5 Min Walk to Piazza Maggiore",Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,3.00000,4.00000,2.00000,7.00000,ia,4.75000,8,0,1,1.00000,2026-11-15,2026-11-18,4
 1597822605569345345,Petrus Apartment in Bologna Historic Center,Vacation home,44.49568,11.34583,c_maggiore,Santo Stefano,2.00000,3.00000,2.00000,6.00000,ia,4.75000,4,1,0,1.00000,2026-11-15,2026-11-18,4
@@ -3866,7 +3866,7 @@ id,name,kind,lat,lon,zone,district,bedrooms,beds,baths,guests,guests_src,rating,
 1688272381564414162,"Belle Arti, Bologna by Short Holidays",Apartment,44.49769,11.35063,c_universita,Santo Stefano,3.00000,6.00000,2.00000,10.00000,ia,5.00000,5,0,1,1.00000,2026-11-15,2026-11-18,4
 1688568253904988924,The Station Loft - BeMyHost,Vacation home,44.50259,11.34127,c_stazione,Porto - Saragozza,1.00000,3.00000,1.00000,4.00000,ia,4.67000,12,1,0,1.00000,2026-11-15,2026-11-18,4
 1688845403763161485,Stylish Rooftop Retreat • Historic Centre,Vacation home,44.49775,11.33967,c_marconi,Porto - Saragozza,1.00000,2.00000,2.00000,2.00000,ia,5.00000,23,0,2,1.00000,2026-11-15,2026-11-18,4
-1688859611815202874,Luxury Rooftop + Terrace | Herb Market,Vacation home,44.49775,11.33967,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,5.00000,29,0,2,2.00000,2026-11-15,2026-11-18,4
+1688859611815202874,Luxury Rooftop + Terrace | Herb Market,Vacation home,44.49775,11.33967,c_marconi,Porto - Saragozza,1.00000,2.00000,1.00000,3.00000,ia,5.00000,30,0,2,2.00000,2026-11-15,2026-11-18,4
 1688974157131659682,Stress-Free Residential Stay + Parking,Vacation home,44.52039,11.32145,navile,Navile,1.00000,1.00000,1.00000,2.00000,ia,5.00000,19,0,1,1.00000,2026-11-15,2026-11-18,4
 1688975723251540982,Palazzo Marescalchi,Vacation home,44.49427,11.33922,c_maggiore,Porto - Saragozza,1.00000,2.00000,1.00000,2.00000,ia,5.00000,2,0,0,4.00000,,,0
 1689943811151115993,Fattori Deluxe Apartment,Apartment,44.50671,11.29323,santaviola,Borgo Panigale - Reno,1.00000,1.00000,1.00000,2.00000,ia,,0,0,0,1.00000,2026-11-17,2026-11-18,2
