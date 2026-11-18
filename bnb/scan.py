@@ -279,6 +279,8 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
     priced: dict[str, set] = {}
     track = {"windows": 0, "complete": 0, "requests": 0, "splits": 0, "resplits": 0, "found": 0, "expected": 0}
     track_left = [int(sc.get("track_requests", 950))]
+    extras = {"prices": 0, "stripped": 0, "tax": 0, "cleaning": 0, "service": 0, "tax_eur": 0.0, "cleaning_eur": 0.0,
+              "service_eur": 0.0, "samples": []}
 
     def take(page, w: Window | None, src: str) -> set:
         """Mette da parte ciò che c'è nella pagina; restituisce gli alloggi liberi per quella finestra."""
@@ -291,6 +293,14 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
             if c.price:
                 price_rows.append({"id": c.id, "checkin": w.key(), "nights": w.nights, "price": round(c.price, 2),
                                    "orig": round(c.orig, 2) if c.orig else None, "src": src})
+                extras["prices"] += 1
+                if c.extra:              # Airbnb aveva messo tasse o spese nel prezzo: tolte, e contate
+                    extras["stripped"] += 1
+                    for k, v in c.extra.items():
+                        extras[k] += 1
+                        extras[k + "_eur"] += v
+                    if len(extras["samples"]) < 3:
+                        extras["samples"].append({"id": c.id, "checkin": w.key(), "price": c.price, "extra": c.extra})
                 priced.setdefault(w.key(), set()).add(c.id)
         if w is not None:
             seen.setdefault(w.key(), set()).update(ids)
@@ -460,6 +470,7 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
         if seen_rows:
             store.add_seen(today, seen_rows)
         run["track"] = track
+        run["price_extras"] = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in extras.items()}
         cat.save()
         run.update(requests=client.requests, errors=client.errors, error_samples=getattr(client, "error_samples", []),
                    listings=len(cat.rows), secs=round(time.time() - t0, 1),

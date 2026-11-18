@@ -154,6 +154,8 @@ def test_budget_stop_keeps_data(tmp_path):
     run = scan.run_scan(cfg, store, SimClient(mk, START, max_requests=200), START, log=lambda *a: None)
     assert "tetto" in run["stopped"]
     assert run["prices"] > 500 and len(store.load_listings()) > 100      # salvato comunque ciò che era stato letto
+    pe = run["price_extras"]                                                # i prezzi simulati non hanno tasse dentro
+    assert pe["prices"] > 500 and pe["stripped"] == 0 and pe["samples"] == []
 
 
 def test_first_day_is_already_usable(tmp_path):

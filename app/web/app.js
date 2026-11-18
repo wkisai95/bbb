@@ -903,7 +903,7 @@
     root.appendChild(h("div", { class: "stack" }, h("button", { class: "btn block", onclick: function () { exportCsv(rec); }, text: "Esporta questi prezzi (CSV)" })));
     root.appendChild(h("p", { class: "note", text: (net
       ? "Prezzi per notte al netto della commissione " + f.ch.name + " (" + pct1(f.share) + "): quanto ti resta prima dei costi. Sul portale va messo il prezzo lordo, che trovi toccando la notte."
-      : "Prezzi per notte pagati dall'ospite, pulizie e commissioni incluse, tassa di soggiorno esclusa.") +
+      : "Prezzi per notte come li imposta chi affitta, sconti compresi: pulizie, costi del servizio di Airbnb e tassa di soggiorno sono a parte.") +
       " Il prezzo è quello da impostare oggi: riapri l'app nei prossimi giorni, perché cambia con le prenotazioni del mercato. La percentuale di notti vendute conta solo quelle ancora libere oggi." }));
   }
 

@@ -31,8 +31,9 @@ Questo ramo è scritto in automatico dalla scansione giornaliera. Non modificarl
 | `public/listings.json` | catalogo compatto per la pagina Mercato dell'app |
 | `public/status.json` | stato dell'ultima esecuzione |
 
-I prezzi sono in euro, per l'intero soggiorno campione, tutto incluso per l'ospite (pulizie e commissioni),
-tassa di soggiorno esclusa. `orig` è il prezzo pieno quando Airbnb mostra uno sconto.
+I prezzi sono in euro, per l'intero soggiorno campione: prezzo per notte di chi affitta per il numero di notti,
+dopo gli sconti, senza pulizie, costi del servizio e tassa di soggiorno. `orig` è il prezzo pieno quando Airbnb
+mostra uno sconto.
 """
 
 

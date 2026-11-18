@@ -2,7 +2,7 @@
 import json
 import os
 
-from bnb.airbnb import parse_content, parse_money, parse_page, parse_price, parse_rating
+from bnb.airbnb import parse_breakdown, parse_content, parse_money, parse_page, parse_price, parse_rating, strip_extras
 
 FIX = os.path.join(os.path.dirname(__file__), "fixtures", "search_page.json")
 
@@ -21,6 +21,29 @@ def test_real_page():
     assert discounted.price == 193.0 and discounted.orig == 231.0
     component_style = next(c for c in page.cards if c.id == 2280311)      # riga prezzo "a componenti"
     assert component_style.price == 196.0 and component_style.orig == 217.0
+    # nella risposta vera il dettaglio ha solo notti, sconti e prezzo dopo lo sconto: niente da togliere
+    assert not any(c.extra for c in page.cards)
+
+
+def test_breakdown_and_extras():
+    bd = parse_breakdown({"explanationData": {"priceDetails": [
+        {"items": [{"description": "2 nights x €95.50", "priceString": "€191.00"},
+                   {"description": "Discount from Airbnb", "priceString": "-€4.78"}]},
+        {"items": [{"description": "Price after discount", "priceString": "€186.22"}]}]}})
+    assert (bd["base"], bd["discount"], bd["total"], bd["tax"]) == (191.0, -4.78, 186.22, 0.0)
+    assert strip_extras(187.0, None, bd) == (187.0, None, None)
+    # come la mostra Airbnb agli ospiti europei: pulizie, servizio e tasse dentro il totale -> tolte
+    eu = parse_breakdown({"explanationData": {"priceDetails": [
+        {"items": [{"description": "2 nights x €100.00", "priceString": "€200.00"},
+                   {"description": "Weekly stay discount", "priceString": "-€20.00", "__typename": "DiscountedExplanationLineItem"},
+                   {"description": "Cleaning fee", "priceString": "€40.00"},
+                   {"description": "Airbnb service fee", "priceString": "€34.00"},
+                   {"description": "Taxes", "priceString": "€18.90"}]},
+        {"items": [{"description": "Total", "priceString": "€272.90"}]}]}})
+    assert strip_extras(273.0, 300.0, eu) == (180.1, 197.91, {"tax": 18.9, "cleaning": 40.0, "service": 34.0})
+    # se il prezzo mostrato non le comprende, resta com'è
+    assert strip_extras(180.0, None, eu) == (180.0, None, None)
+    assert parse_breakdown(None) is None and parse_breakdown({"explanationData": {"priceDetails": [{"items": []}]}}) is None
 
 
 def test_money():

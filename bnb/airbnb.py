@@ -37,7 +37,8 @@ class Card:
     reviews: int = 0
     superhost: bool = False
     fav: int = 0            # 0 no · 1 "Amato dagli ospiti" · 2 tra i migliori (top 1/5/10%)
-    price: float | None = None   # totale mostrato per il soggiorno, tasse escluse
+    price: float | None = None   # prezzo del soggiorno dopo gli sconti, senza tasse, pulizie e costi del servizio
+    extra: dict | None = None    # voci in più che Airbnb aveva messo nel prezzo mostrato e che sono state tolte
     orig: float | None = None    # prezzo pieno, se c'è uno sconto
     nights: int | None = None
 
@@ -141,6 +142,62 @@ def _dig(d, path, default=None):
     return cur
 
 
+_EXTRA = (("tax", ("tax", "vat", "tassa", "imposta", "iva")), ("cleaning", ("cleaning", "pulizia")),
+          ("service", ("service fee", "servizio")))
+
+
+def parse_breakdown(sdp: dict | None) -> dict | None:
+    """Dettaglio del prezzo che Airbnb manda con ogni risultato ("2 nights x €95.50", sconti, eventuali pulizie,
+    costi del servizio e tasse). Il primo gruppo sono le voci, gli altri i totali ("Price after discount", "Total")."""
+    groups = [g for g in (_dig(sdp or {}, "explanationData.priceDetails", []) or []) if isinstance(g, dict) and g.get("items")]
+    if not groups:
+        return None
+    out = {"base": 0.0, "discount": 0.0, "tax": 0.0, "cleaning": 0.0, "service": 0.0, "other": 0.0, "total": None, "lines": []}
+    for gi, g in enumerate(groups):
+        for it in g.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            ps = str(it.get("priceString") or "")
+            v = parse_money(ps)
+            if v is None:
+                continue
+            if ps.strip().startswith(("-", "\u2212")) or it.get("__typename") == "DiscountedExplanationLineItem":
+                v = -v
+            d = str(it.get("description") or "").strip()
+            out["lines"].append([d, v])
+            t = d.lower()
+            if gi > 0:
+                out["total"] = v
+            elif re.search(r"\bnights?\s*x\b", t):
+                out["base"] += v
+            elif v < 0:
+                out["discount"] += v
+            else:
+                for k, words in _EXTRA:
+                    if any(w in t for w in words):
+                        out[k] += v
+                        break
+                else:
+                    out["other"] += v
+    return out
+
+
+def strip_extras(price: float | None, orig: float | None, bd: dict | None):
+    """Se nel prezzo mostrato ci sono tasse, pulizie o costi del servizio, li toglie: resta il prezzo per notte
+    come lo imposta chi affitta, dopo gli sconti. Oggi la ricerca non li mette; serve se Airbnb cambia."""
+    if not price or not bd:
+        return price, orig, None
+    extras = {k: round(bd[k], 2) for k in ("tax", "cleaning", "service") if bd[k] > 0}
+    if not extras:
+        return price, orig, None
+    tot = sum(extras.values())
+    with_extras = bd["base"] + bd["discount"] + bd["other"] + tot
+    if abs(with_extras - price) > max(2.0, 0.02 * price):     # il prezzo mostrato non le comprende
+        return price, orig, None
+    keep = (price - tot) / price
+    return round(price - tot, 2), (round(orig * keep, 2) if orig else None), extras
+
+
 def parse_price(sdp: dict | None, nights: int | None) -> tuple[float | None, float | None, int | None]:
     """(prezzo totale del soggiorno, prezzo pieno se scontato, notti)."""
     pl = dict((sdp or {}).get("primaryLine") or {})
@@ -209,7 +266,9 @@ def parse_page(raw: dict, nights: int | None = None) -> Page:
                 c.fav = max(c.fav, 1)
             elif "GUEST_FAVORITE" in t:
                 c.fav = 2
-        c.price, c.orig, c.nights = parse_price(x.get("structuredDisplayPrice"), nights)
+        sdp = x.get("structuredDisplayPrice")
+        c.price, c.orig, c.nights = parse_price(sdp, nights)
+        c.price, c.orig, c.extra = strip_extras(c.price, c.orig, parse_breakdown(sdp))
         page.cards.append(c)
     return page
 
