@@ -239,3 +239,37 @@ def test_aggressive_pricing(world):
     for n in own["nights"]:
         want = max(100, round(n["market"] * (0.75 if n["lead"] <= 5 else 1.0)))
         assert abs(n["price"] - want) <= 1 and n["price"] >= 100
+
+
+def test_single_nights_are_kept_apart(tmp_path):
+    """Le notti singole: una ricerca per notte, prezzi e conteggi a parte; il modello dei soggiorni campione
+    non cambia di una virgola se ci sono o non ci sono."""
+    import glob
+    import json as _json
+
+    import pandas as pd
+    from bnb import model
+
+    cfg = load_settings()
+    mk = SimMarket(START, n=900, seed=11, days=3)
+    store = Store(str(tmp_path))
+    run = scan.run_scan(cfg, store, SimClient(mk, START), START, log=lambda *a: None)
+    ph = {p["name"]: p["requests"] for p in run["phases"]}
+    assert ph["notti singole"] == cfg["scan"]["single_days"] == run["single_windows"]
+    pr = store.load_prices()
+    assert set(pr["nights"]) == {1, 2} and (store.load_prices(nights=2)["nights"] == 2).all()
+    m = model.build(store, cfg, START, log=lambda *a: None)
+    s = m["single_night"]
+    assert s["pairs"] >= 100 and 0.95 < s["premium"] < 1.05          # nel mercato simulato una notte costa uguale
+    assert 0.05 < s["supply_ratio"] < 1.0                               # chi chiede almeno due notti non compare
+    # tolte le notti singole dall'archivio, il resto del modello è identico
+    for f in glob.glob(str(tmp_path / "data" / "prices" / "*.csv.gz")):
+        df = pd.read_csv(f)
+        df[df["nights"] != 1].to_csv(f, index=False, compression="gzip", float_format="%.2f")
+    for f in glob.glob(str(tmp_path / "data" / "counts" / "*.csv")):
+        df = pd.read_csv(f, keep_default_na=False)
+        df[df["nights"].astype(str) != "1"].to_csv(f, index=False)
+    m2 = model.build(store, cfg, START, log=lambda *a: None)
+    assert m2["single_night"] is None
+    keys = ["market", "pace", "theta", "beta", "calibration", "tracking", "base"]
+    assert _json.dumps({k: m.get(k) for k in keys}, sort_keys=True, default=str) == _json.dumps({k: m2.get(k) for k in keys}, sort_keys=True, default=str)

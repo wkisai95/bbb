@@ -282,8 +282,9 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
     extras = {"prices": 0, "stripped": 0, "tax": 0, "cleaning": 0, "service": 0, "tax_eur": 0.0, "cleaning_eur": 0.0,
               "service_eur": 0.0, "samples": []}
 
-    def take(page, w: Window | None, src: str) -> set:
-        """Mette da parte ciò che c'è nella pagina; restituisce gli alloggi liberi per quella finestra."""
+    def take(page, w: Window | None, src: str, follow: bool = True) -> set:
+        """Mette da parte ciò che c'è nella pagina; restituisce gli alloggi liberi per quella finestra.
+        follow=False (notti singole): prezzi sì, ma niente elenchi di chi è libero, che servono solo ai soggiorni campione."""
         ids = set()
         for c in page.cards:
             cat.upsert(c, today)
@@ -301,8 +302,9 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
                         extras[k + "_eur"] += v
                     if len(extras["samples"]) < 3:
                         extras["samples"].append({"id": c.id, "checkin": w.key(), "price": c.price, "extra": c.extra})
-                priced.setdefault(w.key(), set()).add(c.id)
-        if w is not None:
+                if follow:
+                    priced.setdefault(w.key(), set()).add(c.id)
+        if w is not None and follow:
             seen.setdefault(w.key(), set()).update(ids)
         return ids
 
@@ -443,8 +445,22 @@ def run_scan(cfg: dict, store: Store, client, today: date, log=print, pages: dic
                     break
                 scan_window(w, i, "light")
 
+        def singles():
+            """Soggiorni di una notte nei prossimi giorni: una ricerca sulla città per notte. Dicono quanti alloggi
+            accettano una notte sola e quanto chiedono, rispetto agli stessi alloggi per due notti."""
+            for d in range(1, int(sc.get("single_days", 0)) + 1):
+                if left() < 15:
+                    break
+                w = Window(today + timedelta(days=d), 1, "single")
+                p = client.search(city, w.key(), w.checkout.isoformat())
+                if p:
+                    count_row(w, "city", p)
+                    take(p, w, "s", follow=False)
+                run["single_windows"] = run.get("single_windows", 0) + 1
+
         phase("date seguite", followed)
         phase("date vicine", lambda: [scan_window(w, i, "near") for i, w in enumerate(w for w in near if not w.census)])
+        phase("notti singole", singles)            # poche richieste: prima delle date lontane, che si fermano al tetto
         phase("date lontane ed eventi", far)
 
         def details():

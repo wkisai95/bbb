@@ -13,6 +13,8 @@ room_type: "Entire home/apt"
 scan:
   nights: 2                  # durata dei soggiorni campione: il minimo più comune a Bologna
   near_days: 60              # ogni notte dei prossimi 60 giorni viene letta a giorni alterni
+  single_days: 21            # soggiorni di UNA notte: ogni notte dei prossimi 21 giorni, una ricerca sulla città
+                             # (prezzi e quanti alloggi la accettano); servono a chi affitta anche le notti singole
   mid_days: 180              # da 60 a 180 giorni: un fine settimana e un infrasettimanale per settimana, a rotazione
   far_days: 365              # da 180 a 365 giorni: una coppia di finestre al mese, più tutte le date con eventi
   mid_share: 2               # ogni finestra "media" viene letta un giorno ogni 2

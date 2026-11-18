@@ -34,7 +34,7 @@ def _empty() -> dict:
             "samples": [], "back_rate": BACK_PRIOR[0] / BACK_PRIOR[1], "checked": 0}
 
 
-def detect(store: Store, today: date, lookback: int = 45) -> dict:
+def detect(store: Store, today: date, lookback: int = 45, nights: int = 2) -> dict:
     """Confronta le letture complete consecutive di ogni finestra.
 
     Restituisce:
@@ -45,7 +45,7 @@ def detect(store: Store, today: date, lookback: int = 45) -> dict:
       back_rate  quota di spariti che ricompare alla lettura successiva
     """
     since = today - timedelta(days=lookback)
-    cn = store.load_counts(since=since)
+    cn = store.load_counts(since=since, nights=nights)
     if cn.empty:
         return _empty()
     cens = cn[(cn["scope"] == "census") & (pd.to_numeric(cn["complete"], errors="coerce") == 1)]
@@ -54,7 +54,7 @@ def detect(store: Store, today: date, lookback: int = 45) -> dict:
     if not len(reads):
         return _empty()
     first = min(days[0] for days in reads)
-    pr = store.load_prices(since=date.fromisoformat(first))
+    pr = store.load_prices(since=date.fromisoformat(first), nights=nights)
     if pr.empty:
         return _empty()
     pr["pn"] = pr["price"] / pr["nights"]

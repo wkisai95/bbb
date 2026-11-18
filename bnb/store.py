@@ -120,24 +120,30 @@ class Store:
                 pass
         return sorted(out)
 
-    def load_prices(self, since: date | None = None, until: date | None = None) -> pd.DataFrame:
+    def load_prices(self, since: date | None = None, until: date | None = None, nights: int | None = None) -> pd.DataFrame:
+        """Prezzi letti; con nights solo quelli dei soggiorni di quella durata (2 = campione, 1 = notti singole)."""
         frames = []
         for d in self.scan_days("prices"):
             if (since and d < since) or (until and d > until):
                 continue
             df = pd.read_csv(self._day_path("prices", d), dtype={"id": "int64", "checkin": "string", "src": "string"})
+            if nights is not None:
+                df = df[df["nights"] == nights]
             df["scan"] = d.isoformat()
             frames.append(df)
         if not frames:
             return pd.DataFrame(columns=PRICE_COLS + ["scan"])
         return pd.concat(frames, ignore_index=True)
 
-    def load_counts(self, since: date | None = None, until: date | None = None) -> pd.DataFrame:
+    def load_counts(self, since: date | None = None, until: date | None = None, nights: int | None = None) -> pd.DataFrame:
+        """Conteggi; con nights solo quelli delle finestre di quella durata, più quelli senza date (offerta)."""
         frames = []
         for d in self.scan_days("counts"):
             if (since and d < since) or (until and d > until):
                 continue
             df = pd.read_csv(self._day_path("counts", d), dtype={"checkin": "string", "scope": "string"}, keep_default_na=False)
+            if nights is not None:
+                df = df[(df["checkin"] == "") | (pd.to_numeric(df["nights"], errors="coerce") == nights)]
             df["scan"] = d.isoformat()
             frames.append(df)
         if not frames:

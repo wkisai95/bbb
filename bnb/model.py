@@ -407,6 +407,49 @@ def fit_beta(pairs: list, prior: float, prior_sd: float) -> dict:
 
 # ------------------------------------------------------------------ modello completo
 
+def _single_nights(store: Store, today: date, nights_per: int, level: dict | None = None, days: int = 28) -> dict | None:
+    """Soggiorni di una notte (lette a parte, vedi scan.singles): quanto chiedono gli stessi alloggi per una
+    notte sola rispetto al prezzo che quella notte ha dentro il soggiorno campione con lo stesso arrivo, e quanti
+    alloggi liberi si trovano per una notte sola ogni 100 che si trovano per i soggiorni campione.
+
+    level: livello del prezzo di ogni notte (giorno ordinale -> fattore): un sabato dentro "sabato e domenica"
+    vale più della metà del soggiorno, e senza questa correzione sembrerebbe un rincaro della notte singola."""
+    since = today - timedelta(days=days)
+    p1 = store.load_prices(since=since, nights=1)
+    if p1.empty:
+        return None
+    p2 = store.load_prices(since=since, nights=nights_per)
+    j = p1.merge(p2, on=["scan", "id", "checkin"], suffixes=("_1", "_2"))
+    out = {"since": since.isoformat(), "prices": int(len(p1)), "pairs": int(len(j)), "premium": None,
+           "premium_weekend": None, "premium_weekday": None, "share_higher": None, "supply_ratio": None, "dates": 0}
+    if len(j):
+        def share(ci: str) -> float:
+            d0 = date.fromisoformat(ci).toordinal()
+            lv = [level.get(d0 + k) for k in range(nights_per)] if level else []
+            return lv[0] / sum(lv) if lv and all(v for v in lv) else 1.0 / nights_per
+        j = j.assign(r=j["price_1"] / (j["price_2"] * j["checkin"].map(share)))
+        j = j[(j["r"] > 0.4) & (j["r"] < 2.5)]
+        weekend = pd.to_datetime(j["checkin"]).dt.weekday.isin([4, 5]).to_numpy()      # notti di venerdì e sabato
+
+        def premium(mask) -> float | None:
+            x = j["r"].to_numpy()[mask]
+            return round(float(np.exp(np.median(np.log(x)))), 3) if len(x) >= 30 else None
+        out["premium"] = premium(np.ones(len(j), bool))
+        out["premium_weekend"] = premium(weekend)
+        out["premium_weekday"] = premium(~weekend)
+        out["share_higher"] = round(float((j["r"] > 1.02).mean()), 3) if len(j) else None
+    c1 = store.load_counts(since=since, nights=1)
+    c2 = store.load_counts(since=since, nights=nights_per)
+    c1 = c1[(c1["checkin"] != "") & (c1["scope"] == "city")]
+    c2 = c2[(c2["checkin"] != "") & (c2["scope"] == "city")]
+    cc = c1.merge(c2, on=["scan", "checkin"], suffixes=("_1", "_2"))
+    if len(cc):
+        ratio = (pd.to_numeric(cc["count_1"], errors="coerce") / pd.to_numeric(cc["count_2"], errors="coerce").replace(0, np.nan)).dropna()
+        out["supply_ratio"] = round(float(ratio.median()), 3) if len(ratio) else None
+        out["dates"] = int(cc["checkin"].nunique())
+    return out
+
+
 def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
     """Stima tutto dai dati raccolti e restituisce il modello (dizionario pronto per l'app)."""
     mcfg = cfg["model"]
@@ -423,7 +466,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
     lst["group"] = lst["zone"].map(lambda z: zones.group_of(z) if z in zones.by_id else "")
 
     since = today - timedelta(days=int(mcfg["fit_days"]))
-    pr = store.load_prices(since=since)
+    pr = store.load_prices(since=since, nights=nights_per)
     if pr.empty:
         log("modello: nessun prezzo raccolto")
         return None
@@ -490,12 +533,12 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
     base_arr = [base[d] for d in days]
 
     # ---- 3. domanda
-    cn = store.load_counts(since=today - timedelta(days=75))
+    cn = store.load_counts(since=today - timedelta(days=75), nights=nights_per)
     calib = dict((store.load_state().get("calibration") or {}))
     if mcfg.get("nu") is not None:
         calib["nu"] = float(mcfg["nu"])
     # chi era libero a una lettura completa e non lo è più a quella dopo: prenotazioni rilevate
-    trk = track.detect(store, today)
+    trk = track.detect(store, today, nights=nights_per)
     attr = _attr(lst, c, zones)
     demand = _demand(cn, days, today, nights_per, weights, zones, cfg, calib, log, trk["pairs"])
 
@@ -583,6 +626,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
         "groups": zones.groups,
         "market": market,
         "tracking": tracking,
+        "single_night": _single_nights(store, today, nights_per, {d: math.exp(v) for d, v in zip(days, idx)}),
         "reliability": {
             "scan_days": len(scan_days),
             "first_scan": scan_days[0].isoformat() if scan_days else None,

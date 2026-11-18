@@ -17,6 +17,7 @@ DEFAULTS: dict = {
     "room_type": "Entire home/apt",
     "scan": {
         "nights": 2,
+        "single_days": 21,
         "near_days": 60,
         "mid_days": 180,
         "far_days": 365,

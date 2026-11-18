@@ -213,6 +213,15 @@
       steps: aggSteps(), strategy: strategy, start: P.isoDate(start), end: P.isoDate(start + (days - 1) * DAY) };
   }
   function firstNight() { return Math.max(todayMs(), P.parseDate(model().start)); }
+  /* soggiorno di una notte sola: il prezzo consigliato per quanto chiedono in più (o in meno) gli altri per una
+     notte singola rispetto alla stessa notte dentro un soggiorno di due; venerdì e sabato a parte */
+  function singleNight(price, isoDay, a) {
+    var s = model().single_night;
+    if (!s || !s.premium) return null;
+    var wd = new Date(isoDay + "T00:00:00Z").getUTCDay(), we = wd === 5 || wd === 6;
+    var k = (we ? s.premium_weekend : s.premium_weekday) || s.premium;
+    return { price: Math.max(+(a.minPrice || 0), Math.round(price * k)), k: k };
+  }
   function recommend(strategy, days, from, which) {
     var m = model(), a = which || apt();
     var p = recParams(strategy, days, from === undefined ? firstNight() : from, a);
@@ -980,6 +989,8 @@
       STRATS.forEach(function (x) {
         if (x[0] !== state.strategy) kv("Con " + STRAT_NAME[x[0]], euro(pv(recommend(x[0], 1, ms, aa).nights[0].price, aa)));
       });
+      var one = singleNight(n.price, n.date, aa);
+      if (one) kv("Per una notte sola", euro(pv(one.price, aa)) + " (" + signedPct(one.k - 1) + ")");
       body.appendChild(dl);
 
       // quanto resta, e la tassa di soggiorno
@@ -1029,9 +1040,10 @@
   }
 
   function exportCsv(rec) {
-    var a = apt(), f = aptFees(a), rows = [["data", "prezzo_consigliato", "probabilita_vendita", "commissione_portale", "netto_dopo_commissione", "tassa_soggiorno", "tassa_riscossa_da", "prezzo_mediano_comparabili", "comparabili_25", "comparabili_75", "rispetto_al_normale", "misurato", "eventi"]];
+    var a = apt(), f = aptFees(a), rows = [["data", "prezzo_consigliato", "prezzo_una_notte_sola", "probabilita_vendita", "commissione_portale", "netto_dopo_commissione", "tassa_soggiorno", "tassa_riscossa_da", "prezzo_mediano_comparabili", "comparabili_25", "comparabili_75", "rispetto_al_normale", "misurato", "eventi"]];
     rec.nights.forEach(function (n) {
-      rows.push([n.date, n.price, n.sell.toFixed(3), n.fee.toFixed(2), n.payout.toFixed(2), n.tax.toFixed(2), f.ch.tax === "portal" ? f.ch.name : "host", n.market, n.low, n.high, n.uplift.toFixed(3), n.measured ? "si" : "no", n.events.join(" | ")]);
+      var one = singleNight(n.price, n.date, a);
+      rows.push([n.date, n.price, one ? one.price : "", n.sell.toFixed(3), n.fee.toFixed(2), n.payout.toFixed(2), n.tax.toFixed(2), f.ch.tax === "portal" ? f.ch.name : "host", n.market, n.low, n.high, n.uplift.toFixed(3), n.measured ? "si" : "no", n.events.join(" | ")]);
     });
     var csv = csvText(rows);
     saveFile("prezzi-" + slugOf(a.name) + "-" + rec.strategy + "-" + rec.nights[0].date + ".csv", "text/csv", "﻿# " + a.name + " · " + aptSpec(a) + " · strategia: " + rec.strategy + " · portale: " + f.ch.name + " (" + pct1(f.share) + ") · tassa di soggiorno per " + guestsWord(f.payers) + "\r\n" + csv);
@@ -1145,8 +1157,22 @@
     root.appendChild(list);
     root.appendChild(h("p", { class: "note", style: "margin-top:12px", text: "Scala da " + euro(lo) + " a " + euro(hi) + ". Tocca una riga per vedere gli annunci." }));
     bookingsBlock(root, m);
+    singleBlock(root, m);
   }
   /* chi era libero a una lettura completa e non c'è più alla successiva: prenotato */
+  function singleBlock(root, m) {
+    var s = m.single_night;
+    root.appendChild(h("h2", { text: "Notti singole" }));
+    if (!s || (!s.premium && !s.supply_ratio)) {
+      root.appendChild(h("p", { class: "note", text: "Ogni giorno lo scanner cerca anche i soggiorni di una notte sola per le prossime tre settimane: quanti alloggi li accettano e quanto chiedono. I primi risultati compaiono dopo la prossima scansione." }));
+      return;
+    }
+    if (s.supply_ratio) root.appendChild(h("p", {}, "Per una notte sola si trovano ", h("b", { text: nf.format(Math.round(s.supply_ratio * 100)) + " alloggi liberi" }), " ogni 100 che si trovano per due notti: " +
+      (s.supply_ratio < 1 ? "molti chiedono almeno due notti, quindi per una notte sola la concorrenza è minore." : "molti hanno libera una notte sola, quindi per una notte sola c'è più scelta.")));
+    if (s.premium) root.appendChild(h("p", {}, "Per una notte sola gli stessi alloggi chiedono ", h("b", { text: signedPct(s.premium - 1) }), " rispetto a quella notte dentro un soggiorno di due" +
+      (s.premium_weekend && s.premium_weekday ? " (venerdì e sabato " + signedPct(s.premium_weekend - 1) + ", altri giorni " + signedPct(s.premium_weekday - 1) + ")" : "") + ". L'app lo applica al prezzo consigliato: lo trovi toccando una notte."));
+    root.appendChild(h("p", { class: "note", text: "Dati delle ultime quattro settimane: " + nf.format(s.pairs) + " confronti sugli stessi alloggi e stesse date, " + nf.format(s.dates) + " date. Sono prezzi per notte, senza pulizie: chi fa pagare le pulizie a parte le incassa intere anche per una notte." }));
+  }
   function bookingsBlock(root, m) {
     var t = m.tracking;
     root.appendChild(h("h2", { text: "Chi viene prenotato" }));

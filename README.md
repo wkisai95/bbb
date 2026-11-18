@@ -188,6 +188,10 @@ Fine-grained tokens → Generate new token, solo sul repository `bbb`, con perme
   è quasi sempre stato prenotato, ma da fuori non si distingue da una data bloccata dal proprietario o da un
   soggiorno minimo alzato; e qualche alloggio sfugge alla lettura (per questo serve la conferma due giorni
   dopo). Le prenotazioni si vedono solo per le date entro 30 giorni.
+- **Notti singole:** ogni giorno lo scan cerca anche i soggiorni di una notte sola per le prossime tre settimane
+  (una ricerca per notte). Servono solo a misurare quanti alloggi accettano una notte sola e quanto chiedono in
+  più per la stessa notte rispetto a un soggiorno di due; il modello dei soggiorni campione non li usa. L'app
+  mostra il prezzo per una notte sola toccando una notte, nell'esportazione e in Mercato → Notti singole.
 - **I prezzi sono quelli chiesti, non quelli incassati**, per soggiorni di due notti: è il prezzo per notte che
   imposta chi affitta, dopo gli sconti, senza pulizie, costi del servizio di Airbnb e tassa di soggiorno. All'ospite
   Airbnb mostra un totale che in Europa comprende anche la tassa; lo scan legge invece il dettaglio del prezzo
