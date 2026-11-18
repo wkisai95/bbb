@@ -30,6 +30,7 @@ Questo ramo è scritto in automatico dalla scansione giornaliera. Non modificarl
 | `public/model.json` | modello di prezzo usato dall'app |
 | `public/listings.json` | catalogo compatto per la pagina Mercato dell'app |
 | `public/status.json` | stato dell'ultima esecuzione |
+| `public/realizzo.json` | per ogni annuncio: finestre prenotate rilevate negli ultimi 45 giorni (arrivo e giorno in cui è sparito, come giorni dopo `since`; prezzo a notte che chiedeva; confermata o no) e in quante finestre era libero |
 
 I prezzi sono in euro, per l'intero soggiorno: prezzo per notte di chi affitta per il numero di notti, dopo gli
 sconti, senza pulizie, costi del servizio e tassa di soggiorno. `nights` vale 2 per i soggiorni campione e 1 per
@@ -103,6 +104,7 @@ def publish(store: Store, model: dict | None, today: date, run: dict | None, cfg
     }
     if model:
         listing_rows = model.pop("_listings", [])
+        realized = model.pop("_realized", None)
         extra = update_history(store, model, today, run)
         model["reliability"]["forecast"] = extra["forecast"]
         model["reliability"]["history"] = extra["history"]
@@ -111,6 +113,10 @@ def publish(store: Store, model: dict | None, today: date, run: dict | None, cfg
             warnings.append(f"Prezzo mediano insolito ({med} €/notte): controllare la lettura dei prezzi")
         store.write_json("public/model.json", model, compact=True)
         store.write_json("public/listings.json", {"generated": today.isoformat(), "fields": LISTING_FIELDS, "rows": listing_rows}, compact=True)
+        if realized is not None:
+            store.write_json("public/realizzo.json", {"generated": today.isoformat(), "nights": int(cfg["scan"]["nights"]),
+                                                      "fields": ["arrivo", "rilevata", "prezzo_notte", "confermata"],
+                                                      "note": "arrivo e rilevata sono giorni dopo since", **realized}, compact=True)
         status.update(scan_days=model["reliability"]["scan_days"], listings=len(listing_rows),
                       n_obs=model["reliability"]["n_obs"], median_price=med)
     else:

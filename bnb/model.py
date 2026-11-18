@@ -539,6 +539,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
         calib["nu"] = float(mcfg["nu"])
     # chi era libero a una lettura completa e non lo è più a quella dopo: prenotazioni rilevate
     trk = track.detect(store, today, nights=nights_per)
+    realized = track.realized(trk, today)
     attr = _attr(lst, c, zones)
     demand = _demand(cn, days, today, nights_per, weights, zones, cfg, calib, log, trk["pairs"])
 
@@ -648,6 +649,7 @@ def build(store: Store, cfg: dict, today: date, log=print) -> dict | None:
         "curve": demand["curve"],
     }
     model["_listings"] = listing_rows
+    model["_realized"] = realized
     return model
 
 

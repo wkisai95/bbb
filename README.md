@@ -138,6 +138,21 @@ aggiornato anche un archivio unico:
 (lo stesso che scarichi dall'app in Dati → Scarica il backup completo). Sono CSV e JSON leggibili con Excel
 o qualunque programma.
 
+## Riscontro: cosa è successo davvero
+
+Nella scheda di ogni appartamento si può incollare il link del suo annuncio Airbnb. In Prezzi → **Riscontro**
+l'app mostra allora, con i dati dello scanner:
+
+- in quante letture complete (date entro 30 giorni) lo scanner ha visto l'annuncio libero e in quante l'ha poi
+  trovato prenotato, confrontato con gli appartamenti simili (stessa zona e camere);
+- gli arrivi prenotati rilevati, con il prezzo a notte che l'annuncio chiedeva prima della prenotazione e, accanto,
+  il prezzo consigliato e la probabilità prevista dall'app in quei giorni (ogni giorno l'app annota sul telefono
+  le sue previsioni per le prossime 30 notti);
+- quanto hanno sbagliato le previsioni di mercato fatte 7, 14 e 28 giorni prima.
+
+Limiti: solo Airbnb e solo date entro 30 giorni; una data bloccata dal proprietario sembra una prenotazione (le
+chiusure di tante date insieme sono escluse). I dati sono in `public/realizzo.json`.
+
 ## Appartamenti, proprietari e stime: file cifrati
 
 Gli appartamenti, i nomi dei proprietari e le stime di guadagno stanno sul telefono, ma l'app ne salva anche una

@@ -84,6 +84,7 @@ def detect(store: Store, today: date, lookback: int = 45, nights: int = 2) -> di
         return (date.fromisoformat(b) - date.fromisoformat(a)).days
 
     ev, pairs = [], []
+    risk_ids: dict[int, int] = {}       # per ogni alloggio: in quanti confronti era libero alla prima lettura
     for w, days in reads.items():
         ci = date.fromisoformat(w)
         for k in range(len(days) - 1):
@@ -107,6 +108,8 @@ def detect(store: Store, today: date, lookback: int = 45, nights: int = 2) -> di
                            "pn": pa.get(i), "status": status, "sure": int(C is not None), "w": 0.0})
             pairs.append({"scan": b, "prev": a, "checkin": w, "lead": lead, "gap": gap, "risk": len(A),
                           "new": len(B - A), "sure": int(C is not None)})
+            for i in A:
+                risk_ids[i] = risk_ids.get(i, 0) + 1
     if not pairs:
         return _empty()
     E = pd.DataFrame(ev, columns=EV_COLS)
@@ -158,7 +161,26 @@ def detect(store: Store, today: date, lookback: int = 45, nights: int = 2) -> di
         samples.append({"scan": r.scan, "checkin": r.checkin, "lead": r.lead, "gap": r.gap, "id": np.array(ids),
                         "pn": np.array([pa[i] for i in ids], dtype=float),
                         "y": np.array([1.0 if i in yes else 0.0 for i in ids])})
-    return {"events": E, "pairs": P, "samples": samples, "back_rate": float(back_rate), "checked": int(len(chk))}
+    return {"events": E, "pairs": P, "samples": samples, "back_rate": float(back_rate), "checked": int(len(chk)),
+            "risk_ids": risk_ids}
+
+
+def realized(trk: dict, today: date, lookback: int = 45) -> dict:
+    """Per il riscontro nell'app, annuncio per annuncio: le finestre prenotate rilevate (arrivo, giorno della
+    lettura in cui è sparito, prezzo a notte che chiedeva alla lettura prima, 1 se confermato dalla lettura dopo)
+    e in quante finestre era libero a una lettura completa. Solo date entro 30 giorni, solo Airbnb."""
+    since = today - timedelta(days=lookback)
+    out = {"since": since.isoformat(), "booked": {}, "observed": {}}
+    off = lambda iso: (date.fromisoformat(iso) - since).days       # date come giorni da "since": file più piccolo
+    E = trk["events"]
+    if len(E):
+        b = E[(E["status"] == "prenotato") & (E["scan"] >= out["since"])].sort_values(["id", "checkin"])
+        for i, g in b.groupby("id", sort=False):
+            out["booked"][str(int(i))] = [[off(r.checkin), off(r.scan), None if pd.isna(r.pn) else int(round(float(r.pn))), int(r.sure)]
+                                          for r in g.itertuples(index=False)]
+    for i, n in (trk.get("risk_ids") or {}).items():
+        out["observed"][str(int(i))] = [int(n), len(out["booked"].get(str(int(i)), []))]
+    return out
 
 
 def hazard_by_lead(pairs: pd.DataFrame, horizon: int, smooth: int = 2):

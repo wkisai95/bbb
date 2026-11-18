@@ -113,3 +113,35 @@ def test_model_uses_the_bookings(tracked):
     assert rel["beta"]["pairs"] >= 50 and -5.0 < m["beta"] < -1.6                  # vero: -3
     rows = m["_listings"]
     assert len(rows[0]) == 15 and sum(1 for r in rows if r[13] > 0) > 200
+
+
+def test_realized_for_the_app(tmp_path):
+    """Riscontro: per ogni annuncio le finestre prenotate (date come giorni dopo since) e le letture in cui era libero."""
+    from datetime import date as _date, timedelta as _td
+
+    from bnb import model, publish, scan, track
+    from bnb.config import load_settings
+    from bnb.sim import SimClient, SimMarket
+    from bnb.store import Store
+
+    cfg = load_settings()
+    start = _date(2026, 3, 2)
+    mk = SimMarket(start, n=500, seed=3, days=8)
+    store = Store(str(tmp_path))
+    for k in range(0, 5, 2):                     # tre scansioni a due giorni di distanza: due confronti per finestra
+        day = start + _td(days=k)
+        scan.run_scan(cfg, store, SimClient(mk, day), day, log=lambda *a: None)
+    today = start + _td(days=4)
+    trk = track.detect(store, today)
+    r = track.realized(trk, today)
+    assert r["since"] == (today - _td(days=45)).isoformat()
+    assert r["booked"] and r["observed"]
+    for lid, ev in r["booked"].items():
+        assert r["observed"][lid][1] == len(ev) <= r["observed"][lid][0]
+        for arr, seen, pn, sure in ev:
+            assert 0 < seen <= arr and (pn is None or pn > 0) and sure in (0, 1)
+    m = model.build(store, cfg, today, log=lambda *a: None)
+    publish.publish(store, m, today, None, cfg, log=lambda *a: None)
+    pub = store.read_json("public/realizzo.json", {})
+    assert pub["fields"] == ["arrivo", "rilevata", "prezzo_notte", "confermata"] and pub["booked"] == r["booked"]
+    assert "_realized" not in store.read_json("public/model.json", {})
