@@ -3,16 +3,16 @@
  "program": "1.0.0",
  "generated": "2026-11-19",
  "city": "Bologna",
- "last_scan": "2026-11-18",
+ "last_scan": "2026-11-19",
  "run": {
-  "date": "2026-11-18",
-  "requests": 1296,
+  "date": "2026-11-19",
+  "requests": 1584,
   "errors": 1,
-  "prices": 38292,
-  "windows": 67,
-  "census": 15,
+  "prices": 35225,
+  "windows": 58,
+  "census": 11,
   "stopped": "",
-  "secs": 2214.1
+  "secs": 2696.7
  },
  "inside_airbnb": {
   "snapshot": "2026-09-19",
@@ -23,8 +23,8 @@
  },
  "has_model": true,
  "warnings": [],
- "scan_days": 4,
- "listings": 3133,
- "n_obs": 91795,
- "median_price": 132
+ "scan_days": 5,
+ "listings": 3143,
+ "n_obs": 99013,
+ "median_price": 131
 }
