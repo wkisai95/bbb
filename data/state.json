@@ -105,22 +105,22 @@
  },
  "inside_airbnb": {
   "snapshot": "2026-09-19",
-  "merged": "2026-11-15",
+  "merged": "2026-11-22",
   "rows": 3997,
-  "added": 3997,
-  "guests_filled": 3997
+  "added": 0,
+  "guests_filled": 0
  },
- "tile_supply_day": "2026-11-15",
- "last_scan": "2026-11-21",
+ "tile_supply_day": "2026-11-22",
+ "last_scan": "2026-11-22",
  "last_run": {
-  "date": "2026-11-21",
-  "requests": 1588,
-  "errors": 1,
-  "prices": 34133,
-  "windows": 49,
-  "census": 8,
+  "date": "2026-11-22",
+  "requests": 1596,
+  "errors": 2,
+  "prices": 34487,
+  "windows": 48,
+  "census": 9,
   "stopped": "",
-  "secs": 2721.3
+  "secs": 2780.6
  },
  "calibration_tried": "2026-11-16"
 }

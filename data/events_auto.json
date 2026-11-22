@@ -1,25 +1,10 @@
 {
- "updated": "2026-11-21",
+ "updated": "2026-11-22",
  "sources": {
   "bolognafiere": true,
   "bolognawelcome": true
  },
  "events": [
-  {
-   "name": "AIOP XLV Congresso Internazionale",
-   "start": "2026-11-19",
-   "end": "2026-11-21",
-   "venue": "Bologna Congress Center",
-   "category": "congresso",
-   "weight": 1,
-   "source": "auto",
-   "note": "",
-   "nights_from": null,
-   "nights_to": null,
-   "id": "aiop-xlv-congresso-internazionale-2026-11-19",
-   "night_first": "2026-11-18",
-   "night_last": "2026-11-20"
-  },
   {
    "name": "Mercato dei Vini dei Vignaioli Indipendenti 2026",
    "start": "2026-11-21",
@@ -844,21 +829,6 @@
    "id": "anna-2026-12-17",
    "night_first": "2026-12-17",
    "night_last": "2026-12-17"
-  },
-  {
-   "name": "Shiva",
-   "start": "2026-11-21",
-   "end": "2026-11-21",
-   "venue": "Unipol Arena",
-   "category": "concerto",
-   "weight": 1,
-   "source": "auto",
-   "note": "",
-   "nights_from": null,
-   "nights_to": null,
-   "id": "shiva-2026-11-21",
-   "night_first": "2026-11-21",
-   "night_last": "2026-11-21"
   },
   {
    "name": "Cesare Cremonini",

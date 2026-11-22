@@ -1,0 +1,98 @@
+{
+ "date": "2026-11-22",
+ "started": "2026-11-22T11:41:27Z",
+ "stopped": "",
+ "windows": 48,
+ "census": 9,
+ "prices": 34487,
+ "details": 2,
+ "phases": [
+  {
+   "name": "offerta",
+   "requests": 20,
+   "secs": 69.2
+  },
+  {
+   "name": "date seguite",
+   "requests": 1247,
+   "secs": 2133.8
+  },
+  {
+   "name": "date vicine",
+   "requests": 165,
+   "secs": 280.8
+  },
+  {
+   "name": "notti singole",
+   "requests": 21,
+   "secs": 34.6
+  },
+  {
+   "name": "date lontane ed eventi",
+   "requests": 138,
+   "secs": 232.0
+  },
+  {
+   "name": "capienze",
+   "requests": 3,
+   "secs": 18.8
+  }
+ ],
+ "single_windows": 21,
+ "track": {
+  "windows": 15,
+  "complete": 9,
+  "requests": 947,
+  "splits": 2,
+  "resplits": 87,
+  "found": 23910,
+  "expected": 24541
+ },
+ "price_extras": {
+  "prices": 50707,
+  "stripped": 17,
+  "tax": 0,
+  "cleaning": 17,
+  "service": 0,
+  "tax_eur": 0.0,
+  "cleaning_eur": 2040.0,
+  "service_eur": 0.0,
+  "samples": [
+   {
+    "id": 1577112587294490579,
+    "checkin": "2026-12-01",
+    "price": 604.0,
+    "extra": {
+     "cleaning": 120.0
+    }
+   },
+   {
+    "id": 1577112587294490579,
+    "checkin": "2026-12-01",
+    "price": 604.0,
+    "extra": {
+     "cleaning": 120.0
+    }
+   },
+   {
+    "id": 1577112587294490579,
+    "checkin": "2026-12-03",
+    "price": 604.0,
+    "extra": {
+     "cleaning": 120.0
+    }
+   }
+  ]
+ },
+ "requests": 1596,
+ "errors": 2,
+ "error_samples": [
+  "SSLError('Failed to perform, curl: (35) Recv failure: Connection reset by peer. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.')",
+  "HTTPError('HTTP Error 410: ')"
+ ],
+ "listings": 4230,
+ "secs": 2780.6,
+ "finished": "2026-11-22T12:27:48Z",
+ "windows_planned": 66,
+ "source": "AirbnbClient"
+}
