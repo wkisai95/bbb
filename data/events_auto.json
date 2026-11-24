@@ -1,25 +1,10 @@
 {
- "updated": "2026-11-23",
+ "updated": "2026-11-24",
  "sources": {
   "bolognafiere": true,
   "bolognawelcome": true
  },
  "events": [
-  {
-   "name": "Mercato dei Vini dei Vignaioli Indipendenti 2026",
-   "start": "2026-11-21",
-   "end": "2026-11-23",
-   "venue": "BolognaFiere",
-   "category": "fiera",
-   "weight": 1,
-   "source": "auto",
-   "note": "",
-   "nights_from": null,
-   "nights_to": null,
-   "id": "mercato-dei-vini-dei-vignaioli-indipende-2026-11-21",
-   "night_first": "2026-11-20",
-   "night_last": "2026-11-22"
-  },
   {
    "name": "Davis Cup by Generali Final 8",
    "start": "2026-11-24",

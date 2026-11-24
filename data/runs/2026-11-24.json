@@ -1,0 +1,97 @@
+{
+ "date": "2026-11-24",
+ "started": "2026-11-24T13:59:05Z",
+ "stopped": "",
+ "windows": 51,
+ "census": 11,
+ "prices": 35079,
+ "details": 4,
+ "phases": [
+  {
+   "name": "offerta",
+   "requests": 3,
+   "secs": 4.8
+  },
+  {
+   "name": "date seguite",
+   "requests": 1237,
+   "secs": 2117.1
+  },
+  {
+   "name": "date vicine",
+   "requests": 165,
+   "secs": 282.6
+  },
+  {
+   "name": "notti singole",
+   "requests": 21,
+   "secs": 35.0
+  },
+  {
+   "name": "date lontane ed eventi",
+   "requests": 161,
+   "secs": 280.9
+  },
+  {
+   "name": "capienze",
+   "requests": 5,
+   "secs": 21.7
+  }
+ ],
+ "single_windows": 21,
+ "track": {
+  "windows": 15,
+  "complete": 11,
+  "requests": 937,
+  "splits": 2,
+  "resplits": 81,
+  "found": 23850,
+  "expected": 24227
+ },
+ "price_extras": {
+  "prices": 50983,
+  "stripped": 19,
+  "tax": 0,
+  "cleaning": 19,
+  "service": 0,
+  "tax_eur": 0.0,
+  "cleaning_eur": 2280.0,
+  "service_eur": 0.0,
+  "samples": [
+   {
+    "id": 1577112587294490579,
+    "checkin": "2026-12-01",
+    "price": 604.0,
+    "extra": {
+     "cleaning": 120.0
+    }
+   },
+   {
+    "id": 1577112587294490579,
+    "checkin": "2026-12-01",
+    "price": 604.0,
+    "extra": {
+     "cleaning": 120.0
+    }
+   },
+   {
+    "id": 1577112587294490579,
+    "checkin": "2026-12-03",
+    "price": 604.0,
+    "extra": {
+     "cleaning": 120.0
+    }
+   }
+  ]
+ },
+ "requests": 1594,
+ "errors": 1,
+ "error_samples": [
+  "HTTPError('HTTP Error 410: ')"
+ ],
+ "listings": 4235,
+ "secs": 2745.2,
+ "finished": "2026-11-24T14:44:50Z",
+ "windows_planned": 65,
+ "source": "AirbnbClient"
+}
