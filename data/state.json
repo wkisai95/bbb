@@ -111,16 +111,16 @@
   "guests_filled": 0
  },
  "tile_supply_day": "2026-11-22",
- "last_scan": "2026-11-24",
+ "last_scan": "2026-11-25",
  "last_run": {
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "requests": 1594,
   "errors": 1,
-  "prices": 35079,
-  "windows": 51,
+  "prices": 36112,
+  "windows": 57,
   "census": 11,
   "stopped": "",
-  "secs": 2745.2
+  "secs": 2727.3
  },
  "calibration_tried": "2026-11-16"
 }

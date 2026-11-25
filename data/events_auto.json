@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24",
+ "updated": "2026-11-25",
  "sources": {
   "bolognafiere": true,
   "bolognawelcome": true
@@ -152,21 +152,6 @@
    "nights_from": null,
    "nights_to": null,
    "id": "mostra-mercato-del-fumetto-2026-11-28",
-   "night_first": "2026-11-27",
-   "night_last": "2026-11-28"
-  },
-  {
-   "name": "FIERA DELL’ELETTRONICA DI CONSUMO",
-   "start": "2026-11-28",
-   "end": "2026-11-29",
-   "venue": "BolognaFiere",
-   "category": "fiera",
-   "weight": 1,
-   "source": "auto",
-   "note": "",
-   "nights_from": null,
-   "nights_to": null,
-   "id": "fiera-dell-elettronica-di-consumo-2026-11-28",
    "night_first": "2026-11-27",
    "night_last": "2026-11-28"
   },
