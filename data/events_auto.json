@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25",
+ "updated": "2026-11-26",
  "sources": {
   "bolognafiere": true,
   "bolognawelcome": true
@@ -771,6 +771,21 @@
    "night_last": "2027-11-11"
   },
   {
+   "name": "I.U.C. – Italian Underground Conference",
+   "start": "2027-12-01",
+   "end": "2027-12-03",
+   "venue": "BolognaFiere",
+   "category": "congresso",
+   "weight": 2,
+   "source": "auto",
+   "note": "",
+   "nights_from": null,
+   "nights_to": null,
+   "id": "i-u-c-italian-underground-conference-2027-12-01",
+   "night_first": "2027-11-30",
+   "night_last": "2027-12-02"
+  },
+  {
    "name": "Pestmed",
    "start": "2028-03-01",
    "end": "2028-03-03",
@@ -784,21 +799,6 @@
    "id": "pestmed-2028-03-01",
    "night_first": "2028-02-29",
    "night_last": "2028-03-02"
-  },
-  {
-   "name": "Anna",
-   "start": "2026-12-17",
-   "end": "2026-12-17",
-   "venue": "Unipol Arena",
-   "category": "concerto",
-   "weight": 1,
-   "source": "auto",
-   "note": "",
-   "nights_from": null,
-   "nights_to": null,
-   "id": "anna-2026-12-17",
-   "night_first": "2026-12-17",
-   "night_last": "2026-12-17"
   },
   {
    "name": "Cesare Cremonini",
@@ -1099,6 +1099,21 @@
    "id": "eros-ramazzotti-2028-03-06",
    "night_first": "2028-03-06",
    "night_last": "2028-03-06"
+  },
+  {
+   "name": "Anna",
+   "start": "2026-12-17",
+   "end": "2026-12-17",
+   "venue": "Unipol Arena",
+   "category": "concerto",
+   "weight": 1,
+   "source": "auto",
+   "note": "",
+   "nights_from": null,
+   "nights_to": null,
+   "id": "anna-2026-12-17",
+   "night_first": "2026-12-17",
+   "night_last": "2026-12-17"
   }
  ]
 }
